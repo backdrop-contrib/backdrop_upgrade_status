@@ -1,0 +1,15 @@
+// $Id$
+
+Upgrade Status x.x-x.x, xxxx-xx-xx
+----------------------------------
+
+
+Upgrade Status 5.x-1.x, xxxx-xx-xx
+----------------------------------
+
+
+Upgrade Status 5.x-1.0, 2008-05-31
+----------------------------------
+Initial release of Upgrade Status.
+
+
