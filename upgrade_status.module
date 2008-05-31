@@ -369,6 +369,10 @@ function theme_upgrade_status_report($data) {
   $rows = array();
 
   foreach ($data as $project) {
+    // Skip upgrade_status. Doesn't make sense to display it.
+    if ($project['name'] == 'upgrade_status') {
+      continue;
+    }
     switch ($project['status']) {
       case UPGRADE_STATUS_STABLE:
         $class = 'ok';

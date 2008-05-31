@@ -6,6 +6,7 @@ Upgrade Status x.x-x.x, xxxx-xx-xx
 
 Upgrade Status 5.x-1.x, xxxx-xx-xx
 ----------------------------------
+#264980 by sun: Removed upgrade_status from list output.
 Added pointer to Coder module to help porting modules.
 Fixed wrong URL for manually updating.
 Removed superfluous help text.
