@@ -1,0 +1,4 @@
+; $Id$
+name = Upgrade Status
+description = Checks to see if your installed modules are available for the next major release of Drupal.
+dependencies = update_status
