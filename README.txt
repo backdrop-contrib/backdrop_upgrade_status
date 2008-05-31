@@ -14,6 +14,18 @@ list of your projects along with a status, which can be one of the following:
 Clicking on any of the modules' boxes will expand the area and show you a link
 to download the new version of the project, as well as read its release notes.
 
+If one or more of your installed modules are not yet ported to a new Drupal
+major version, you should
+
+1) search the modules' issue queue for already existing issues that might
+   contain a patch, and test that patch yourself.  See
+   http://drupal.org/patch/apply for further information.
+
+2) go ahead and install Coder module (http://drupal.org/project/coder), use its
+   code review rules for migrating a module to the new Drupal version, create a
+   patch, and file a new issue against that project with your patch attached.
+   See http://drupal.org/patch/create for further information.
+
 If you've checked your projects out from CVS, you will need the CVS Deploy
 module (http://drupal.org/project/cvs_deploy) in order for this module to be
 able to read versions.

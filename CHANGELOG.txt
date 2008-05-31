@@ -6,6 +6,10 @@ Upgrade Status x.x-x.x, xxxx-xx-xx
 
 Upgrade Status 5.x-1.x, xxxx-xx-xx
 ----------------------------------
+Added pointer to Coder module to help porting modules.
+Fixed wrong URL for manually updating.
+Removed superfluous help text.
+Fixed ambigious CSS class for project title.
 
 
 Upgrade Status 5.x-1.0, 2008-05-31

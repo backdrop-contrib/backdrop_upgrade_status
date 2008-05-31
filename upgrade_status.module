@@ -43,23 +43,8 @@ define('UPGRADE_STATUS_CORE', 6);
  */
 function upgrade_status_help($section) {
   switch ($section) {
-    case 'admin/logs/updates/upgrade':
-      return t('<p>Upgrade Status module was designed to provide an easy way tell when your website is ready to be upgraded to the next Drupal version. The module will compile a list of your projects along with a status, which can be one of the following:</p>
-
-<ul>
-<li><strong>Available</strong>: A stable release of this project is available.</li>
-<li><strong>In development</strong>: A development release of this project is available, which can be installed for testing purposes.</li>
-<li><strong>Not ported yet</strong>: There are no releases available for this project.</li>
-</ul>
-
-<p>If you are having trouble seeing this list, please try:</p>
-
-<ul>
-<li><a href="!check">Manually refresh Upgrade Status\' database</a>.</li>
-</ul>', array('!check' => url('admin/logs/updates/upgrade/check')));
-    
     case 'admin/help#module':
-      $file = drupal_get_path('module', '...') .'/README.txt';
+      $file = drupal_get_path('module', 'upgrade_status') .'/README.txt';
       if (file_exists($file)) {
         return _filter_autop(file_get_contents($file));
       }
@@ -369,7 +354,7 @@ function theme_upgrade_status_report($data) {
   $last = variable_get('upgrade_status_last', 0);
   $output = '<p>'. t("Clicking on any of the modules' boxes will expand the area and show you a link to download the new version of the project, as well as read its release notes.") .'</p>';
   $output .= '<div class="upgrade-status checked">'. t('Last checked: ') . ($last ? format_interval(time() - $last) .' '. t('ago') : t('Never'));
-  $output .= ' <span class="check-manually">('. l(t('Check manually'), 'admin/logs/updates/check') .')</span>';
+  $output .= ' <span class="check-manually">('. l(t('Check manually'), 'admin/logs/updates/upgrade/check') .')</span>';
   $output .= "</div>\n";
 
   if (!is_array($data)) {
@@ -438,7 +423,7 @@ function theme_upgrade_status_report($data) {
     $row .= '<span class="icon">'. $icon .'</span>';
     $row .= "</div>\n";
 
-    $row .= '<span class="title">';
+    $row .= '<span class="project-title">';
     if (isset($project['title'])) {
       if (isset($project['link'])) {
         $row .= l($project['title'], $project['link']);
