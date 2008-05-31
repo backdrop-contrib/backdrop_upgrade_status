@@ -57,6 +57,7 @@ function upgrade_status_menu($may_cache) {
       'path' => 'admin/logs/updates/upgrade/list',
       'title' => t('List'),
       'type' => MENU_DEFAULT_LOCAL_TASK,
+      'weight' => -10,
     );
     $items[] = array(
       'path' => 'admin/logs/updates/upgrade/check',
