@@ -352,6 +352,8 @@ function upgrade_status_moved_into_core(&$projects, $project) {
  */
 function theme_upgrade_status_report($data) {
   $last = variable_get('upgrade_status_last', 0);
+  $current_data = update_status_get_available(TRUE);
+
   $output = '<p>'. t("Clicking on any of the modules' boxes will expand the area and show you a link to download the new version of the project, as well as read its release notes.") .'</p>';
   $output .= '<div class="upgrade-status checked">'. t('Last checked: ') . ($last ? format_interval(time() - $last) .' '. t('ago') : t('Never'));
   $output .= ' <span class="check-manually">('. l(t('Check manually'), 'admin/logs/updates/upgrade/check') .')</span>';
@@ -436,6 +438,17 @@ function theme_upgrade_status_report($data) {
         $row .= check_plain($project['title']);
       }
     }
+    // Couldn't find this project's data for the next version of Drupal core.
+    // Let's try the current one instead.
+    elseif (isset($current_data[$project['name']]) && isset($current_data[$project['name']]['title'])) {
+      if (isset($current_data[$project['name']]['link'])) {
+        $row .= l($current_data[$project['name']]['title'], $current_data[$project['name']]['link']);
+      }
+      else {
+        $row .= check_plain($current_data[$project_name]['title']);
+      }
+    }
+    // Otherwise, just print the name.
     else {
       $row .= check_plain($project['name']);
     }
