@@ -4,12 +4,13 @@
  * Attach collapsible behaviour.
  */
 Drupal.upgradeStatusAttach = function() {
-  $('table.upgrade-status .project:not(.processed)').each(function() {
+  $('table.upgrade-status .collapse-icon:not(.processed)').each(function() {
     $(this).addClass('upgrade-status-processed')
       .click(function() {
-        $('.details-wrapper', this).slideToggle('fast');
+        this.src = (this.src.match(/collapsed.png$/) ? this.src.replace(/collapsed.png$/, 'expanded.png') : this.src.replace(/expanded.png$/, 'collapsed.png'));
+        $('.details-wrapper', this.parentNode).slideToggle('fast');
       })
-      .children('.details-wrapper').hide();
+      .parent().children('.details-wrapper').hide();
   });
 };
 

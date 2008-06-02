@@ -3,6 +3,12 @@
 .upgrade-status .project {
   font-size: 110%;
   padding: 0.3em 0 0 1em;
+}
+.upgrade-status .project .collapse-icon {
+  margin: 0 .3em 0 0;
+  padding: .4em .8em .7em 0;
+  display: block;
+  float: left;
   cursor: pointer;
 }
 .upgrade-status .project .project-title {

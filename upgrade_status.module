@@ -429,6 +429,9 @@ function theme_upgrade_status_report($data) {
     $row .= '<span class="icon">'. $icon .'</span>';
     $row .= "</div>\n";
 
+    // Collapse-trigger icon.
+    $row .= theme('image', 'misc/menu-collapsed.png', '', '', array('class' => 'collapse-icon'));
+
     $row .= '<span class="project-title">';
     if (isset($project['title'])) {
       if (isset($project['link'])) {
