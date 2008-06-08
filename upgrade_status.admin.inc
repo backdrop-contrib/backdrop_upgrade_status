@@ -8,7 +8,7 @@
  */
 
 /**
- * Version of core we want to query for.
+ * Default version of core we want to query for.
  */
 define('UPGRADE_STATUS_CORE_VERSION', '6.x');
 
@@ -309,9 +309,11 @@ function theme_upgrade_status_report($data) {
   $current_data = update_status_get_available(TRUE);
 
   $output = '<p>'. t("Clicking on any of the modules' boxes will expand the area and show you a link to download the new version of the project, as well as read its release notes.") .'</p>';
-  $output .= '<div class="upgrade-status checked">'. t('Last checked: ') . ($last ? format_interval(time() - $last) .' '. t('ago') : t('Never'));
+  $output .= '<div class="upgrade-status checked"><p>'. t('Last checked: ') . ($last ? format_interval(time() - $last) .' '. t('ago') : t('Never'));
   $output .= ' <span class="check-manually">('. l(t('Check manually'), 'admin/logs/updates/upgrade/check') .')</span>';
-  $output .= "</div>\n";
+  $output .= "</p></div>\n";
+
+  $output .= drupal_get_form('upgrade_status_core_version_form');
 
   if (!is_array($data)) {
     $output .= '<p>'. $data .'</p>';
@@ -544,11 +546,12 @@ function upgrade_status_refresh() {
 
   $available = array();
   $data = array();
+  $version = variable_get('upgrade_status_core_version', UPGRADE_STATUS_CORE_VERSION);
 
   $projects = update_status_get_projects();
   foreach ($projects as $key => $project) {
-    // No site key to avoid hi-jacking module usage statistics. 31/05/2008 sun
-    $url = _upgrade_status_build_fetch_url($project);
+    // No site key to avoid hi-jacking module usage statistics.
+    $url = _upgrade_status_build_fetch_url($project, $version);
     $xml = drupal_http_request($url);
     if (isset($xml->data)) {
       $data[] = $xml->data;
@@ -577,29 +580,20 @@ function upgrade_status_refresh() {
  *
  * @param $project
  *   The array of project information from update_status_get_projects().
- * @param $site_key
- *   The anonymous site key hash (optional).
+ * @param $version
+ *   The target version of Drupal core you wish to query.
  *
  * @see upgrade_status_refresh()
  * @see update_status_get_projects()
  */
-function _upgrade_status_build_fetch_url($project, $site_key = '') {
+function _upgrade_status_build_fetch_url($project, $version) {
   $default_url = variable_get('upgrade_status_fetch_url', UPGRADE_STATUS_DEFAULT_URL);
   if (!isset($project['info']['project status url'])) {
     $project['info']['project status url'] = $default_url;
   }
   $name = $project['name'];
   $url = $project['info']['project status url'];
-  $url .= '/'. $name .'/'. UPGRADE_STATUS_CORE_VERSION;
-//  if (!empty($site_key)) {
-//    $url .= (strpos($url, '?') === TRUE) ? '&' : '?';
-//    $url .= 'site_key=';
-//    $url .= drupal_urlencode($site_key);
-//    if (!empty($project['info']['version'])) {
-//      $url .= '&version=';
-//      $url .= drupal_urlencode($project['info']['version']);
-//    }
-//  }
+  $url .= '/'. $name .'/'. $version;
   return $url;
 }
 
@@ -685,3 +679,43 @@ function upgrade_status_project_cache($cid) {
   }
   return $projects;
 }
+
+/**
+ * Form to display Drupal core version selection. 
+ */
+function upgrade_status_core_version_form() {
+  $form['upgrade_status_core_version'] = array(
+    '#type' => 'select',
+    '#title' => t('Target version of Drupal core'),
+    '#options' => drupal_map_assoc(array('6.x', '7.x')),
+    '#default_value' => variable_get('upgrade_status_core_version', UPGRADE_STATUS_CORE_VERSION),
+    '#description' => t('Select the version of Drupal core you wish to check for project status.'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Change'),
+  );
+  return $form;
+}
+
+/**
+ * Set the new Drupal core version in a variable; refresh project data.
+ */
+function upgrade_status_core_version_form_submit($form_id, $form_values) {
+  // Refresh status if a different version than the default has been selected.
+  if ($form_values['upgrade_status_core_version'] != UPGRADE_STATUS_CORE_VERSION) {
+    variable_set('upgrade_status_core_version', $form_values['upgrade_status_core_version']);
+    upgrade_status_refresh();
+  }
+  // Refresh status if the default version has been selected, but only if it
+  // was not selected before (noob protection).
+  else if (variable_get('upgrade_status_core_version', UPGRADE_STATUS_CORE_VERSION) != UPGRADE_STATUS_CORE_VERSION) {
+    variable_del('upgrade_status_core_version');
+    upgrade_status_refresh();
+  }
+  // ...or just ensure that we've got no stale variable set.
+  else {
+    variable_del('upgrade_status_core_version');
+  }
+}
+
