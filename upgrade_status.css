@@ -34,7 +34,8 @@
 }
 
 .upgrade-status .details-wrapper {
-  clear: right;
+  clear: both;
+  padding: 0 3.1em 0 1.8em;
   font-weight: normal;
   font-size: 90%;
 }
@@ -105,7 +106,6 @@ table.upgrade-status,
 
 .upgrade-status table.version .version-links {
   text-align: right;
-  padding-right: 1em;
 }
 
 .upgrade-status table.version-security .version-title {

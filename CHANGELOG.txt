@@ -6,6 +6,7 @@ Upgrade Status x.x-x.x, xxxx-xx-xx
 
 Upgrade Status 5.x-1.x, xxxx-xx-xx
 ----------------------------------
+Moved core functions of this module into separate upgrade_status.admin.inc.
 #265419 by sun: Fixed clicking on project title/link toggles collapse status.
 #265061 by webchick, sun: Added title and link for not (yet) upgraded modules.
 
