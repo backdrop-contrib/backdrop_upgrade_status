@@ -6,6 +6,7 @@ Upgrade Status x.x-x.x, xxxx-xx-xx
 
 Upgrade Status 5.x-1.x, xxxx-xx-xx
 ----------------------------------
+#268578 by dww, sun: Fixed missing modules moved into Drupal 6 core.
 
 
 Upgrade Status 5.x-1.2, 2008-06-08

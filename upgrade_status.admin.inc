@@ -279,6 +279,11 @@ function upgrade_status_calculate_project_data($available) {
 function upgrade_status_moved_into_core(&$projects, $project) {
   $core = TRUE;
   switch ($project) {
+    case 'actions':
+      $projects[$project]['in_core_since'] = '6.x';
+      $projects[$project]['in_core_note'] = t('Please note that the syntax for actions used by the 5.x-1.x and 4.7 versions of Actions module are different to triggers in Drupal 6.x. For further information please refer to the <a href="!project-url">Actions</a> module project page.', array('!project-url' => 'http://drupal.org/project/actions'));
+      break;
+
     case 'autolocale':
       $projects[$project]['in_core_since'] = '6.x';
       break;
@@ -287,9 +292,18 @@ function upgrade_status_moved_into_core(&$projects, $project) {
       $projects[$project]['in_core_since'] = '6.x';
       break;
 
+    case 'openid':
+      $projects[$project]['in_core_since'] = '6.x';
+      break;
+
     case 'update_status':
       $projects[$project]['in_core_since'] = '6.x';
       $projects[$project]['in_core_note'] = t('Please note that some of the advanced settings in the 5.x version of Update status are not present in the update.module in 6.x core, and have been moved into the <a href="!project-url">Update status advanced settings</a> module for Drupal 6.x and beyond.', array('!project-url' => 'http://drupal.org/project/update_advanced'));
+      break;
+
+    case 'user_status':
+      $projects[$project]['in_core_since'] = '6.x';
+      $projects[$project]['in_core_note'] = t('There is no database upgrade path for sites that used the 5.x version of the user_status module to migrate the message templates to the new settings in core. Furthermore, the place-holders available in these templates are different in 6.x core. Therefore, users will have to re-enter their message templates into the core settings at admin/user/settings.');
       break;
 
     default:
