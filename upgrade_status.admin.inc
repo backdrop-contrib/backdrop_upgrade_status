@@ -284,7 +284,19 @@ function upgrade_status_moved_into_core(&$projects, $project) {
       $projects[$project]['in_core_note'] = t('Please note that the syntax for actions used by the 5.x-1.x and 4.7 versions of Actions module are different to triggers in Drupal 6.x. For further information please refer to the <a href="!project-url">Actions</a> module project page.', array('!project-url' => 'http://drupal.org/project/actions'));
       break;
 
+    case 'ahah_forms':
+      $projects[$project]['in_core_since'] = '6.x';
+      break;
+
     case 'autolocale':
+      $projects[$project]['in_core_since'] = '6.x';
+      break;
+
+    case 'book_bridge':
+      $projects[$project]['in_core_since'] = '6.x';
+      break;
+
+    case 'html_to_text':
       $projects[$project]['in_core_since'] = '6.x';
       break;
 
@@ -293,6 +305,10 @@ function upgrade_status_moved_into_core(&$projects, $project) {
       break;
 
     case 'openid':
+      $projects[$project]['in_core_since'] = '6.x';
+      break;
+
+    case 'themesettingsapi':
       $projects[$project]['in_core_since'] = '6.x';
       break;
 
