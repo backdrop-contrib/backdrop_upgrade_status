@@ -37,17 +37,10 @@ function upgrade_status_menu($may_cache) {
       'weight' => 10,
     );
     $items[] = array(
-      'path' => 'admin/logs/updates/upgrade/list',
-      'title' => t('List'),
-      'type' => MENU_DEFAULT_LOCAL_TASK,
-      'weight' => -10,
-    );
-    $items[] = array(
       'path' => 'admin/logs/updates/upgrade/check',
-      'title' => t('Check'),
       'callback' => 'upgrade_status_manual_status',
       'access' => $admin_access,
-      'type' => MENU_LOCAL_TASK,
+      'type' => MENU_CALLBACK,
     );
   }
   return $items;
