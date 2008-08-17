@@ -50,7 +50,7 @@ Bug reports, feature suggestions and latest developments:
 
 -- USAGE --
 
-* Go to administer >> Logs >> Available updates >> Upgrade status and check the
+* Go to Administer >> Logs >> Available updates >> Upgrade status and check the
   status of your installed modules.
 
 
