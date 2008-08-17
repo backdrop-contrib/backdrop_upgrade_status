@@ -42,13 +42,12 @@ define('UPGRADE_STATUS_CORE', 6);
  * Menu callback. Generate a page about the upgrade status of projects.
  */
 function _upgrade_status_status() {
-  if ($available = upgrade_status_get_available(TRUE)) {
+  if ($available = upgrade_status_get_available()) {
     $data = upgrade_status_calculate_project_data($available);
     return theme('upgrade_status_report', $data);
   }
   else {
-    return theme('upgrade_status_report', t('No information is available about potential new releases for currently installed modules. To check for updates, you may need to <a href="@run_cron">run cron</a> or you can <a href="@check_manually">check manually</a>. Please note that checking for available updates can take a long time, so please be patient.', array(
-      '@run_cron' => url('admin/logs/status/run-cron', $destination),
+    return theme('upgrade_status_report', t('No information is available about potential new releases for currently installed modules. To check for updates, you can <a href="@check_manually">check manually</a>. Please note that checking for available updates can take a long time, so please be patient.', array(
       '@check_manually' => url('admin/logs/updates/check', $destination),
     )));
   }
@@ -591,7 +590,7 @@ function upgrade_status_refresh() {
   if ($data) {
     $parser = new update_status_xml_parser;
     $available = $parser->parse($data);
-    cache_set('upgrade_status_info', 'cache', serialize($available), time() + (60 * 60 * 24));
+    cache_set('upgrade_status_info', 'cache', serialize($available));
     variable_set('upgrade_status_last', time());
     watchdog('upgrade_status', t('Fetched information about all available new releases and updates.'), WATCHDOG_NOTICE, l('view', 'admin/logs/updates'));
   }
@@ -637,27 +636,10 @@ function _upgrade_status_build_fetch_url($project, $version) {
  */
 function upgrade_status_get_available($refresh = FALSE) {
   $available = array();
-
-  // First, make sure that none of the .info files have a change time newer
-  // than the last time we checked for available updates. If something was
-  // changed, it almost certainly means a new version was installed. Without
-  // fresh data, the logic in upgrade_status_calculate_project_data() will be
-  // wrong and produce confusing, bogus results.
-  $needs_refresh = FALSE;
-  $last_check = variable_get('upgrade_status_last', 0);
-  $projects = update_status_get_projects();
-  foreach ($projects as $key => $project) {
-    if ($project['info']['_info_file_ctime'] > $last_check) {
-      $needs_refresh = TRUE;
-      break;
-    }
-  }
-
-  if (!$needs_refresh && ($cache = cache_get('upgrade_status_info', 'cache'))
-      && $cache->expire > time()) {
+  if (!$refresh && $cache = cache_get('upgrade_status_info', 'cache')) {
     $available = unserialize($cache->data);
   }
-  elseif ($needs_refresh || $refresh) {
+  else {
     $available = upgrade_status_refresh();
   }
   return $available;
@@ -693,16 +675,7 @@ function upgrade_status_invalidate_cache() {
  */
 function upgrade_status_project_cache($cid) {
   $projects = array();
-
-  // In some cases, we must clear the cache.  Rather than do so on a time
-  // basis, we check for specific paths.
-  $q = $_GET['q'];
-  $paths = array('admin/logs/updates/upgrade', 'admin/logs/updates/upgrade/check');
-  if (in_array($q, $paths)) {
-    cache_clear_all($cid, 'cache');
-  }
-  else {
-    $cache = cache_get($cid, 'cache');
+  if ($cache = cache_get($cid, 'cache')) {
     if (!empty($cache->data) && $cache->expire > time()) {
       $projects = unserialize($cache->data);
     }
