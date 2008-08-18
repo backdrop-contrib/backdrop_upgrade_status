@@ -295,6 +295,10 @@ function upgrade_status_moved_into_core(&$projects, $project) {
       $projects[$project]['in_core_since'] = '6.x';
       break;
 
+    case 'find_path':
+      $projects[$project]['in_core_since'] = '6.x';
+      break;
+
     case 'html_to_text':
       $projects[$project]['in_core_since'] = '6.x';
       break;
