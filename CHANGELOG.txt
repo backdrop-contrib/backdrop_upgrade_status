@@ -6,6 +6,7 @@ Upgrade Status x.x-x.x, xxxx-xx-xx
 
 Upgrade Status 5.x-1.x, xxxx-xx-xx
 ----------------------------------
+#303279 by sun: Added JavaScript Aggregator moved into Drupal 6 core.
 #270531 by sun: Added Find Path to modules moved into Drupal 6 core.
 
 

@@ -307,6 +307,10 @@ function upgrade_status_moved_into_core(&$projects, $project) {
       $projects[$project]['in_core_since'] = '6.x';
       break;
 
+    case 'javascript_aggregator':
+      $projects[$project]['in_core_since'] = '6.x';
+      break;
+
     case 'openid':
       $projects[$project]['in_core_since'] = '6.x';
       break;
