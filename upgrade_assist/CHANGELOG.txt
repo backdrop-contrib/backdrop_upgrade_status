@@ -1,0 +1,10 @@
+// $Id$
+
+Upgrade Assist x.x-x.x, xxxx-xx-xx
+----------------------------------
+
+
+Upgrade Assist 5.x-1.x, xxxx-xx-xx
+----------------------------------
+by sun: Added first draft of Upgrade Assist module.
+
