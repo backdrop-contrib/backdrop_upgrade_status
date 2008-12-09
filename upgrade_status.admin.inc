@@ -309,6 +309,7 @@ function upgrade_status_moved_into_core(&$projects, $project) {
 
     case 'javascript_aggregator':
       $projects[$project]['in_core_since'] = '6.x';
+      $projects[$project]['in_core_note'] = t('Please note that there is a version of <a href="!project-url">JavaScript Aggregator</a> module for Drupal 6.x, which additionally minifies JavaScript.', array('!project-url' => 'http://drupal.org/project/javascript_aggregator'));
       break;
 
     case 'openid':
