@@ -28,7 +28,6 @@ function upgrade_status_menu() {
   $items['admin/reports/updates/upgrade'] = array(
     'title' => 'Upgrade status',
     'page callback' => 'upgrade_status_status',
-    'access callback' => 'user_access',
     'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
@@ -36,7 +35,6 @@ function upgrade_status_menu() {
   );
   $items['admin/reports/updates/upgrade/check'] = array(
     'page callback' => 'upgrade_status_manual_status',
-    'access callback' => 'user_access',
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
     'file' => 'upgrade_status.admin.inc'
@@ -50,18 +48,12 @@ function upgrade_status_menu() {
 function upgrade_status_theme() {
   return array(
     'upgrade_status_report' => array(
+      'arguments' => array('data' => NULL),
       'file' => 'upgrade_status.admin.inc',
-      'arguments' => array(
-        'data' => NULL,
-      ),
     ),
     'upgrade_status_version' => array(
+      'arguments' => array('version' => NULL, 'tag' => NULL, 'class' => NULL),
       'file' => 'upgrade_status.admin.inc',
-      'arguments' => array(
-        'version' => NULL,
-        'tag' => NULL,
-        'class' => NULL,
-      ),
     ),
   );
 }
