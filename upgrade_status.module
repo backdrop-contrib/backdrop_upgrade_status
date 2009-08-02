@@ -10,8 +10,8 @@
 /**
  * Implementation of hook_help().
  */
-function upgrade_status_help($section) {
-  switch ($section) {
+function upgrade_status_help($path, $arg) {
+  switch ($path) {
     case 'admin/help#module':
       $file = drupal_get_path('module', 'upgrade_status') .'/README.txt';
       if (file_exists($file)) {
@@ -24,45 +24,45 @@ function upgrade_status_help($section) {
 /**
  * Implementation of hook_menu().
  */
-function upgrade_status_menu($may_cache) {
-  $items = array();
-  if ($may_cache) {
-    $admin_access = user_access('administer site configuration');
-    $items[] = array(
-      'path' => 'admin/logs/updates/upgrade',
-      'title' => t('Upgrade status'),
-      'callback' => 'upgrade_status_status',
-      'access' => $admin_access,
-      'type' => MENU_LOCAL_TASK,
-      'weight' => 10,
-    );
-    $items[] = array(
-      'path' => 'admin/logs/updates/upgrade/check',
-      'callback' => 'upgrade_status_manual_status',
-      'access' => $admin_access,
-      'type' => MENU_CALLBACK,
-    );
-  }
+function upgrade_status_menu() {
+  $items['admin/reports/updates/upgrade'] = array(
+    'title' => 'Upgrade status',
+    'page callback' => 'upgrade_status_status',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+    'file' => 'upgrade_status.admin.inc'
+  );
+  $items['admin/reports/updates/upgrade/check'] = array(
+    'page callback' => 'upgrade_status_manual_status',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+    'file' => 'upgrade_status.admin.inc'
+  );
   return $items;
 }
 
 /**
- * Menu callback. Generate a page about the upgrade status of projects.
- *
- * Stub function for Drupal 5.x.
+ * Implementation of hook_theme().
  */
-function upgrade_status_status() {
-  require_once drupal_get_path('module', 'upgrade_status') .'/upgrade_status.admin.inc';
-  return _upgrade_status_status();
-}
-
-/**
- * Menu callback to manually check the upgrade status.
- *
- * Stub function for Drupal 5.x.
- */
-function upgrade_status_manual_status() {
-  require_once drupal_get_path('module', 'upgrade_status') .'/upgrade_status.admin.inc';
-  return _upgrade_status_manual_status();
+function upgrade_status_theme() {
+  return array(
+    'upgrade_status_report' => array(
+      'file' => 'upgrade_status.admin.inc',
+      'arguments' => array(
+        'data' => NULL,
+      ),
+    ),
+    'upgrade_status_version' => array(
+      'file' => 'upgrade_status.admin.inc',
+      'arguments' => array(
+        'version' => NULL,
+        'tag' => NULL,
+        'class' => NULL,
+      ),
+    ),
+  );
 }
 

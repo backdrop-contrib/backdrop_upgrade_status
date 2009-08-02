@@ -10,7 +10,7 @@
 /**
  * Default version of core we want to query for.
  */
-define('UPGRADE_STATUS_CORE_VERSION', '6.x');
+define('UPGRADE_STATUS_CORE_VERSION', '7.x');
 
 /**
  * URL to check updates at, if a given project doesn't define its own.
@@ -41,14 +41,14 @@ define('UPGRADE_STATUS_CORE', 6);
 /**
  * Menu callback. Generate a page about the upgrade status of projects.
  */
-function _upgrade_status_status() {
+function upgrade_status_status() {
   if ($available = upgrade_status_get_available()) {
     $data = upgrade_status_calculate_project_data($available);
     return theme('upgrade_status_report', $data);
   }
   else {
     return theme('upgrade_status_report', t('No information is available about potential new releases for currently installed modules. To check for updates, you can <a href="@check_manually">check manually</a>. Please note that checking for available updates can take a long time, so please be patient.', array(
-      '@check_manually' => url('admin/logs/updates/check', $destination),
+      '@check_manually' => url('admin/reports/updates/check', array('query' => array('query' => $destination))),
     )));
   }
 }
@@ -56,14 +56,14 @@ function _upgrade_status_status() {
 /**
  * Menu callback to manually check the upgrade status.
  */
-function _upgrade_status_manual_status() {
+function upgrade_status_manual_status() {
   if (upgrade_status_refresh()) {
     drupal_set_message(t('Fetched information about all available upgrades.'));
   }
   else {
     drupal_set_message(t('Unable to fetch any information on available upgrades.'), 'error');
   }
-  drupal_goto('admin/logs/updates/upgrade');
+  drupal_goto('admin/reports/updates/upgrade');
 }
 
 /**
@@ -94,8 +94,9 @@ function upgrade_status_calculate_project_data($available) {
     return $projects;
   }
 
-  $projects = update_status_get_projects();
-  update_status_process_project_info($projects);
+  module_load_include('inc', 'update', 'update.compare');
+  $projects = update_get_projects();
+  update_process_project_info($projects);
   $settings = variable_get('upgrade_status_settings', array());
   foreach ($projects as $project => $project_info) {
     if (isset($available[$project])) {
@@ -259,7 +260,7 @@ function upgrade_status_calculate_project_data($available) {
       $projects[$project]['reason'] = t('Not ported yet');
     }
   }
-  cache_set('upgrade_status_data', 'cache', serialize($projects), time() + (60 * 60));
+  cache_set('upgrade_status_data', $projects, 'cache', time() + (60 * 60));
   return $projects;
 }
 
@@ -344,11 +345,11 @@ function upgrade_status_moved_into_core(&$projects, $project) {
  */
 function theme_upgrade_status_report($data) {
   $last = variable_get('upgrade_status_last', 0);
-  $current_data = update_status_get_available(TRUE);
+  $current_data = update_get_available(TRUE);
 
   $output = '<p>'. t("Clicking on any of the modules' boxes will expand the area and show you a link to download the new version of the project, as well as read its release notes.") .'</p>';
   $output .= '<div class="upgrade-status checked"><p>'. t('Last checked: ') . ($last ? format_interval(time() - $last) .' '. t('ago') : t('Never'));
-  $output .= ' <span class="check-manually">('. l(t('Check manually'), 'admin/logs/updates/upgrade/check') .')</span>';
+  $output .= ' <span class="check-manually">('. l(t('Check manually'), 'admin/reports/updates/upgrade/check') .')</span>';
   $output .= "</p></div>\n";
 
   $output .= drupal_get_form('upgrade_status_core_version_form');
@@ -531,7 +532,7 @@ function theme_upgrade_status_report($data) {
     }
 
     $row .= '<div class="modules">';
-    $row .= t('Includes: %modules', array('%modules' => implode(', ', $project['modules'])));
+    $row .= t('Includes: %modules', array('%modules' => implode(', ', $project['includes'])));
     $row .= "</div>\n";
 
     $row .= "</div>\n"; // info div.
@@ -586,7 +587,8 @@ function upgrade_status_refresh() {
   $data = array();
   $version = variable_get('upgrade_status_core_version', UPGRADE_STATUS_CORE_VERSION);
 
-  $projects = update_status_get_projects();
+  module_load_include('inc', 'update', 'update.compare');
+  $projects = update_get_projects();
   foreach ($projects as $key => $project) {
     // No site key to avoid hi-jacking module usage statistics.
     $url = _upgrade_status_build_fetch_url($project, $version);
@@ -597,14 +599,15 @@ function upgrade_status_refresh() {
   }
 
   if ($data) {
-    $parser = new update_status_xml_parser;
+    module_load_include('inc', 'update', 'update.fetch');
+    $parser = new update_xml_parser;
     $available = $parser->parse($data);
-    cache_set('upgrade_status_info', 'cache', serialize($available));
+    cache_set('upgrade_status_info', $available);
     variable_set('upgrade_status_last', time());
-    watchdog('upgrade_status', t('Fetched information about all available new releases and updates.'), WATCHDOG_NOTICE, l('view', 'admin/logs/updates'));
+    watchdog('upgrade_status', 'Fetched information about all available new releases and updates.', array(), WATCHDOG_NOTICE, l('view', 'admin/reports/updates'));
   }
   else {
-    watchdog('upgrade_status', 'Unable to fetch any information on available new releases and updates.', WATCHDOG_ERROR, l('view', 'admin/logs/updates'));
+    watchdog('upgrade_status', 'Unable to fetch any information on available new releases and updates.', array(), WATCHDOG_ERROR, l('view', 'admin/reports/updates'));
   }
   return $available;
 }
@@ -646,7 +649,7 @@ function _upgrade_status_build_fetch_url($project, $version) {
 function upgrade_status_get_available($refresh = FALSE) {
   $available = array();
   if (!$refresh && $cache = cache_get('upgrade_status_info', 'cache')) {
-    $available = unserialize($cache->data);
+    $available = $cache->data;
   }
   else {
     $available = upgrade_status_refresh();
@@ -686,7 +689,7 @@ function upgrade_status_project_cache($cid) {
   $projects = array();
   if ($cache = cache_get($cid, 'cache')) {
     if (!empty($cache->data) && $cache->expire > time()) {
-      $projects = unserialize($cache->data);
+      $projects = $cache->data;
     }
   }
   return $projects;
@@ -695,11 +698,11 @@ function upgrade_status_project_cache($cid) {
 /**
  * Form to display Drupal core version selection. 
  */
-function upgrade_status_core_version_form() {
+function upgrade_status_core_version_form(&$form_state) {
   $form['upgrade_status_core_version'] = array(
     '#type' => 'select',
     '#title' => t('Target version of Drupal core'),
-    '#options' => drupal_map_assoc(array('6.x', '7.x')),
+    '#options' => drupal_map_assoc(array('7.x', '8.x')),
     '#default_value' => variable_get('upgrade_status_core_version', UPGRADE_STATUS_CORE_VERSION),
     '#description' => t('Select the version of Drupal core you wish to check for project status.'),
   );
@@ -713,10 +716,10 @@ function upgrade_status_core_version_form() {
 /**
  * Set the new Drupal core version in a variable; refresh project data.
  */
-function upgrade_status_core_version_form_submit($form_id, $form_values) {
+function upgrade_status_core_version_form_submit($form, &$form_state) {
   // Refresh status if a different version than the default has been selected.
-  if ($form_values['upgrade_status_core_version'] != UPGRADE_STATUS_CORE_VERSION) {
-    variable_set('upgrade_status_core_version', $form_values['upgrade_status_core_version']);
+  if ($form_state['values']['upgrade_status_core_version'] != UPGRADE_STATUS_CORE_VERSION) {
+    variable_set('upgrade_status_core_version', $form_state['values']['upgrade_status_core_version']);
     upgrade_status_refresh();
   }
   // Refresh status if the default version has been selected, but only if it
