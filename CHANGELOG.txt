@@ -6,6 +6,7 @@ Upgrade Status x.x-x.x, xxxx-xx-xx
 
 Upgrade Status 6.x-1.x, xxxx-xx-xx
 ----------------------------------
+#620714 by philbar, sun, klonos: Added modules which are in D7 core.
 by sun: Revamped entire module and synced with Update module.
 #728608 by philbar, sun: Fixed unsupported releases are missing status text.
 #297335 by naught101, Rob Loach, sun: Ported to 6.x.
