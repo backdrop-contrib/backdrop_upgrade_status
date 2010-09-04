@@ -410,6 +410,10 @@ function theme_upgrade_status_report($data) {
         $row .= '<span class="not-supported">'. t('Not ported yet') .'</span>';
         break;
       case UPGRADE_STATUS_DEVELOPMENT:
+      // Although unsupported releases should actually be unsupported, we treat
+      // them like development releases, since many maintainers merely use this
+      // additional flag to hide the release from novice Drupal users.
+      case UPDATE_STATUS_NOT_SUPPORTED:
         $row .= '<span class="not-current">'. t('In development') .'</span>';
         break;
       case UPGRADE_STATUS_STABLE:
