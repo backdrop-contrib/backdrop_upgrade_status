@@ -27,7 +27,9 @@
 }
 
 .upgrade-status .version-status .icon {
+  display: inline-block;
   padding-left: .5em;
+  width: 17px;
 }
 .upgrade-status .version-status .icon img {
   vertical-align: middle;

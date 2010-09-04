@@ -37,12 +37,6 @@ Bug reports, feature suggestions and latest developments:
   http://drupal.org/project/issues/upgrade_status
 
 
--- REQUIREMENTS --
-
-* Update Status
-  http://drupal.org/project/update_status
-
-
 -- INSTALLATION --
 
 * Install as usual, see http://drupal.org/node/70151 for further information.
@@ -50,8 +44,8 @@ Bug reports, feature suggestions and latest developments:
 
 -- USAGE --
 
-* Go to Administer >> Logs >> Available updates >> Upgrade status and check the
-  status of your installed modules.
+* Go to Administer >> Reports >> Available updates >> Upgrade status and check
+  the status of your installed modules.
 
 
 -- CONTACT --

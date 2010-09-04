@@ -1,5 +1,5 @@
 ; $Id$
-name = Upgrade Status
-description = Checks to see if your installed modules are available for the next major release of Drupal.
+name = Upgrade status
+description = Checks to see if the installed modules are available for the next major version of Drupal.
 core = 6.x
 dependencies[] = update
