@@ -6,6 +6,10 @@ Upgrade Status x.x-x.x, xxxx-xx-xx
 
 Upgrade Status 6.x-1.x, xxxx-xx-xx
 ----------------------------------
+
+
+Upgrade Status 6.x-1.0, 2010-09-05
+----------------------------------
 by sun: Removed .info for experimental and outdated Upgrade Assist module.
 #732054 by sun: Added support for Update status advanced module.
 by sun: Fixed PHP notice and styling for not yet ported components.
