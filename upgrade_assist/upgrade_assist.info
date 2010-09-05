@@ -1,5 +1,0 @@
-; $Id$
-name = Upgrade Assist
-description = Assists in upgrading Drupal. WARNING: Maintenance mode is enabled UPON ENABLING this module.
-; dependencies = update_status upgrade_status demo
-
