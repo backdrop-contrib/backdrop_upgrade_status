@@ -308,6 +308,12 @@ function upgrade_status_calculate_project_data($available) {
       $projects[$project]['reason'] = t('No available releases found');
     }
   }
+  // Give other modules a chance to alter the status (for example, to allow a
+  // contrib module to provide fine-grained settings to ignore specific
+  // projects or releases).
+  drupal_alter('update_status', $projects);
+  // US: Same for us, afterwards.
+  drupal_alter('upgrade_status', $projects);
 
   // Cache the site's update status for at most 1 hour.
   _update_cache_set('upgrade_status_project_data', $projects, time() + 3600);
