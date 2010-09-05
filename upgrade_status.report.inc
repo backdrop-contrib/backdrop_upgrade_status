@@ -159,7 +159,7 @@ function theme_upgrade_status_report($data) {
     $row .= '</span>';
     $row .= '<span class="existing-version">';
     $row .= ' '. check_plain($project['existing_version']);
-    if ($project['type'] == 'dev' && !empty($project['datestamp'])) {
+    if ($project['install_type'] == 'dev' && !empty($project['datestamp'])) {
       $row .= ' <span class="version-date">('. format_date($project['datestamp'], 'custom', 'Y-M-d') .')</span>';
     }
     $row .= '</span>';
