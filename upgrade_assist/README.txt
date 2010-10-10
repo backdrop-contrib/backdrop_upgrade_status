@@ -4,13 +4,13 @@
 
 Upgrade Assist module assists in upgrading a Drupal site.  It accounts for
 
+* UPGRADE.txt in Drupal core
+
 * http://drupal.org/upgrade/tutorial-introduction
 
 * http://drupal.org/project/cck
 
 This module is just a helper, to perform the right steps at the right time.
-You SHOULD NOT install or enable this module if you do not want to upgrade.
-
 
 For a full description visit the project page:
   http://drupal.org/project/upgrade_status
@@ -18,10 +18,7 @@ Bug reports, feature suggestions and latest developments:
   http://drupal.org/project/issues/upgrade_status
 
 
--- REQUIREMENTS --
-
-* Update Status
-  http://drupal.org/project/update_status
+-- RECOMMENDATIONS --
 
 * Demonstration Site
   http://drupal.org/project/demo
@@ -29,20 +26,14 @@ Bug reports, feature suggestions and latest developments:
 
 -- INSTALLATION --
 
-* You SHOULD NOT install or enable this module if you do not want to upgrade.
-
-
--- USAGE --
-
-* Enable the module to set your site offline.
-
-* Follow the on-screen directions.
+* Install the module and enable the "Upgrade tasks" block, if it does not appear
+  automatically.
 
 
 -- CONTACT --
 
 Current maintainers:
-* Daniel F. Kudwien (sun) - dev@unleashedmind.com
+* Daniel F. Kudwien (sun) <http://drupal.org/user/54136>
 
 
 This project has been sponsored by:

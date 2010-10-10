@@ -4,72 +4,150 @@
 /**
  * @file
  * Assists in upgrading Drupal.
- *
- * WARNING: Maintenance mode is enabled UPON ENABLING this module.
  */
 
 /**
  * Return upgrade states.
  *
- * @param $render
- *   (optional) TRUE to return an task list array suitable for theme_item_list().
+ * @param $item_list
+ *   (optional) Whether to return states in a structure suitable for
+ *   theme_item_list().
  */
-function upgrade_assist_states($render = FALSE) {
-  $states = array();
+function upgrade_assist_states($item_list = FALSE) {
+  // @todo Add drupal_alter() and move Demo functionality into Demo module.
+  module_load_include('inc', 'demo', 'demo.admin');
 
-  $states['offline'] = array(
-    'title' => t('Site set to offline'),
-    'status' => variable_get('site_offline', 0),
+  $core = variable_get('upgrade_assist_core', NULL);
+  $core_current = variable_get('upgrade_assist_core_current', NULL);
+  if (!isset($core) || !isset($core_current)) {
+    drupal_set_message(t('Upgrade Assist installation failure. Re-install the module to start over.'), 'error');
+    return;
+  }
+
+  $states['upgrade-status'] = array(
+    'title' => t('Check upgrade status'),
+    // This is purely informational, so always TRUE.
+    'status' => TRUE,
+    'href' => 'admin/reports/updates/upgrade',
+  );
+
+  $states['update-modules'] = array(
+    'title' => t('Update modules'),
+    // If Update (Status) module is not enabled, the module update status has to
+    // be confirmed manually.
+    'status' => NULL,
+  );
+  switch ($core) {
+    case 6:
+      $states['update-modules']['href'] = (module_exists('update') ? 'admin/reports/updates' : 'admin/build/modules');
+      break;
+
+    case 7:
+      $states['update-modules']['href'] = (module_exists('update') ? 'admin/reports/updates' : 'admin/modules');
+      break;
+  }
+  if (module_exists('update')) {
+    require_once './includes/install.inc';
+    $status = update_requirements('runtime');
+    foreach (array('core', 'contrib') as $report_type) {
+      $type = 'update_'. $report_type;
+      if (isset($status[$type]['severity'])) {
+        if ($status[$type]['severity'] == REQUIREMENT_ERROR) {
+          $states['update-modules']['status'] = FALSE;
+        }
+        elseif ($status[$type]['severity'] == REQUIREMENT_WARNING) {
+          $states['update-modules']['status'] = FALSE;
+        }
+      }
+    }
+  }
+
+  $states['maintenance-mode'] = array(
+    'title' => t('Enable maintenance mode'),
+    'status' => NULL,
+  );
+  switch ($core) {
+    case 6:
+      $states['maintenance-mode']['status'] = variable_get('site_offline', 0);
+      $states['maintenance-mode']['href'] = 'admin/settings/site-maintenance';
+      break;
+
+    case 7:
+      $states['maintenance-mode']['status'] = variable_get('maintenance_mode', 0);
+      $states['maintenance-mode']['href'] = 'admin/config/development/maintenance';
+      break;
+  }
+
+  $states['maintenance-theme'] = array(
+    'title' => t('Verify maintenance theme'),
+    'status' => FALSE,
+  );
+  switch ($core) {
+    case 6:
+      $upgrade_theme = 'garland';
+      break;
+
+    case 7:
+      $upgrade_theme = 'seven';
+      break;
+  }
+  $theme_path = drupal_get_path('theme', $upgrade_theme);
+  $maintenance_theme = variable_get('maintenance_theme', NULL);
+  if (file_exists($theme_path) && (!isset($maintenance_theme) || $maintenance_theme == $upgrade_theme)) {
+    $states['maintenance-theme']['status'] = $maintenance_theme;
+  }
+
+  $states['update-access'] = array(
+    'title' => t('Verify access to update.php'),
+    'status' => ($GLOBALS['user']->uid == 1 || !empty($GLOBALS['update_free_access'])),
   );
 
   $states['backup-current'] = array(
     'title' => t('Backup current site'),
-    'status' => (bool)module_invoke('demo', 'get_dump', 'upgrade_assist_current'),
+    'status' => (bool) module_invoke('demo', 'get_fileconfig', 'upgrade_assist_current'),
   );
+  if (module_exists('demo')) {
+    switch ($core) {
+      case 6:
+        $states['backup-current']['href'] = 'admin/build/demo';
+        break;
 
-  // @todo Cache this using cache_set(), so it's invalidated when update.php runs.
-  if (module_exists('update_status')) {
-    $site_key = md5($base_url . drupal_get_private_key());
-    $project = array('name' => 'drupal', 'version' => VERSION);
-    $url = _update_status_build_fetch_url($project, $site_key);
-    $xml = drupal_http_request($url);
-    $data = array();
-    if (isset($xml->data)) {
-      $data[] = $xml->data;
-    }
-    if ($data) {
-      $parser = new update_status_xml_parser;
-      $available = $parser->parse($data);
+      case 7:
+        $states['backup-current']['href'] = 'admin/structure/demo';
+        break;
     }
   }
-  $states['update-modules-5'] = array(
-    'title' => t('Update 5.x modules'),
-    'status' => $available['drupal']['recommended version'] < VERSION,
+
+  $states['disable-modules'] = array(
+    'title' => t('Disable non-core modules'),
+    'status' => variable_get('upgrade_assist_modules_enabled', FALSE),
+    'href' => 'upgrade/assist/upgrade_assist_disable_modules',
   );
 
-  $states['backup-updated'] = array(
-    'title' => t('Backup updated site'),
-    'status' => (bool)module_invoke('demo', 'get_dump', 'upgrade_assist_updated'),
+  $states['settings'] = array(
+    'title' => t('Verify settings.php'),
+    'status' => NULL,
   );
 
-  $states['garland-added'] = array(
-    'title' => t('Ensure Garland theme'),
-    'status' => (bool)file_exists('./themes/garland'),
+  // @todo Store core version in a variable upon installation.
+  $states['update-core'] = array(
+    'title' => t('Run update.php for core'),
+    'status' => NULL,
   );
 
-  $states['modules-downloaded'] = array(
-    'title' => t('Download upgraded modules'),
-    'status' => (bool)variable_get('upgrade_assist_status_modules_downloaded', FALSE),
+  $states['download-modules'] = array(
+    'title' => t('Download new modules'),
+    'status' => variable_get('upgrade_assist_modules_downloaded', FALSE),
   );
 
-  $states['modules-disabled'] = array(
-    'title' => t('Disable contrib modules'),
-    'status' => (bool)variable_get('upgrade_assist_enabled_modules', array()),
-  );
 
+
+
+
+  /*
   $states['upgraded-drupal-core'] = array(
     'title' => t('Upgrade Drupal core'),
-    'status' => (bool)(strpos(VERSION, '6') === 0),
+    'status' => (bool) (strpos(VERSION, '6') === 0),
     // @todo Supply further info, properly replacing core files, updating/merging
     //   settings.php, aso.
   );
@@ -77,53 +155,82 @@ function upgrade_assist_states($render = FALSE) {
   // @todo States for 6.x.
   $states['ran-drupal-core-update'] = array(
     'title' => t('Run update.php for Drupal core'),
-    'status' => (bool)(strpos(VERSION, '6') === 0), // @todo Schema version?
+    'status' => (bool) (strpos(VERSION, '6') === 0), // @todo Schema version?
   );
 
   $modules = variable_get('upgrade_assist_enabled_modules', array());
   if (isset($modules['content'])) {
     $states['enabled-cck-core'] = array(
       'title' => t('Enable CCK core'),
-      'status' => (bool)module_exists('content'), // @todo Also ensure other CCK core modules.
+      'status' => (bool) module_exists('content'), // @todo Also ensure other CCK core modules.
       // @todo We can do this on behalf of the user!
     );
 
     $states['upgraded-cck-core'] = array(
       'title' => t('Upgrade CCK core'),
-      'status' => (bool)(strpos(VERSION, '6') === 0), // @todo Schema version?
+      'status' => (bool) (strpos(VERSION, '6') === 0), // @todo Schema version?
     );
 
     $states['ran-cck-core-update'] = array(
       'title' => t('Run update.php for CCK core'),
-      'status' => (bool)(strpos(VERSION, '6') === 0), // @todo Schema version?
+      'status' => (bool) (strpos(VERSION, '6') === 0), // @todo Schema version?
     );
   }
 
   $states['upgraded-modules'] = array(
     'title' => t('Upgrade contrib modules'),
-    'status' => (bool)(strpos(VERSION, '6') === 0), // @todo
+    'status' => (bool) (strpos(VERSION, '6') === 0), // @todo
     // Iterate over upgrade_assist_enabled_modules, ~90% should be re-enabled,
     // re-use information of upgrade_status_moved_into_core()!
   );
 
   $states['ran-modules-update'] = array(
     'title' => t('Run update.php for contrib modules'),
-    'status' => (bool)(strpos(VERSION, '6') === 0), // @todo Schema version?
+    'status' => (bool) (strpos(VERSION, '6') === 0), // @todo Schema version?
   );
+  */
+
+  // Set the active (next) task. That is the first step having a status of FALSE
+  // (not NULL, as that means we don't know).
+  foreach ($states as $name => $state) {
+    if (isset($state['status']) && $state['status'] == FALSE) {
+      $states[$name]['active'] = TRUE;
+      break;
+    }
+  }
 
   // Prepare states to be displayed in block as tasks.
-  if ($render) {
+  if ($item_list) {
     $items = array();
-    $active = TRUE;
-    foreach ($states as $name => $item) {
-      $items[$name]['data'] = $item['title'];
-      if ($item['status'] && $active) {
-        $items[$name]['class'] = 'done';
+    $active_step_found = FALSE;
+    foreach ($states as $name => $state) {
+      $class = array();
+      // All steps before the active step can be already done or we don't know
+      // the status.
+      if (!$active_step_found) {
+        if (isset($state['href'])) {
+          $items[$name]['data'] = l($state['title'], $state['href']);
+        }
+        else {
+          $items[$name]['data'] = $state['title'];
+        }
+        if (!empty($state['active'])) {
+          $class[] = 'active';
+          $active_step_found = $name;
+        }
+        if (!empty($state['status'])) {
+          $class[] = 'done';
+        }
+        elseif (!isset($state['status'])) {
+          $class[] = 'unsure';
+        }
       }
+      // If the active step was found, all next steps still need to be done.
       else {
-        $items[$name]['class'] = ($active ? 'active' : '');
-        $active = FALSE;
+        $items[$name]['data'] = $state['title'];
+        $class[] = 'todo';
       }
+      $items[$name]['class'] = ($core >= 7 ? $class : implode(' ', $class));
     }
     return $items;
   }
@@ -131,47 +238,86 @@ function upgrade_assist_states($render = FALSE) {
 }
 
 /**
- * Implementation of hook_enable().
+ * Implements hook_init().
  */
-function upgrade_assist_enable() {
-  if (strpos(VERSION, '5') === 0) {
-    // Enable maintenance mode.
-    variable_set('site_offline', 1);
-    drupal_set_message(t('This site is in maintenance mode now.'));
-    // Check whether Demo, Update Status and Upgrade Status are enabled.
+function upgrade_assist_init() {
+  drupal_add_css(drupal_get_path('module', 'upgrade_assist') . '/upgrade_assist.css');
+}
 
-    // Enable our workflow block.
-    _block_rehash();
-  }
-  else {
-    
+/**
+ * Implements hook_block().
+ */
+function upgrade_assist_block($op = 'list', $delta = '') {
+  if (in_array($op, array('list', 'view'))) {
+    $function = 'upgrade_assist_block_' . $op;
+    return $function($delta);
   }
 }
 
 /**
- * Implementation of hook_block().
+ * Implements hook_block_list().
  */
-function upgrade_assist_block($op = 'list', $delta = 0, $edit = array()) {
-  if ($op == 'list') {
-    $blocks['workflow'] = array(
-      'info' => t('Upgrade workflow'),
-      'region' => 'left',
-      'status' => 1,
-      'weight' => -10,
-    );
-    return $blocks;
+function upgrade_assist_block_list() {
+  $blocks['tasks'] = array(
+    'info' => t('Upgrade tasks'),
+    'region' => 'left',
+    'status' => 1,
+    'weight' => -10,
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function upgrade_assist_block_view($delta) {
+  $block = array();
+  switch ($delta) {
+    case 'tasks':
+      $core = variable_get('upgrade_assist_core', NULL);
+      $tasks = upgrade_assist_states(TRUE);
+      $block['subject'] = t('Upgrade tasks');
+      switch ($core) {
+        case 6:
+          $block['content'] = theme('item_list', $tasks, NULL, 'ol', array('class' => 'task-list'));
+          break;
+
+        case 7:
+          $block['content'] = theme('item_list', array(
+            'items' => $tasks,
+            'type' => 'ol',
+            'attributes' => array('class' => array('task-list')),
+          ));
+          break;
+      }
+      break;
   }
-  else if ($op == 'view') {
-    $block = array();
-    switch($delta) {
-      case 'workflow':
-        drupal_add_css(drupal_get_path('module', 'upgrade_assist') .'/upgrade_assist.css');
-        $block['subject'] = t('Drupal Upgrade');
-        $tasks = upgrade_assist_states(TRUE);
-        $block['content'] = theme('item_list', $tasks, NULL, 'ol', array('class' => 'task-list'));
-        break;
-    }
-    return $block;
-  }
+  return $block;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function upgrade_assist_menu() {
+  $items['upgrade/assist/%'] = array(
+    'title' => 'Upgrade assist',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array(2),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Form constructor to disable non-core modules.
+ */
+function upgrade_assist_disable_modules() {
+  $form['enabled_modules'] = array(
+    '#theme' => 'item_list',
+    '#heading' => t('Modules to disable'),
+    '#items' => array(),
+  );
+  $enabled_modules = module_list();
 }
 

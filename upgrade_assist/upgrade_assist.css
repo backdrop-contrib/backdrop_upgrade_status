@@ -1,21 +1,24 @@
 /* $Id$ */
 
-ol.task-list {
-  margin-left: 0; /* LTR */
-  padding: 0;
+div.item-list ol.task-list {
   list-style-type: none;
   list-style-image: none;
+  padding: 0;
+  margin-left: 0; /* LTR */
 }
-ol.task-list li {
-  padding: 0.5em 1em 0.5em 2em; /* LTR */
+div.item-list ol.task-list li {
+  color: #adadad;
+  list-style-type: none;
+  list-style-image: none;
+  margin: 0;
+  padding: 0.5em 1em 0.5em 20px; /* LTR */
 }
-ol.task-list li.active {
-  background: transparent url(images/task-list.png) no-repeat 3px 50%; /* LTR */
+div.item-list ol.task-list li.active {
+  background: transparent url(images/task-item.png) no-repeat 3px 50%; /* LTR */
+  color: #000;
+  padding: 0.5em 1em 0.5em 20px; /* LTR */
 }
-ol.task-list li.done {
-  color: #393;
-  background: transparent url(/misc/watchdog-ok.png) no-repeat 0px 50%; /* LTR */
-}
-ol.task-list li.active {
-  margin-right: 1em; /* LTR */
+div.item-list ol.task-list li.done {
+  color: green;
+  background: transparent url(images/task-check.png) no-repeat 0px 50%; /* LTR */
 }
