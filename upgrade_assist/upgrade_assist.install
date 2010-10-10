@@ -16,7 +16,7 @@ function upgrade_assist_install() {
   // Figure out current major versions.
   $core = (defined('DRUPAL_CORE_COMPATIBILITY') ? DRUPAL_CORE_COMPATIBILITY : VERSION);
   preg_match('@^(\d+)@', $core, $matches);
-  $core = $matches[0];
+  $core = (int) $matches[0];
 
   switch ($core) {
     case 6:
@@ -47,5 +47,14 @@ function upgrade_assist_enable() {
 function upgrade_assist_uninstall() {
   variable_del('upgrade_assist_core');
   variable_del('upgrade_assist_core_current');
+}
+
+/**
+ * Update the stored version of Drupal core.
+ */
+function upgrade_assist_update_7000() {
+  preg_match('@^(\d+)@', DRUPAL_CORE_COMPATIBILITY, $matches);
+  $core = (int) $matches[0];
+  variable_set('upgrade_assist_core', $core);
 }
 

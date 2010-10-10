@@ -19,6 +19,8 @@ div.item-list ol.task-list li.active {
   padding: 0.5em 1em 0.5em 20px; /* LTR */
 }
 div.item-list ol.task-list li.done {
-  color: green;
   background: transparent url(images/task-check.png) no-repeat 0px 50%; /* LTR */
+}
+div.item-list ol.task-list li.done, div.item-list ol.task-list li.done a {
+  color: green;
 }

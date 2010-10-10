@@ -6,6 +6,7 @@ Upgrade Assist x.x-x.x, xxxx-xx-xx
 
 Upgrade Assist 6.x-1.x, xxxx-xx-xx
 ----------------------------------
+by sun: Added more upgrade steps, filled out some gaps.
 by sun: Revamped for Drupal X.
 by sun: Added first draft of Upgrade Assist module.
 
