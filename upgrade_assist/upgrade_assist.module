@@ -198,10 +198,20 @@ function upgrade_assist_states($item_list = FALSE) {
 
   // Check whether any of the disabled modules have been replaced with new
   // versions.
-  $module_files_upgraded = array();
+  $module_files_upgraded = FALSE;
   $disabled_modules = variable_get('upgrade_assist_modules_disabled', array());
+  // As always, there are exceptions to the rule: certain modules have been
+  // re-owned by Drupal core. Since the module names are identical, the upgrade
+  // check below will lead to false positives, so explicitly exclude them here.
+  $disabled_modules = array_diff_key($disabled_modules, array_flip(array(
+    // CCK / Field type modules.
+    'text', 'number',
+    // Image module.
+    'image',
+  )));
   if ($core_is_upgraded && $disabled_modules) {
-    foreach ($disabled_modules as $module) {
+    $module_files_upgraded = array();
+    foreach ($disabled_modules as $module => $upgrade_info) {
       $info_file = drupal_get_path('module', $module) . "/$module.info";
       $module_info = drupal_parse_info_file($info_file);
       if (isset($module_info['core']) && $module_info['core'] == DRUPAL_CORE_COMPATIBILITY) {
@@ -586,11 +596,6 @@ function upgrade_assist_download_projects() {
   drupal_set_title(t('Download new project versions'));
 
   $projects = variable_get('upgrade_assist_projects', array());
-  // @todo Demo module is not as smart as Upgrade Assist ;)
-  if (!module_exists('demo')) {
-    system_rebuild_module_data();
-    module_enable(array('demo'));
-  }
 
   /* @todo Does drush have a maximum arguments limit?
   $drush = '';
@@ -598,11 +603,11 @@ function upgrade_assist_download_projects() {
     $drush .= 'drush dl ' . implode(' ', $drush_args) . "\n";
   }
   */
-  $drush = 'drush dl --delete ' . implode(' ', $projects);
+  $drush = 'drush dl --delete ' . implode(' ', array_keys($projects));
 
   $project_links = array();
-  foreach ($projects as $project) {
-    $project_links[] = l($project, 'http://drupal.org/project/' . $project);
+  foreach ($projects as $name => $project) {
+    $project_links[] = l($name, 'http://drupal.org/project/' . $name);
   }
 
   // @todo Upgrade Status knows the recommended release for each project and
