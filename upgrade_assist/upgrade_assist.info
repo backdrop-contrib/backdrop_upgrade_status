@@ -2,6 +2,5 @@
 name = Upgrade Assist
 description = Assists in upgrading Drupal to a new major version.
 core = 6.x
-;dependencies[] = upgrade_status
 ;dependencies[] = demo
 files[] = upgrade_assist.module

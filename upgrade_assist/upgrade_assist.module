@@ -52,13 +52,15 @@ function upgrade_assist_states($item_list = FALSE) {
   }
   $core_is_upgraded = ($core > $core_current);
 
-  $states['upgrade-status'] = array(
-    'title' => t('Check upgrade status'),
-    'phase' => 'pre-upgrade',
-    // This is purely informational, so always TRUE.
-    'status' => TRUE,
-    'href' => 'admin/reports/updates/upgrade',
-  );
+  if (module_exists('upgrade_status')) {
+    $states['upgrade-status'] = array(
+      'title' => t('Check upgrade status'),
+      'phase' => 'pre-upgrade',
+      // This is purely informational, so always TRUE.
+      'status' => TRUE,
+      'href' => 'admin/reports/updates/upgrade',
+    );
+  }
 
   $states['update-modules'] = array(
     'title' => t('Update modules'),
@@ -446,8 +448,8 @@ function upgrade_assist_backup_current() {
   $form['dump']['filename']['#value'] = $filename;
   $form['dump']['filename']['#disabled'] = TRUE;
 
-  $form['dump']['description']['#default_value'] = t('Before upgrade to Drupal !version', array(
-    '!version' => variable_get('upgrade_assist_core', VERSION),
+  $form['dump']['description']['#default_value'] = t('Before upgrade to Drupal !version.', array(
+    '!version' => variable_get('upgrade_assist_core', 6) + 1,
   ));
 
   return $form;
@@ -459,12 +461,10 @@ function upgrade_assist_backup_current() {
 function upgrade_assist_disable_modules() {
   drupal_set_title(t('Disable non-core modules'));
 
-  // Reload already disabled modules.
-  $default = variable_get('upgrade_assist_modules_disabled', array());
-  $add_defaults = empty($default);
-
   $options = array();
-  $projects = array();
+  $default_value = array();
+  $form['#modules'] = array();
+  $form['#projects'] = array();
   $result = db_query("SELECT * FROM {system} WHERE type = 'module'");
   while ($module = db_fetch_object($result)) {
     $module->info = unserialize($module->info);
@@ -478,35 +478,47 @@ function upgrade_assist_disable_modules() {
     if (in_array($module->info['package'], array('Core - required', 'Core - optional'))) {
       continue;
     }
-    // Lastly, skip Upgrade Assist and its dependencies.
-    if (in_array($module->name, array('upgrade_assist', 'demo'))) {
-      continue;
-    }
-    // Valid options are already disabled modules and enabled modules.
-    if (isset($default[$module->name]) || $module->status) {
+    // Only enabled modules can be disabled.
+    if ($module->status) {
+      $form['#modules'][$module->name] = array(
+        'name' => $module->info['name'],
+        'project' => $module->info['project'],
+      );
+      // @todo Make use of Upgrade Status information, if available. We are only
+      //   interested in projects that are actually available for the new
+      //   version. Thus, add project title + recommended release info.
+      if (isset($module->info['project'])) {
+        $form['#projects'][$module->name] = array(
+          'project' => $module->info['project'],
+        );
+      }
+      // Skip Upgrade Assist and its dependencies. We need their module and
+      // project info though.
+      if (in_array($module->name, array('upgrade_assist', 'demo'))) {
+        continue;
+      }
       $options[$module->name] = t('@project: @name', array(
         '@project' => isset($module->info['project']) ? $module->info['project'] : t('Unknown'),
         '@name' => $module->info['name'],
       ));
-      if (isset($module->info['project'])) {
-        $projects[$module->name] = $module->info['project'];
-      }
-      if ($add_defaults) {
-        $default[$module->name] = $module->name;
-      }
+      $default_value[$module->name] = $module->name;
     }
   }
-  // Sort options by label.
-  asort($options);
-  $form['disable'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Modules to disable'),
-    '#options' => $options,
-    '#default_value' => $default,
-    '#description' => t('Upgrade Assist keeps track of the modules disabled here, allowing you to re-enable disabled modules after upgrading Drupal core.'),
-  );
-  $form['#projects'] = $projects;
-  $form['submit'] = array('#type' => 'submit', '#value' => t('Disable'));
+  if ($options) {
+    // Sort options by label.
+    asort($options);
+    $form['disable'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Modules to disable'),
+      '#options' => $options,
+      '#default_value' => $default_value,
+      '#description' => t('All disabled modules are tracked and may be re-enabled after upgrading Drupal core.'),
+    );
+    $form['submit'] = array('#type' => 'submit', '#value' => t('Disable'));
+  }
+  else {
+    drupal_set_message(t('All non-core modules have been disabled already.'), 'warning');
+  }
   return $form;
 }
 
@@ -517,19 +529,22 @@ function upgrade_assist_disable_modules_validate($form, &$form_state) {
   if (!empty($form_state['values']['disable'])) {
     $modules = array_filter($form_state['values']['disable']);
 
-    // Save the list of disabled modules for later use.
-    variable_set('upgrade_assist_modules_disabled', $modules);
-    // Compile a list of projects for later use.
-    // @todo Make use of Upgrade Status information, if available. We are only
-    //   interested in projects that are actually available for the new version.
-    //   Also, having project titles would be nicey.
-    $projects = array();
+    // Reload already disabled modules, merge the new ones, and save the list
+    // for later use.
+    $module_info = variable_get('upgrade_assist_modules_disabled', array());
+    $module_info = array_merge($module_info, array_intersect_key($form['#modules'], $modules));
+    variable_set('upgrade_assist_modules_disabled', $module_info);
+
+    // Compile and save a list of projects for later use.
+    // Ensure that special cases are contained.
+    $project_info = array_intersect_key($form['#projects'], array('upgrade_assist' => 1, 'demo' => 1));
     foreach ($modules as $module) {
       if (isset($form['#projects'][$module])) {
-        $projects[$form['#projects'][$module]] = $form['#projects'][$module];
+        $project = $form['#projects'][$module];
+        $project_info[$project['project']] = $project;
       }
     }
-    variable_set('upgrade_assist_projects', array_values($projects));
+    variable_set('upgrade_assist_projects', $project_info);
 
     module_disable($modules);
     drupal_flush_all_caches();
@@ -569,16 +584,15 @@ function upgrade_assist_replace_core() {
  */
 function upgrade_assist_download_projects() {
   drupal_set_title(t('Download new project versions'));
+
   $projects = variable_get('upgrade_assist_projects', array());
-  // @todo Demo module is excluded in the project list.
-  array_unshift($projects, 'demo');
-  // @todo ...and also not as smart as Upgrade Assist ;)
+  // @todo Demo module is not as smart as Upgrade Assist ;)
   if (!module_exists('demo')) {
     system_rebuild_module_data();
     module_enable(array('demo'));
   }
 
-  /*
+  /* @todo Does drush have a maximum arguments limit?
   $drush = '';
   foreach (array_chunk($projects, 6) as $drush_args) {
     $drush .= 'drush dl ' . implode(' ', $drush_args) . "\n";
@@ -591,9 +605,8 @@ function upgrade_assist_download_projects() {
     $project_links[] = l($project, 'http://drupal.org/project/' . $project);
   }
 
-  // @todo Actually, if Upgrade Status was/is installed, then we know the
-  //   recommended release for each project and could even provide direct
-  //   download links to the FTP archives.
+  // @todo Upgrade Status knows the recommended release for each project and
+  //   could provide direct download links to FTP files.
   $form['upgrades'] = array(
     '#prefix' => t('<p>Further upgrades are required. It is recommended to</p>'),
     '#theme' => 'item_list',
@@ -650,7 +663,7 @@ function upgrade_assist_enable_modules() {
       continue;
     }
     // Skip already enabled modules and not previously disabled modules.
-    if ($module->status || !in_array($module->name, $disabled_modules)) {
+    if ($module->status || !isset($disabled_modules[$module->name])) {
       continue;
     }
     // Dependencies need to exist.
@@ -692,9 +705,13 @@ function upgrade_assist_enable_modules_validate($form, &$form_state) {
 
     $status = module_enable($modules);
     if ($status === TRUE) {
-      // Save the list of disabled modules for later use.
-      variable_set('upgrade_assist_modules_enabled', $modules);
       drupal_flush_all_caches();
+
+      // Update the list of disabled modules.
+      $module_info = variable_get('upgrade_assist_modules_disabled', array());
+      $module_info = array_diff_key($module_info, $modules);
+      variable_set('upgrade_assist_modules_disabled', $module_info);
+
       drupal_set_message(t('The selected modules have been re-enabled.'));
     }
     else {

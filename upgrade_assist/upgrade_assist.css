@@ -24,3 +24,8 @@ div.item-list ol.task-list li.done {
 div.item-list ol.task-list li.done, div.item-list ol.task-list li.done a {
   color: green;
 }
+
+pre.command {
+  margin: 1em 0;
+  white-space: pre-wrap;
+}
