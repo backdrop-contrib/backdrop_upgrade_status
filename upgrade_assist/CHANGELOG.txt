@@ -6,6 +6,7 @@ Upgrade Assist x.x-x.x, xxxx-xx-xx
 
 Upgrade Assist 6.x-1.x, xxxx-xx-xx
 ----------------------------------
+by sun: Fixed project download instructions.
 by sun: Fixed post upgrade path.
 by sun: Added more upgrade steps, filled out some gaps.
 by sun: Revamped for Drupal X.

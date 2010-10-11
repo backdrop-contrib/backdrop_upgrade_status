@@ -571,7 +571,7 @@ function upgrade_assist_download_projects() {
   drupal_set_title(t('Download new project versions'));
   $projects = variable_get('upgrade_assist_projects', array());
   // @todo Demo module is excluded in the project list.
-  $projects[] = 'demo';
+  array_unshift($projects, 'demo');
   // @todo ...and also not as smart as Upgrade Assist ;)
   if (!module_exists('demo')) {
     system_rebuild_module_data();
@@ -584,30 +584,38 @@ function upgrade_assist_download_projects() {
     $drush .= 'drush dl ' . implode(' ', $drush_args) . "\n";
   }
   */
-  $drush = 'drush dl ' . implode(' ', $projects);
+  $drush = 'drush dl --delete ' . implode(' ', $projects);
 
   $project_links = array();
   foreach ($projects as $project) {
     $project_links[] = l($project, 'http://drupal.org/project/' . $project);
   }
 
+  // @todo Actually, if Upgrade Status was/is installed, then we know the
+  //   recommended release for each project and could even provide direct
+  //   download links to the FTP archives.
   $form['upgrades'] = array(
     '#prefix' => t('<p>Further upgrades are required. It is recommended to</p>'),
     '#theme' => 'item_list',
     '#items' => array(
-      t('Move all existing, incompatible modules (e.g., into <code>@modules-backup-path</code>).', array(
+      t('Copy all existing, incompatible modules (e.g., into <code>@modules-backup-path</code>).', array(
         '@modules-backup-path' => conf_path() . '/_modules',
       )),
-      t('Download and extract all new modules.  Using <a href="@drush-url">drush</a>:
-<pre style="white-space: pre-wrap">
+      t('<strong>Keep</strong> them in their current location (e.g., in <code>@modules-path</code>).', array(
+        '@modules-path' => conf_path() . '/modules',
+      )),
+      t('Download new module versions. Delete the corresponding module directories prior to extracting the new version.', array(
+      )),
+      t('Using the !drush command line:
+<pre class="command">
 @drush-commands
 </pre>
-', array(
-        '@drush-url' => 'http://drupal.org/project/drush',
+The <code>--delete</code> option may not be supported yet. In that case, you have to delete directories manually, but <strong>only</strong> those that will be replaced.', array(
+        '!drush' => l('Drush', 'http://drupal.org/project/drush', array('attributes' => array('target' => '_blank'))),
         '@drush-commands' => $drush,
       )),
       array(
-        'data' => t('Alternatively, download manually:'),
+        'data' => t('Or downloading manually:'),
         'children' => $project_links,
       ),
     ),
