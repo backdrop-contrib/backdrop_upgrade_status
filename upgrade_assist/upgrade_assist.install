@@ -37,7 +37,7 @@ function upgrade_assist_install() {
  * Implements hook_enable().
  */
 function upgrade_assist_enable() {
-  // Try to auto-enable the upgrade tasks block.
+  // Try to auto-enable the upgrade tasks block. Requires a 'left' region.
   _block_rehash();
 }
 
@@ -49,12 +49,14 @@ function upgrade_assist_uninstall() {
   variable_del('upgrade_assist_core_current');
 }
 
-/**
- * Update the stored version of Drupal core.
- */
-function upgrade_assist_update_7000() {
-  preg_match('@^(\d+)@', DRUPAL_CORE_COMPATIBILITY, $matches);
-  $core = (int) $matches[0];
-  variable_set('upgrade_assist_core', $core);
+if (DRUPAL_CORE_COMPATIBILITY == '7.x') {
+  /**
+   * Update the stored version of Drupal core.
+   */
+  function upgrade_assist_update_7000() {
+    preg_match('@^(\d+)@', DRUPAL_CORE_COMPATIBILITY, $matches);
+    $core = (int) $matches[0];
+    variable_set('upgrade_assist_core', $core);
+  }
 }
 

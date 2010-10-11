@@ -176,7 +176,7 @@ function upgrade_assist_states($item_list = FALSE) {
     module_load_include('inc', 'demo', 'demo.admin');
     $fileconfig = demo_get_fileconfig('pre-upgrade');
     $states['backup-current']['status'] = file_exists($fileconfig['sqlfile']);
-    $states['backup-current']['href'] = 'upgrade/assist/upgrade_assist_backup_current';
+    $states['backup-current']['href'] = 'upgrade/assist/upgrade_assist_backup_current/pre-upgrade';
   }
 
   $states['replace-core'] = array(
@@ -186,8 +186,7 @@ function upgrade_assist_states($item_list = FALSE) {
     'href' => 'upgrade/assist/upgrade_assist_replace_core',
   );
 
-  // @todo Store core version in a variable upon installation.
-  $states['update-core'] = array(
+  $states['upgrade-core'] = array(
     'title' => t('Run update.php for core'),
     'phase' => 'pre-upgrade',
     'status' => !($core == $core_current),
@@ -195,20 +194,79 @@ function upgrade_assist_states($item_list = FALSE) {
     'options' => array('external' => TRUE),
   );
 
+  // Check whether any of the disabled modules have been replaced with new
+  // versions.
+  $module_files_upgraded = array();
+  $disabled_modules = variable_get('upgrade_assist_modules_disabled', array());
+  if ($core_is_upgraded && $disabled_modules) {
+    foreach ($disabled_modules as $module) {
+      $info_file = drupal_get_path('module', $module) . "/$module.info";
+      $module_info = drupal_parse_info_file($info_file);
+      if (isset($module_info['core']) && $module_info['core'] == DRUPAL_CORE_COMPATIBILITY) {
+        $module_files_upgraded[] = $module;
+      }
+    }
+    if ($module_files_upgraded) {
+      $modules_upgraded = db_query('SELECT name, schema_version FROM {system} WHERE type = :type AND name IN (:modules)', array(
+        ':type' => 'module',
+        ':modules' => $module_files_upgraded,
+      ))->fetchAllKeyed();
+      foreach ($modules_upgraded as $module_name => $module_version) {
+        if ($module_version[0] == $core) {
+          $modules_upgraded = TRUE;
+          break;
+        }
+      }
+    }
+  }
   $states['download-modules'] = array(
-    'title' => t('Download new modules'),
+    'title' => t('Download new project versions'),
     'phase' => 'post-upgrade',
-    'status' => !variable_get('upgrade_assist_modules_disabled', array()),
-    'href' => 'upgrade/assist/upgrade_assist_download_modules',
+    'status' => $module_files_upgraded,
+    'href' => 'upgrade/assist/upgrade_assist_download_projects',
   );
 
+  $states['backup-pre-upgrade-modules'] = array(
+    'title' => t('Backup current site'),
+    'phase' => 'post-upgrade',
+    'status' => NULL,
+  );
+  if (module_exists('demo')) {
+    // @todo Add drupal_alter() and move into Demo module.
+    module_load_include('inc', 'demo', 'demo.admin');
+    $fileconfig = demo_get_fileconfig('pre-upgrade-modules');
+    $states['backup-pre-upgrade-modules']['status'] = file_exists($fileconfig['sqlfile']);
+    $states['backup-pre-upgrade-modules']['href'] = 'upgrade/assist/upgrade_assist_backup_current/pre-upgrade-modules';
+  }
 
+  $states['upgrade-modules'] = array(
+    'title' => t('Run update.php for modules'),
+    'phase' => 'post-upgrade',
+    'status' => $modules_upgraded === TRUE || !$module_files_upgraded,
+    'href' => $GLOBALS['base_url'] . '/update.php',
+    'options' => array('external' => TRUE),
+  );
 
+  $states['enable-modules'] = array(
+    'title' => t('Re-enable modules'),
+    'phase' => 'post-upgrade',
+    'status' => variable_get('upgrade_assist_modules_enabled', FALSE),
+    'href' => 'upgrade/assist/upgrade_assist_enable_modules',
+  );
 
+  $status = FALSE;
+  if ($modules_upgraded === TRUE) {
+    // Don't perform duplicate checks on admin/reports/status.
+    $status = NULL;
+//    if (strpos($_GET['q'], 'admin/reports') !== 0) {
+//      module_load_include('inc', 'system', 'system.admin');
+//      $status = system_status(TRUE);
+//    }
+  }
   $states['status-report'] = array(
     'title' => t('Check status report'),
     'phase' => 'post-upgrade',
-    'status' => NULL,
+    'status' => $status,
   );
   switch ($core) {
     case 6:
@@ -216,52 +274,6 @@ function upgrade_assist_states($item_list = FALSE) {
       $states['status-report']['href'] = 'admin/reports/status';
       break;
   }
-
-  /*
-  $states['upgraded-drupal-core'] = array(
-    'title' => t('Upgrade Drupal core'),
-    'status' => (bool) (strpos(VERSION, '6') === 0),
-    // @todo Supply further info, properly replacing core files, updating/merging
-    //   settings.php, aso.
-  );
-
-  // @todo States for 6.x.
-  $states['ran-drupal-core-update'] = array(
-    'title' => t('Run update.php for Drupal core'),
-    'status' => (bool) (strpos(VERSION, '6') === 0), // @todo Schema version?
-  );
-
-  $modules = variable_get('upgrade_assist_enabled_modules', array());
-  if (isset($modules['content'])) {
-    $states['enabled-cck-core'] = array(
-      'title' => t('Enable CCK core'),
-      'status' => (bool) module_exists('content'), // @todo Also ensure other CCK core modules.
-      // @todo We can do this on behalf of the user!
-    );
-
-    $states['upgraded-cck-core'] = array(
-      'title' => t('Upgrade CCK core'),
-      'status' => (bool) (strpos(VERSION, '6') === 0), // @todo Schema version?
-    );
-
-    $states['ran-cck-core-update'] = array(
-      'title' => t('Run update.php for CCK core'),
-      'status' => (bool) (strpos(VERSION, '6') === 0), // @todo Schema version?
-    );
-  }
-
-  $states['upgraded-modules'] = array(
-    'title' => t('Upgrade contrib modules'),
-    'status' => (bool) (strpos(VERSION, '6') === 0), // @todo
-    // Iterate over upgrade_assist_enabled_modules, ~90% should be re-enabled,
-    // re-use information of upgrade_status_moved_into_core()!
-  );
-
-  $states['ran-modules-update'] = array(
-    'title' => t('Run update.php for contrib modules'),
-    'status' => (bool) (strpos(VERSION, '6') === 0), // @todo Schema version?
-  );
-  */
 
   // Override task statuses, depending on core version.
   foreach ($states as $name => $state) {
@@ -410,16 +422,31 @@ function upgrade_assist_maintenance_theme() {
 
 /**
  * Form constructor to perform database backup via Demo.
+ *
+ * @todo Rename this function; used by more than once step now.
  */
 function upgrade_assist_backup_current() {
   drupal_set_title(t('Backup current site'));
   module_load_include('inc', 'demo', 'demo.admin');
 
-  $form = demo_dump_form();
+  $args = func_get_args();
+  switch (DRUPAL_CORE_COMPATIBILITY) {
+    case '6.x':
+      $form = demo_dump_form();
+      $filename = $args[1];
+      break;
+
+    case '7.x':
+      $form = demo_dump_form($args[0], $args[1]);
+      $filename = $args[2];
+      break;
+  }
   $form['#submit'][] = 'demo_dump_form_submit';
-  $form['dump']['filename']['#value'] = 'pre-upgrade';
+
+  $form['dump']['filename']['#value'] = $filename;
   $form['dump']['filename']['#disabled'] = TRUE;
-  $form['dump']['description']['#default_value'] = t('Up-to-date site before upgrade to Drupal !version', array(
+
+  $form['dump']['description']['#default_value'] = t('Before upgrade to Drupal !version', array(
     '!version' => variable_get('upgrade_assist_core', VERSION),
   ));
 
@@ -486,20 +513,25 @@ function upgrade_assist_disable_modules() {
 /**
  * Form submit handler to disable non-core modules.
  */
-function upgrade_assist_disable_modules_submit($form, &$form_state) {
+function upgrade_assist_disable_modules_validate($form, &$form_state) {
   if (!empty($form_state['values']['disable'])) {
+    $modules = array_filter($form_state['values']['disable']);
+
     // Save the list of disabled modules for later use.
-    variable_set('upgrade_assist_modules_disabled', $form_state['values']['disable']);
+    variable_set('upgrade_assist_modules_disabled', $modules);
     // Compile a list of projects for later use.
+    // @todo Make use of Upgrade Status information, if available. We are only
+    //   interested in projects that are actually available for the new version.
+    //   Also, having project titles would be nicey.
     $projects = array();
-    foreach ($form_state['values']['disable'] as $module) {
+    foreach ($modules as $module) {
       if (isset($form['#projects'][$module])) {
         $projects[$form['#projects'][$module]] = $form['#projects'][$module];
       }
     }
     variable_set('upgrade_assist_projects', array_values($projects));
 
-    module_disable($form_state['values']['disable']);
+    module_disable($modules);
     drupal_flush_all_caches();
     drupal_set_message(t('The selected modules have been disabled.'));
   }
@@ -516,11 +548,11 @@ function upgrade_assist_replace_core() {
     '#value' => t('<p>At this point, it is recommended to</p>
 <div class="item-list">
 <ul>
-<li>Download and extract the new <a href="@drupal-url">Drupal core</a> into a separate directory.</li>
-<li>Copy the existing modules (for the previous version of Drupal core) into the identical locations.</li>
+<li>Create a new virtual host (e.g., <code>@domain</code>) on your webserver, pointing to a separate directory.</li>
+<li>Download and extract the new <a href="@drupal-url">Drupal core</a> into that directory.</li>
+<li>Copy all existing modules (for the previous version of Drupal core) into the identical locations.</li>
 <li>Copy <code>settings.php</code> and the files directory into the identical locations.</li>
-<li>Create a new virtual host (e.g., <code>@domain</code>) on your webserver.</li>
-<li>Run <a href="@update-url" title="Run updates (new window)" target="_blank">update.php</a>.</li>
+<li>Run <a href="@update-url" title="Run updates (new window)" target="_blank">@update-url</a>.</li>
 </ul>
 </div>
 <p>If anything breaks, restore the current state from the backup you did earlier.</p>', array(
@@ -533,22 +565,133 @@ function upgrade_assist_replace_core() {
 }
 
 /**
- * Form constructor to disable non-core modules.
+ * Form constructor to aid in downloading new project versions.
  */
-function upgrade_assist_download_modules() {
-  drupal_set_title(t('Download new modules'));
+function upgrade_assist_download_projects() {
+  drupal_set_title(t('Download new project versions'));
   $projects = variable_get('upgrade_assist_projects', array());
-  
+  // @todo Demo module is excluded in the project list.
+  $projects[] = 'demo';
+  // @todo ...and also not as smart as Upgrade Assist ;)
+  if (!module_exists('demo')) {
+    system_rebuild_module_data();
+    module_enable(array('demo'));
+  }
 
-  $form['help'] = array(
-    '#markup' => t('<p>At this point, it is recommended to</p>
+  /*
+  $drush = '';
+  foreach (array_chunk($projects, 6) as $drush_args) {
+    $drush .= 'drush dl ' . implode(' ', $drush_args) . "\n";
+  }
+  */
+  $drush = 'drush dl ' . implode(' ', $projects);
+
+  $project_links = array();
+  foreach ($projects as $project) {
+    $project_links[] = l($project, 'http://drupal.org/project/' . $project);
+  }
+
+  $form['upgrades'] = array(
+    '#prefix' => t('<p>Further upgrades are required. It is recommended to</p>'),
+    '#theme' => 'item_list',
+    '#items' => array(
+      t('Move all existing, incompatible modules (e.g., into <code>@modules-backup-path</code>).', array(
+        '@modules-backup-path' => conf_path() . '/_modules',
+      )),
+      t('Download and extract all new modules.  Using <a href="@drush-url">drush</a>:
 <pre style="white-space: pre-wrap">
-drush dl @modules
+@drush-commands
 </pre>
 ', array(
-      '@modules' => implode(' ', $projects),
-    )),
+        '@drush-url' => 'http://drupal.org/project/drush',
+        '@drush-commands' => $drush,
+      )),
+      array(
+        'data' => t('Alternatively, download manually:'),
+        'children' => $project_links,
+      ),
+    ),
   );
+
   return $form;
+}
+
+/**
+ * Form constructor to re-enable non-core modules.
+ */
+function upgrade_assist_enable_modules() {
+  drupal_set_title(t('Re-enable modules'));
+
+  $disabled_modules = variable_get('upgrade_assist_modules_disabled', array());
+
+  $options = array();
+  $default = array();
+  $all_modules = db_query("SELECT * FROM {system} WHERE type = 'module'")->fetchAllAssoc('name');
+  foreach ($all_modules as $module) {
+    $module->info = unserialize($module->info);
+    // Skip required core modules and hidden modules.
+    if (!empty($module->info['required']) || !empty($module->info['hidden'])) {
+      continue;
+    }
+    // Ignore core modules by package name.
+    if ($module->info['package'] == 'Core') {
+      continue;
+    }
+    // Extra safety.
+    if ($module->info['core'] != DRUPAL_CORE_COMPATIBILITY) {
+      continue;
+    }
+    // Skip already enabled modules and not previously disabled modules.
+    if ($module->status || !in_array($module->name, $disabled_modules)) {
+      continue;
+    }
+    // Dependencies need to exist.
+    $dependencies = TRUE;
+    if (isset($module->info['dependencies'])) {
+      foreach ($module->info['dependencies'] as $required) {
+        if (!isset($all_modules[$required])) {
+          $dependencies = FALSE;
+          break;
+        }
+      }
+    }
+    if ($dependencies) {
+      $options[$module->name] = t('@project: @name', array(
+        '@project' => isset($module->info['project']) ? $module->info['project'] : t('Unknown'),
+        '@name' => $module->info['name'],
+      ));
+      $default[$module->name] = $module->name;
+    }
+  }
+  // Sort options by label.
+  asort($options);
+  $form['enable'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Modules to re-enable'),
+    '#options' => $options,
+    '#default_value' => $default,
+  );
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Re-enable'));
+  return $form;
+}
+
+/**
+ * Form submit handler to re-enable non-core modules.
+ */
+function upgrade_assist_enable_modules_validate($form, &$form_state) {
+  if (!empty($form_state['values']['enable'])) {
+    $modules = array_filter($form_state['values']['enable']);
+
+    $status = module_enable($modules);
+    if ($status === TRUE) {
+      // Save the list of disabled modules for later use.
+      variable_set('upgrade_assist_modules_enabled', $modules);
+      drupal_flush_all_caches();
+      drupal_set_message(t('The selected modules have been re-enabled.'));
+    }
+    else {
+      form_set_error('enable', t('The selected modules could not be re-enabled.'));
+    }
+  }
 }
 
