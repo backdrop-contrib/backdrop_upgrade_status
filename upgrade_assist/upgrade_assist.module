@@ -196,6 +196,7 @@ function upgrade_assist_states($item_list = FALSE) {
     'options' => array('external' => TRUE),
   );
 
+  $modules_upgraded = FALSE;
   // Check whether any of the disabled modules have been replaced with new
   // versions.
   $module_files_upgraded = FALSE;
@@ -219,12 +220,12 @@ function upgrade_assist_states($item_list = FALSE) {
       }
     }
     if ($module_files_upgraded) {
-      $modules_upgraded = db_query('SELECT name, schema_version FROM {system} WHERE type = :type AND name IN (:modules)', array(
+      $result = db_query('SELECT name, schema_version FROM {system} WHERE type = :type AND name IN (:modules)', array(
         ':type' => 'module',
         ':modules' => $module_files_upgraded,
       ))->fetchAllKeyed();
-      foreach ($modules_upgraded as $module_name => $module_version) {
-        if ($module_version[0] == $core) {
+      foreach ($result as $module_name => $module_version) {
+        if ($module_version[0] == $core && drupal_strlen($module_version) > 1) {
           $modules_upgraded = TRUE;
           break;
         }
@@ -238,6 +239,20 @@ function upgrade_assist_states($item_list = FALSE) {
     'href' => 'upgrade/assist/upgrade_assist_download_projects',
   );
 
+  // @todo Demo module is not as smart as Upgrade Assist ;)
+  if ($module_files_upgraded && !module_exists('demo')) {
+    system_rebuild_module_data();
+    switch ($core) {
+      case 7:
+        $demo_info = db_query('SELECT info FROM {system} WHERE name = :name', array(':name' => 'demo'))->fetchField();
+        $demo_info = unserialize($demo_info);
+        break;
+    }
+    if ($demo_info['core'] == DRUPAL_CORE_COMPATIBILITY) {
+      module_enable(array('demo'));
+      drupal_flush_all_caches();
+    }
+  }
   $states['backup-pre-upgrade-modules'] = array(
     'title' => t('Backup current site'),
     'phase' => 'post-upgrade',
@@ -254,7 +269,7 @@ function upgrade_assist_states($item_list = FALSE) {
   $states['upgrade-modules'] = array(
     'title' => t('Run update.php for modules'),
     'phase' => 'post-upgrade',
-    'status' => $modules_upgraded === TRUE || !$module_files_upgraded,
+    'status' => $modules_upgraded === TRUE,
     'href' => $GLOBALS['base_url'] . '/update.php',
     'options' => array('external' => TRUE),
   );
@@ -651,7 +666,6 @@ function upgrade_assist_enable_modules() {
   $disabled_modules = variable_get('upgrade_assist_modules_disabled', array());
 
   $options = array();
-  $default = array();
   $all_modules = db_query("SELECT * FROM {system} WHERE type = 'module'")->fetchAllAssoc('name');
   foreach ($all_modules as $module) {
     $module->info = unserialize($module->info);
@@ -686,7 +700,6 @@ function upgrade_assist_enable_modules() {
         '@project' => isset($module->info['project']) ? $module->info['project'] : t('Unknown'),
         '@name' => $module->info['name'],
       ));
-      $default[$module->name] = $module->name;
     }
   }
   // Sort options by label.
@@ -695,7 +708,6 @@ function upgrade_assist_enable_modules() {
     '#type' => 'checkboxes',
     '#title' => t('Modules to re-enable'),
     '#options' => $options,
-    '#default_value' => $default,
   );
   $form['submit'] = array('#type' => 'submit', '#value' => t('Re-enable'));
   return $form;

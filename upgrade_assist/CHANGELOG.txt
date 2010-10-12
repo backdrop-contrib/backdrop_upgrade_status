@@ -6,6 +6,7 @@ Upgrade Assist x.x-x.x, xxxx-xx-xx
 
 Upgrade Assist 6.x-1.x, xxxx-xx-xx
 ----------------------------------
+by sun: Fixed post-upgrade handling of previously disabled modules.
 by sun: Fixed fatal errors after upgrading.
 by sun: Fixed pre/post-upgrade handling of disabled modules.
 by sun: Fixed project download instructions.
