@@ -1,9 +1,5 @@
 // $Id$
 
-Upgrade Status x.x-x.x, xxxx-xx-xx
-----------------------------------
-
-
 Upgrade Status 6.x-1.x, xxxx-xx-xx
 ----------------------------------
 

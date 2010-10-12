@@ -1,10 +1,10 @@
 // $Id$
 
-Upgrade Assist x.x-x.x, xxxx-xx-xx
+Upgrade Assist 6.x-1.x, xxxx-xx-xx
 ----------------------------------
 
 
-Upgrade Assist 6.x-1.x, xxxx-xx-xx
+Upgrade Assist 6.x-1.1, 2010-10-12
 ----------------------------------
 by sun: Fixed post-upgrade handling of previously disabled modules.
 by sun: Fixed fatal errors after upgrading.
