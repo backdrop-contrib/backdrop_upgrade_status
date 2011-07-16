@@ -114,7 +114,10 @@ function theme_upgrade_status_report($data) {
       // them like development releases, since many maintainers merely use this
       // additional flag to hide the release from novice Drupal users.
       case UPDATE_NOT_SUPPORTED:
-        $row .= '<span class="not-current">'. t('In development') .'</span>';
+        // US: Additionally output the "development stage" of a project; alpha,
+        // beta, and RC are all treated as in development.
+        $type = $project['releases'][$project['recommended']]['version'];
+        $row .= '<span class="not-current">'. t('In development: %type', array('%type' => $type)) .'</span>';
         break;
       case UPGRADE_STATUS_STABLE:
         $row .= '<span class="current">'. t('Available') .'</span>';

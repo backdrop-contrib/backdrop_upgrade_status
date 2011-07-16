@@ -1,6 +1,7 @@
 
 Upgrade Status 6.x-1.x, xxxx-xx-xx
 ----------------------------------
+#1112518 by webchick, NancyDru: Added version for projects 'In development'.
 
 
 Upgrade Status 6.x-1.0, 2010-09-05
