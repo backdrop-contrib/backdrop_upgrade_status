@@ -81,8 +81,8 @@ function _upgrade_status_refresh() {
   }
 
   if ($data) {
-    $parser = new update_xml_parser;
-    $available = $parser->parse($data);
+##    $parser = new update_xml_parser;
+##    $available = $parser->parse($data);
   }
   if (!empty($available) && is_array($available)) {
     // Record the projects where we failed to fetch data.

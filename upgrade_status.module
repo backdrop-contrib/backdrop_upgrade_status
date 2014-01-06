@@ -67,11 +67,11 @@ function upgrade_status_menu() {
 function upgrade_status_theme() {
   return array(
     'upgrade_status_report' => array(
-      'arguments' => array('data' => NULL),
+      'variables' => array('data' => NULL),
       'file' => 'upgrade_status.report.inc',
     ),
     'upgrade_status_version' => array(
-      'arguments' => array('version' => NULL, 'tag' => NULL, 'class' => NULL),
+      'variables' => array('version' => NULL, 'tag' => NULL, 'class' => NULL),
       'file' => 'upgrade_status.report.inc',
     ),
   );

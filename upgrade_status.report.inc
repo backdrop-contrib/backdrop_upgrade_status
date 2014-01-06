@@ -15,14 +15,15 @@ function upgrade_status_status() {
   if ($available = upgrade_status_get_available()) {
     module_load_include('inc', 'upgrade_status', 'upgrade_status.compare');
     $data = upgrade_status_calculate_project_data($available);
-    return theme('upgrade_status_report', $data);
+    return theme('update_report', array('data' => $data));
   }
   else {
     // US: Inlined _update_no_data().
     $destination = drupal_get_destination();
-    return theme('upgrade_status_report', t('No information is available about currently installed modules. You can <a href="@check_manually">check manually</a>. Please note that checking for available upgrades can take a long time, so please be patient.', array(
-      '@check_manually' => url('admin/reports/updates/upgrade/check', array('query' => array('query' => $destination))),
-    )));
+    return t('No update information available. <a href="@run_cron">Run cron</a> or <a href="@check_manually">check manually</a>.', array(
+      '@run_cron' => url('admin/reports/status/run-cron', array('query' => $destination)),
+      '@check_manually' => url('admin/reports/updates/check', array('query' => $destination)),
+    ));
   }
 }
 
@@ -31,7 +32,9 @@ function upgrade_status_status() {
  *
  * @ingroup themeable
  */
-function theme_upgrade_status_report($data) {
+function theme_upgrade_status_report($variables) {
+  $data = $variables['data'];
+
   $last = variable_get('upgrade_status_last_check', 0);
   $output = '<p>'. t("Clicking on any of the modules' boxes will expand the area and show you a link to download the new version of the project, as well as read its release notes.") .'</p>';
   $output .= '<div class="upgrade-status checked">'. ($last ? t('Last checked: @time ago', array('@time' => format_interval(time() - $last))) : t('Last checked: never'));
@@ -305,7 +308,10 @@ function theme_upgrade_status_report($data) {
  *
  * @ingroup themeable
  */
-function theme_upgrade_status_version($version, $tag, $class) {
+function theme_upgrade_status_version($variables) {
+  $version = $variables['version'];
+  $tag = $variables['tag'];
+  $class = $variables['class'];
   $output = '';
   $output .= '<table class="version '. $class .'">';
   $output .= '<tr>';
