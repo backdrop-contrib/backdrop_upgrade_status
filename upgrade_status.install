@@ -2,14 +2,14 @@
 
 /**
  * @file
- * Install, update, and uninstall functions for the Upgrade Manager module.
+ * Install, update, and uninstall functions for the Upgrade Status module.
  */
 
 /**
  * Implements hook_install().
  */
-function update_install() {
-  $queue = DrupalQueue::get('update_fetch_tasks', TRUE);
+function upgrade_status_install() {
+  $queue = DrupalQueue::get('upgrade_status_fetch_tasks', TRUE);
   $queue->createQueue();
 }
 
@@ -21,9 +21,9 @@ function update_install() {
 /**
  * Create a queue to store tasks for requests to fetch available update data.
  */
-function update_update_7000() {
+function upgrade_status_update_7000() {
   module_load_include('inc', 'system', 'system.queue');
-  $queue = DrupalQueue::get('update_fetch_tasks');
+  $queue = DrupalQueue::get('upgrade_status_fetch_tasks');
   $queue->createQueue();
 }
 
