@@ -12,7 +12,7 @@ module_load_include('inc', 'update', 'update.report');
  *
  * @see update_menu()
  */
-function update_status() {
+function upgrade_status_status() {
   if ($available = update_get_available(TRUE)) {
     module_load_include('inc', 'update', 'update.compare');
     $data = update_calculate_project_data($available);
@@ -32,7 +32,7 @@ function update_status() {
  *
  * @ingroup themeable
  */
-function theme_update_report($variables) {
+function theme_upgrade_status_report($variables) {
   $data = $variables['data'];
 
   $last = variable_get('update_last_check', 0);
@@ -263,7 +263,7 @@ function theme_update_report($variables) {
  * @see update_calculate_project_data()
  * @ingroup themeable
  */
-function theme_update_status_label($variables) {
+function theme_upgrade_status_status_label($variables) {
   switch ($variables['status']) {
     case UPDATE_NOT_SECURE:
       return '<span class="security-error">' . t('Security update required!') . '</span>';
@@ -298,7 +298,7 @@ function theme_update_status_label($variables) {
  *
  * @ingroup themeable
  */
-function theme_update_version($variables) {
+function theme_upgrade_status_version($variables) {
   $version = $variables['version'];
   $tag = $variables['tag'];
   $class = implode(' ', $variables['class']);

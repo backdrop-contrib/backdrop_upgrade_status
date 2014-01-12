@@ -55,7 +55,7 @@ module_load_include('inc', 'update', 'update.compare');
  * @see update_calculate_project_data()
  * @see update_project_cache()
  */
-function update_get_projects() {
+function upgrade_status_get_projects() {
   $projects = &drupal_static(__FUNCTION__, array());
   if (empty($projects)) {
     // Retrieve the projects from cache, if present.
@@ -105,7 +105,7 @@ function update_get_projects() {
  *
  * @see update_get_projects()
  */
-function _update_process_info_list(&$projects, $list, $project_type, $status) {
+function _upgrade_status_process_info_list(&$projects, $list, $project_type, $status) {
   foreach ($list as $file) {
     // A disabled base theme of an enabled sub-theme still has all of its code
     // run by the sub-theme, so we include it in our "enabled" projects list.
@@ -248,7 +248,7 @@ function _update_process_info_list(&$projects, $list, $project_type, $status) {
  *
  * @see system_get_files_database()
  */
-function update_get_project_name($file) {
+function upgrade_status_get_project_name($file) {
   $project_name = '';
   if (isset($file->info['project'])) {
     $project_name = $file->info['project'];
@@ -269,7 +269,7 @@ function update_get_project_name($file) {
  * @param $projects
  *   Array of project information from update_get_projects().
  */
-function update_process_project_info(&$projects) {
+function upgrade_status_process_project_info(&$projects) {
   foreach ($projects as $key => $project) {
     // Assume an official release until we see otherwise.
     $install_type = 'official';
@@ -334,7 +334,7 @@ function update_process_project_info(&$projects) {
  * @see update_process_project_info()
  * @see update_project_cache()
  */
-function update_calculate_project_data($available) {
+function upgrade_status_calculate_project_data($available) {
   // Retrieve the projects from cache, if present.
   $projects = update_project_cache('update_project_data');
   // If $projects is empty, then the cache must be rebuilt.
@@ -426,7 +426,7 @@ function update_calculate_project_data($available) {
  * @param $available
  *   Data about available project releases of a specific project.
  */
-function update_calculate_project_update_status($project, &$project_data, $available) {
+function upgrade_status_calculate_project_update_status($project, &$project_data, $available) {
   foreach (array('title', 'link') as $attribute) {
     if (!isset($project_data[$attribute]) && isset($available[$attribute])) {
       $project_data[$attribute] = $available[$attribute];
@@ -778,7 +778,7 @@ function update_calculate_project_update_status($project, &$project_data, $avail
  *   update_calculate_project_data() or update_get_projects(), or an empty array
  *   when the cache is cleared.
  */
-function update_project_cache($cid) {
+function upgrade_status_project_cache($cid) {
   $projects = array();
 
   // On certain paths, we should clear the cache and recompute the projects for
@@ -818,7 +818,7 @@ function update_project_cache($cid) {
  *
  * @see _update_process_info_list()
  */
-function update_filter_project_info($info) {
+function upgrade_status_filter_project_info($info) {
   $whitelist = array(
     '_info_file_ctime',
     'datestamp',

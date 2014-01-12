@@ -14,7 +14,7 @@ module_load_include('inc', 'update', 'update.fetch');
  *
  * @see update_menu()
  */
-function update_manual_status() {
+function upgrade_status_manual_status() {
   _update_refresh();
   $batch = array(
     'operations' => array(
@@ -36,7 +36,7 @@ function update_manual_status() {
  * @param $context
  *   Reference to an array used for Batch API storage.
  */
-function update_fetch_data_batch(&$context) {
+function upgrade_status_fetch_data_batch(&$context) {
   $queue = DrupalQueue::get('update_fetch_tasks');
   if (empty($context['sandbox']['max'])) {
     $context['finished'] = 0;
@@ -88,7 +88,7 @@ function update_fetch_data_batch(&$context) {
  *   'updated' which holds the total number of projects we fetched available
  *   update data for.
  */
-function update_fetch_data_finished($success, $results) {
+function upgrade_status_fetch_data_finished($success, $results) {
   if ($success) {
     if (!empty($results)) {
       if (!empty($results['updated'])) {
@@ -107,7 +107,7 @@ function update_fetch_data_finished($success, $results) {
 /**
  * Attempts to drain the queue of tasks for release history data to fetch.
  */
-function _update_fetch_data() {
+function _upgrade_status_fetch_data() {
   $queue = DrupalQueue::get('update_fetch_tasks');
   $end = time() + variable_get('update_max_fetch_time', UPDATE_MAX_FETCH_TIME);
   while (time() < $end && ($item = $queue->claimItem())) {
@@ -128,7 +128,7 @@ function _update_fetch_data() {
  * @return
  *   TRUE if we fetched parsable XML, otherwise FALSE.
  */
-function _update_process_fetch_task($project) {
+function _upgrade_status_process_fetch_task($project) {
   global $base_url;
   $fail = &drupal_static(__FUNCTION__, array());
   // This can be in the middle of a long-running batch, so REQUEST_TIME won't
@@ -196,7 +196,7 @@ function _update_process_fetch_task($project) {
 /**
  * Clears out all the cached available update data and initiates re-fetching.
  */
-function _update_refresh() {
+function _upgrade_status_refresh() {
   module_load_include('inc', 'update', 'update.compare');
 
   // Since we're fetching new available update data, we want to clear
@@ -238,7 +238,7 @@ function _update_refresh() {
  * @see update_fetch_data()
  * @see _update_process_fetch_task()
  */
-function _update_create_fetch_task($project) {
+function _upgrade_status_create_fetch_task($project) {
   $fetch_tasks = &drupal_static(__FUNCTION__, array());
   if (empty($fetch_tasks)) {
     $fetch_tasks = _update_get_cache_multiple('fetch_task');
@@ -286,7 +286,7 @@ function _update_create_fetch_task($project) {
  * @see _update_process_fetch_task()
  * @see update_get_projects()
  */
-function _update_build_fetch_url($project, $site_key = '') {
+function _upgrade_status_build_fetch_url($project, $site_key = '') {
   $name = $project['name'];
   $url = _update_get_fetch_url_base($project);
   $url .= '/' . $name . '/' . DRUPAL_CORE_COMPATIBILITY;
@@ -326,7 +326,7 @@ function _update_build_fetch_url($project, $site_key = '') {
  *
  * @see _update_build_fetch_url()
  */
-function _update_get_fetch_url_base($project) {
+function _upgrade_status_get_fetch_url_base($project) {
   return isset($project['info']['project status url']) ? $project['info']['project status url'] : variable_get('update_fetch_url', UPDATE_DEFAULT_URL);
 }
 
@@ -339,7 +339,7 @@ function _update_get_fetch_url_base($project) {
  *
  * @see update_requirements()
  */
-function _update_cron_notify() {
+function _upgrade_status_cron_notify() {
   module_load_install('update');
   $status = update_requirements('runtime');
   $params = array();
@@ -383,7 +383,7 @@ function _update_cron_notify() {
  *   Array of parsed data about releases for a given project, or NULL if there
  *   was an error parsing the string.
  */
-function update_parse_xml($raw_xml) {
+function upgrade_status_parse_xml($raw_xml) {
   try {
     $xml = new SimpleXMLElement($raw_xml);
   }
