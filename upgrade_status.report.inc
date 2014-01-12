@@ -43,8 +43,8 @@ function upgrade_status_status() {
 function theme_upgrade_status_report($variables) {
   $data = $variables['data'];
 
-  $last = variable_get('update_last_check', 0);
-  $output = theme('update_last_check', array('last' => $last));
+  $last = variable_get('upgrade_status_last_check', 0);
+  $output = theme('upgrade_status_last_check', array('last' => $last));
 
   if (!is_array($data)) {
     $output .= '<p>' . $data . '</p>';

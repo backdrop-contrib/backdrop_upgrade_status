@@ -66,6 +66,9 @@ function upgrade_status_menu() {
  */
 function upgrade_status_theme() {
   return array(
+    'upgrade_status_last_check' => array(
+      'variables' => array('last' => NULL),
+    ),
     'upgrade_status_report' => array(
       'variables' => array('data' => NULL),
       'file' => 'upgrade_status.report.inc',
@@ -180,6 +183,29 @@ function upgrade_status_refresh() {
 function upgrade_status_fetch_data() {
   module_load_include('inc', 'upgrade_status', 'upgrade_status.fetch');
   return _upgrade_status_fetch_data();
+}
+
+/**
+ * Returns HTML for the last time we checked for update data.
+ *
+ * In addition to properly formatting the given timestamp, this function also
+ * provides a "Check manually" link that refreshes the available update and
+ * redirects back to the same page.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - last: The timestamp when the site last checked for available updates.
+ *
+ * @see theme_upgrade_status_report()
+ * @ingroup themeable
+ */
+function theme_upgrade_status_last_check($variables) {
+  $last = $variables['last'];
+  $output = '<div class="update checked">';
+  $output .= $last ? t('Last checked: @time ago', array('@time' => format_interval(REQUEST_TIME - $last))) : t('Last checked: never');
+  $output .= ' <span class="check-manually">(' . l(t('Check manually'), 'admin/reports/updates/upgrade/check', array('query' => drupal_get_destination())) . ')</span>';
+  $output .= "</div>\n";
+  return $output;
 }
 
 /**
