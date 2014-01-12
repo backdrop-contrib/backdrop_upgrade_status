@@ -10,16 +10,24 @@ module_load_include('inc', 'update', 'update.report');
 /**
  * Page callback: Generates a page about the update status of projects.
  *
- * @see update_menu()
+ * @see upgrade_status_menu()
  */
 function upgrade_status_status() {
-  if ($available = update_get_available(TRUE)) {
-    module_load_include('inc', 'update', 'update.compare');
-    $data = update_calculate_project_data($available);
-    return theme('update_report', array('data' => $data));
+  // US: Don't pass TRUE to check cache only.
+  if ($available = upgrade_status_get_available()) {
+    module_load_include('inc', 'upgrade_status', 'upgrade_status.compare');
+    $data = upgrade_status_calculate_project_data($available);
+    return theme('upgrade_status_report', array('data' => $data));
   }
   else {
-    return theme('update_report', array('data' => _update_no_data()));
+    // US: Inlined _update_no_data().
+    // @todo: File an upstream patch for that.
+    $destination = drupal_get_destination();
+    $data = t('No upgrade information available. <a href="@run_cron">Run cron</a> or <a href="@check_manually">check manually</a>.', array(
+      '@run_cron' => url('admin/reports/status/run-cron', array('query' => $destination)),
+      '@check_manually' => url('admin/reports/updates/upgrade/check', array('query' => $destination)),
+    ));
+    return theme('upgrade_status_report', array('data' => $data));
   }
 }
 
