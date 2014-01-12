@@ -12,22 +12,22 @@ module_load_include('inc', 'update', 'update.fetch');
  *
  * Manually checks the update status without the use of cron.
  *
- * @see update_menu()
+ * @see upgrade_status_menu()
  */
 function upgrade_status_manual_status() {
-  _update_refresh();
+  _upgrade_status_refresh();
   $batch = array(
     'operations' => array(
-      array('update_fetch_data_batch', array()),
+      array('upgrade_status_fetch_data_batch', array()),
     ),
-    'finished' => 'update_fetch_data_finished',
-    'title' => t('Checking available update data'),
-    'progress_message' => t('Trying to check available update data ...'),
-    'error_message' => t('Error checking available update data.'),
-    'file' => drupal_get_path('module', 'update') . '/update.fetch.inc',
+    'finished' => 'upgrade_status_fetch_data_finished',
+    'title' => t('Checking available upgrade data'),
+    'progress_message' => t('Trying to check available upgrade data ...'),
+    'error_message' => t('Error checking available upgrade data.'),
+    'file' => drupal_get_path('module', 'upgrade_status') . '/upgrade_status.fetch.inc',
   );
   batch_set($batch);
-  batch_process('admin/reports/updates');
+  batch_process('admin/reports/updates/upgrade');
 }
 
 /**
@@ -37,12 +37,12 @@ function upgrade_status_manual_status() {
  *   Reference to an array used for Batch API storage.
  */
 function upgrade_status_fetch_data_batch(&$context) {
-  $queue = DrupalQueue::get('update_fetch_tasks');
+  $queue = DrupalQueue::get('upgrade_status_fetch_tasks');
   if (empty($context['sandbox']['max'])) {
     $context['finished'] = 0;
     $context['sandbox']['max'] = $queue->numberOfItems();
     $context['sandbox']['progress'] = 0;
-    $context['message'] = t('Checking available update data ...');
+    $context['message'] = t('Checking available upgrade data ...');
     $context['results']['updated'] = 0;
     $context['results']['failures'] = 0;
     $context['results']['processed'] = 0;
@@ -51,12 +51,12 @@ function upgrade_status_fetch_data_batch(&$context) {
   // Grab another item from the fetch queue.
   for ($i = 0; $i < 5; $i++) {
     if ($item = $queue->claimItem()) {
-      if (_update_process_fetch_task($item->data)) {
+      if (_upgrade_status_process_fetch_task($item->data)) {
         $context['results']['updated']++;
-        $context['message'] = t('Checked available update data for %title.', array('%title' => $item->data['info']['name']));
+        $context['message'] = t('Checked available upgrade data for %title.', array('%title' => $item->data['info']['name']));
       }
       else {
-        $context['message'] = t('Failed to check available update data for %title.', array('%title' => $item->data['info']['name']));
+        $context['message'] = t('Failed to check available upgrade data for %title.', array('%title' => $item->data['info']['name']));
         $context['results']['failures']++;
       }
       $context['sandbox']['progress']++;
@@ -81,6 +81,8 @@ function upgrade_status_fetch_data_batch(&$context) {
 /**
  * Batch callback: Performs actions when all fetch tasks have been completed.
  *
+ * @todo: I don't actually think we need to fork this; investigate later.
+ *
  * @param $success
  *   TRUE if the batch operation was successful; FALSE if there were errors.
  * @param $results
@@ -92,15 +94,15 @@ function upgrade_status_fetch_data_finished($success, $results) {
   if ($success) {
     if (!empty($results)) {
       if (!empty($results['updated'])) {
-        drupal_set_message(format_plural($results['updated'], 'Checked available update data for one project.', 'Checked available update data for @count projects.'));
+        drupal_set_message(format_plural($results['updated'], 'Checked available upgrade data for one project.', 'Checked available upgrade data for @count projects.'));
       }
       if (!empty($results['failures'])) {
-        drupal_set_message(format_plural($results['failures'], 'Failed to get available update data for one project.', 'Failed to get available update data for @count projects.'), 'error');
+        drupal_set_message(format_plural($results['failures'], 'Failed to get available upgrade data for one project.', 'Failed to get available upgrade data for @count projects.'), 'error');
       }
     }
   }
   else {
-    drupal_set_message(t('An error occurred trying to get available update data.'), 'error');
+    drupal_set_message(t('An error occurred trying to get available upgrade data.'), 'error');
   }
 }
 
@@ -108,10 +110,10 @@ function upgrade_status_fetch_data_finished($success, $results) {
  * Attempts to drain the queue of tasks for release history data to fetch.
  */
 function _upgrade_status_fetch_data() {
-  $queue = DrupalQueue::get('update_fetch_tasks');
+  $queue = DrupalQueue::get('upgrade_status_fetch_tasks');
   $end = time() + variable_get('update_max_fetch_time', UPDATE_MAX_FETCH_TIME);
   while (time() < $end && ($item = $queue->claimItem())) {
-    _update_process_fetch_task($item->data);
+    _upgrade_status_process_fetch_task($item->data);
     $queue->deleteItem($item);
   }
 }
@@ -137,7 +139,7 @@ function _upgrade_status_process_fetch_task($project) {
   if (empty($fail)) {
     // If we have valid data about release history XML servers that we have
     // failed to fetch from on previous attempts, load that from the cache.
-    if (($cache = _update_cache_get('fetch_failures')) && ($cache->expire > $now)) {
+    if (($cache = _update_cache_get('upgrade_status_fetch_failures')) && ($cache->expire > $now)) {
       $fail = $cache->data;
     }
   }
@@ -180,18 +182,18 @@ function _upgrade_status_process_fetch_task($project) {
   }
 
   $frequency = variable_get('update_check_frequency', 1);
-  $cid = 'available_releases::' . $project_name;
+  $cid = 'upgrade_status_available_releases::' . $project_name;
   _update_cache_set($cid, $available, $now + (60 * 60 * 24 * $frequency));
 
   // Stash the $fail data back in the DB for the next 5 minutes.
-  _update_cache_set('fetch_failures', $fail, $now + (60 * 5));
+  _update_cache_set('upgrade_status_fetch_failures', $fail, $now + (60 * 5));
 
   // Whether this worked or not, we did just (try to) check for updates.
-  variable_set('update_last_check', $now);
+  variable_set('upgrade_status_last_check', $now);
 
   // Now that we processed the fetch task for this project, clear out the
   // record in {cache_update} for this task so we're willing to fetch again.
-  _update_cache_clear('fetch_task::' . $project_name);
+  _update_cache_clear('upgrade_status_fetch_task::' . $project_name);
 
   return $success;
 }
@@ -200,7 +202,7 @@ function _upgrade_status_process_fetch_task($project) {
  * Clears out all the cached available update data and initiates re-fetching.
  */
 function _upgrade_status_refresh() {
-  module_load_include('inc', 'update', 'update.compare');
+  module_load_include('inc', 'upgrade_status', 'upgrade_status.compare');
 
   // Since we're fetching new available update data, we want to clear
   // our cache of both the projects we care about, and the current update
@@ -208,18 +210,19 @@ function _upgrade_status_refresh() {
   // releases just yet, since that data (even if it's stale) can be useful
   // during update_get_projects(); for example, to modules that implement
   // hook_system_info_alter() such as cvs_deploy.
-  _update_cache_clear('update_project_projects');
-  _update_cache_clear('update_project_data');
+  // @todo: File upstream issue: cvs_deploy is irrelevant. :P
+  _update_cache_clear('upgrade_status_project_projects');
+  _update_cache_clear('upgrade_status_project_data');
 
   $projects = update_get_projects();
 
   // Now that we have the list of projects, we should also clear our cache of
   // available release data, since even if we fail to fetch new data, we need
   // to clear out the stale data at this point.
-  _update_cache_clear('available_releases::', TRUE);
+  _update_cache_clear('upgrade_status_available_releases::', TRUE);
 
   foreach ($projects as $key => $project) {
-    update_create_fetch_task($project);
+    upgrade_status_create_fetch_task($project);
   }
 }
 
@@ -227,7 +230,7 @@ function _upgrade_status_refresh() {
  * Adds a task to the queue for fetching release history data for a project.
  *
  * We only create a new fetch task if there's no task already in the queue for
- * this particular project (based on 'fetch_task::' entries in the
+ * this particular project (based on 'upgrade_status_fetch_task::' entries in the
  * {cache_update} table).
  *
  * @param $project
@@ -237,18 +240,18 @@ function _upgrade_status_refresh() {
  *
  * @see update_get_projects()
  * @see update_get_available()
- * @see update_refresh()
- * @see update_fetch_data()
- * @see _update_process_fetch_task()
+ * @see upgrade_status_refresh()
+ * @see upgrade_status_fetch_data()
+ * @see _upgrade_status_process_fetch_task()
  */
 function _upgrade_status_create_fetch_task($project) {
   $fetch_tasks = &drupal_static(__FUNCTION__, array());
   if (empty($fetch_tasks)) {
-    $fetch_tasks = _update_get_cache_multiple('fetch_task');
+    $fetch_tasks = _update_get_cache_multiple('upgrade_status_fetch_task');
   }
-  $cid = 'fetch_task::' . $project['name'];
+  $cid = 'upgrade_status_fetch_task::' . $project['name'];
   if (empty($fetch_tasks[$cid])) {
-    $queue = DrupalQueue::get('update_fetch_tasks');
+    $queue = DrupalQueue::get('upgrade_status_fetch_tasks');
     $queue->createItem($project);
     // Due to race conditions, it is possible that another process already
     // inserted a row into the {cache_update} table and the following query will
