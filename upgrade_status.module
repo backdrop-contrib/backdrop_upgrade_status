@@ -97,7 +97,7 @@ function upgrade_status_theme() {
  * @see update_refresh()
  * @see update_get_projects()
  */
-function update_get_available($refresh = FALSE) {
+function upgrade_status_get_available($refresh = FALSE) {
   module_load_include('inc', 'update', 'update.compare');
   $needs_refresh = FALSE;
 
@@ -157,7 +157,7 @@ function update_get_available($refresh = FALSE) {
  *
  * @see _update_create_fetch_task()
  */
-function update_create_fetch_task($project) {
+function upgrade_status_create_fetch_task($project) {
   module_load_include('inc', 'update', 'update.fetch');
   return _update_create_fetch_task($project);
 }
@@ -167,7 +167,7 @@ function update_create_fetch_task($project) {
  *
  * @see _update_refresh()
  */
-function update_refresh() {
+function upgrade_status_refresh() {
   module_load_include('inc', 'update', 'update.fetch');
   return _update_refresh();
 }
@@ -177,7 +177,7 @@ function update_refresh() {
  *
  * @see _update_fetch_data()
  */
-function update_fetch_data() {
+function upgrade_status_fetch_data() {
   module_load_include('inc', 'update', 'update.fetch');
   return _update_fetch_data();
 }
