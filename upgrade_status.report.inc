@@ -96,7 +96,7 @@ function theme_upgrade_status_report($variables) {
     }
 
     $row = '<div class="version-status">';
-    $status_label = theme('update_status_label', array('status' => $project['status']));
+    $status_label = theme('upgrade_status_status_label', array('status' => $project['status'], 'project' => $project));
     $row .= !empty($status_label) ? $status_label : check_plain($project['reason']);
     $row .= '<span class="icon">' . $icon . '</span>';
     $row .= "</div>\n";
@@ -217,7 +217,7 @@ function theme_upgrade_status_report($variables) {
           case UPDATE_NOT_SECURE:
           case UPDATE_REVOKED:
           case UPDATE_NOT_SUPPORTED:
-            $base_themes[] = t('%base_theme (!base_label)', array('%base_theme' => $base_theme, '!base_label' => theme('update_status_label', array('status' => $status[$base_key]))));
+            $base_themes[] = t('%base_theme (!base_label)', array('%base_theme' => $base_theme, '!base_label' => theme('upgrade_status_status_label', array('status' => $status[$base_key]))));
             break;
 
           default:
@@ -271,27 +271,49 @@ function theme_upgrade_status_report($variables) {
  * @param array $variables
  *   An associative array containing:
  *   - status: The integer code for a project's current update status.
+ *   // US: Add project data as well so we can determine type of release.
+ *   // @todo File upstream patch?
+ *   - project: Project data.
  *
  * @see update_calculate_project_data()
  * @ingroup themeable
  */
 function theme_upgrade_status_status_label($variables) {
+  $project = $variables['project'];
+
   switch ($variables['status']) {
-    case UPDATE_NOT_SECURE:
-      return '<span class="security-error">' . t('Security update required!') . '</span>';
+    // US: Not applicable.
+#    case UPDATE_NOT_SECURE:
+#      return '<span class="security-error">' . t('Security update required!') . '</span>';
 
-    case UPDATE_REVOKED:
-      return '<span class="revoked">' . t('Revoked!') . '</span>';
+    // US: Not applicable.
+#    case UPDATE_REVOKED:
+#      return '<span class="revoked">' . t('Revoked!') . '</span>';
 
+    // Although unsupported releases should actually be unsupported, we treat
+    // them like development releases, since many maintainers merely use this
+    // additional flag to hide the release from novice Drupal users.
+    case UPGRADE_STATUS_DEVELOPMENT:
     case UPDATE_NOT_SUPPORTED:
-      return '<span class="not-supported">' . t('Not supported!') . '</span>';
+#      return '<span class="not-supported">' . t('Not supported!') . '</span>';
+      // US: Additionally output the "development stage" of a project; alpha,
+      // beta, and RC are all treated as in development.
+      $type = $project['releases'][$project['recommended']]['version'];
+      return '<span class="not-current">'. t('In development: %type', array('%type' => $type)) .'</span>';
 
-    case UPDATE_NOT_CURRENT:
-      return '<span class="not-current">' . t('Update available') . '</span>';
+    // US: Not applicable.
+#    case UPDATE_NOT_CURRENT:
+#      return '<span class="not-current">' . t('Update available') . '</span>';
 
-    case UPDATE_CURRENT:
-      return '<span class="current">' . t('Up to date') . '</span>';
+    // US: Good news for us means that a stable release is available...
+#    case UPDATE_CURRENT:
+#      return '<span class="current">' . t('Up to date') . '</span>';
+    case UPGRADE_STATUS_STABLE:
+      return '<span class="current">'. t('Available') .'</span>';
 
+    // US: ...or that a module's been moved into core.
+    case UPGRADE_STATUS_CORE:
+      return '<span class="current">'. t('In core') .'</span>';
   }
 }
 
