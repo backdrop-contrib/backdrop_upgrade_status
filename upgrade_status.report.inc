@@ -46,6 +46,10 @@ function theme_upgrade_status_report($variables) {
   $last = variable_get('upgrade_status_last_check', 0);
   $output = theme('upgrade_status_last_check', array('last' => $last));
 
+  // US: Add the core version selector form.
+  $form = drupal_get_form('upgrade_status_core_version_form');
+  $output .= drupal_render($form);
+
   if (!is_array($data)) {
     $output .= '<p>' . $data . '</p>';
     return $output;
