@@ -205,31 +205,31 @@ function theme_upgrade_status_report($variables) {
               ) {
             $version_class .= ' version-recommended-strong';
           }
-          $row .= theme('upgrade_status_version', $project['releases'][$project['recommended']], t('Recommended version:'), $version_class);
+          $row .= theme('update_version', $project['releases'][$project['recommended']], t('Recommended version:'), $version_class);
         }
 
         // Now, print any security updates.
         if (!empty($project['security updates'])) {
           foreach ($project['security updates'] as $security_update) {
-            $row .= theme('upgrade_status_version', $security_update, t('Security update:'), 'version-security'. $security_class);
+            $row .= theme('update_version', $security_update, t('Security update:'), 'version-security'. $security_class);
           }
         }
       }
 
       if ($project['recommended'] !== $project['latest_version']) {
-        $row .= theme('upgrade_status_version', $project['releases'][$project['latest_version']], t('Latest version:'), 'version-latest');
+        $row .= theme('update_version', $project['releases'][$project['latest_version']], t('Latest version:'), 'version-latest');
       }
       if ($project['install_type'] == 'dev'
           && $project['status'] != UPDATE_CURRENT
           && isset($project['dev_version'])
           && $project['recommended'] !== $project['dev_version']) {
-        $row .= theme('upgrade_status_version', $project['releases'][$project['dev_version']], t('Development version:'), 'version-latest');
+        $row .= theme('update_version', $project['releases'][$project['dev_version']], t('Development version:'), 'version-latest');
       }
     }
 
     if (isset($project['also'])) {
       foreach ($project['also'] as $also) {
-        $row .= theme('upgrade_status_version', $project['releases'][$also], t('Also available:'), 'version-also-available');
+        $row .= theme('update_version', $project['releases'][$also], t('Also available:'), 'version-also-available');
       }
     }
 
@@ -300,40 +300,6 @@ function theme_upgrade_status_report($variables) {
   }
   drupal_add_css(drupal_get_path('module', 'upgrade_status') .'/upgrade_status.css');
   drupal_add_js(drupal_get_path('module', 'upgrade_status') .'/upgrade_status.js');
-  return $output;
-}
-
-/**
- * Theme the version display of a project.
- *
- * @ingroup themeable
- */
-function theme_upgrade_status_version($variables) {
-  $version = $variables['version'];
-  $tag = $variables['tag'];
-  $class = $variables['class'];
-  $output = '';
-  $output .= '<table class="version '. $class .'">';
-  $output .= '<tr>';
-  $output .= '<td class="version-title">'. $tag ."</td>\n";
-  $output .= '<td class="version-details">';
-  $output .= l($version['version'], $version['release_link']);
-  $output .= ' <span class="version-date">('. format_date($version['date'], 'custom', 'Y-M-d') .')</span>';
-  $output .= "</td>\n";
-  $output .= '<td class="version-links">';
-  $links = array();
-  $links['update-download'] = array(
-    'title' => t('Download'),
-    'href' => $version['download_link'],
-  );
-  $links['update-release-notes'] = array(
-    'title' => t('Release notes'),
-    'href' => $version['release_link'],
-  );
-  $output .= theme('links', $links);
-  $output .= '</td>';
-  $output .= '</tr>';
-  $output .= "</table>\n";
   return $output;
 }
 

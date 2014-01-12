@@ -70,10 +70,6 @@ function upgrade_status_theme() {
       'variables' => array('data' => NULL),
       'file' => 'upgrade_status.report.inc',
     ),
-    'upgrade_status_version' => array(
-      'variables' => array('version' => NULL, 'tag' => NULL, 'class' => NULL),
-      'file' => 'upgrade_status.report.inc',
-    ),
   );
 }
 
