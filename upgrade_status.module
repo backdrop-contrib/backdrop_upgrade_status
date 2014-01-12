@@ -94,11 +94,11 @@ function upgrade_status_theme() {
  * @return
  *   Array of data about available releases, keyed by project shortname.
  *
- * @see update_refresh()
+ * @see upgrade_status_refresh()
  * @see update_get_projects()
  */
 function upgrade_status_get_available($refresh = FALSE) {
-  module_load_include('inc', 'update', 'update.compare');
+  module_load_include('inc', 'upgrade_status', 'upgrade_status.compare');
   $needs_refresh = FALSE;
 
   // Grab whatever data we currently have cached in the DB.
@@ -109,7 +109,7 @@ function upgrade_status_get_available($refresh = FALSE) {
   foreach ($projects as $key => $project) {
     // If there's no data at all, we clearly need to fetch some.
     if (empty($available[$key])) {
-      update_create_fetch_task($project);
+      upgrade_status_create_fetch_task($project);
       $needs_refresh = TRUE;
       continue;
     }
@@ -132,14 +132,14 @@ function upgrade_status_get_available($refresh = FALSE) {
     // If we think this project needs to fetch, actually create the task now
     // and remember that we think we're missing some data.
     if (!empty($available[$key]['fetch_status']) && $available[$key]['fetch_status'] == UPDATE_FETCH_PENDING) {
-      update_create_fetch_task($project);
+      upgrade_status_create_fetch_task($project);
       $needs_refresh = TRUE;
     }
   }
 
   if ($needs_refresh && $refresh) {
     // Attempt to drain the queue of fetch tasks.
-    update_fetch_data();
+    upgrade_status_fetch_data();
     // After processing the queue, we've (hopefully) got better data, so pull
     // the latest from the cache again and use that directly.
     $available = _update_get_cached_available_releases();
@@ -155,31 +155,31 @@ function upgrade_status_get_available($refresh = FALSE) {
  *   Associative array of information about a project. See update_get_projects()
  *   for the keys used.
  *
- * @see _update_create_fetch_task()
+ * @see _upgrade_status_create_fetch_task()
  */
 function upgrade_status_create_fetch_task($project) {
-  module_load_include('inc', 'update', 'update.fetch');
-  return _update_create_fetch_task($project);
+  module_load_include('inc', 'upgrade_status', 'upgrade_status.fetch');
+  return _upgrade_status_create_fetch_task($project);
 }
 
 /**
  * Refreshes the release data after loading the necessary include file.
  *
- * @see _update_refresh()
+ * @see _upgrade_status_refresh()
  */
 function upgrade_status_refresh() {
-  module_load_include('inc', 'update', 'update.fetch');
-  return _update_refresh();
+  module_load_include('inc', 'upgrade_status', 'upgrade_status.fetch');
+  return _upgrade_status_refresh();
 }
 
 /**
  * Attempts to fetch update data after loading the necessary include file.
  *
- * @see _update_fetch_data()
+ * @see _upgrade_status_fetch_data()
  */
 function upgrade_status_fetch_data() {
-  module_load_include('inc', 'update', 'update.fetch');
-  return _update_fetch_data();
+  module_load_include('inc', 'upgrade_status', 'upgrade_status.fetch');
+  return _upgrade_status_fetch_data();
 }
 
 /**
