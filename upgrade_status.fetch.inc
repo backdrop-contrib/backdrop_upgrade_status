@@ -20,7 +20,7 @@ function upgrade_status_manual_status() {
     'operations' => array(
       array('upgrade_status_fetch_data_batch', array()),
     ),
-    'finished' => 'upgrade_status_fetch_data_finished',
+    'finished' => 'update_fetch_data_finished',
     'title' => t('Checking available upgrade data'),
     'progress_message' => t('Trying to check available upgrade data ...'),
     'error_message' => t('Error checking available upgrade data.'),
@@ -75,34 +75,6 @@ function upgrade_status_fetch_data_batch(&$context) {
       $context['finished'] = 1;
       return;
     }
-  }
-}
-
-/**
- * Batch callback: Performs actions when all fetch tasks have been completed.
- *
- * @todo: I don't actually think we need to fork this; investigate later.
- *
- * @param $success
- *   TRUE if the batch operation was successful; FALSE if there were errors.
- * @param $results
- *   An associative array of results from the batch operation, including the key
- *   'updated' which holds the total number of projects we fetched available
- *   update data for.
- */
-function upgrade_status_fetch_data_finished($success, $results) {
-  if ($success) {
-    if (!empty($results)) {
-      if (!empty($results['updated'])) {
-        drupal_set_message(format_plural($results['updated'], 'Checked available upgrade data for one project.', 'Checked available upgrade data for @count projects.'));
-      }
-      if (!empty($results['failures'])) {
-        drupal_set_message(format_plural($results['failures'], 'Failed to get available upgrade data for one project.', 'Failed to get available upgrade data for @count projects.'), 'error');
-      }
-    }
-  }
-  else {
-    drupal_set_message(t('An error occurred trying to get available upgrade data.'), 'error');
   }
 }
 
@@ -302,115 +274,4 @@ function _upgrade_status_build_fetch_url($project, $version) {
   // usage statistics, so we don't use any of it.
 
   return $url;
-}
-
-/**
- * Returns the base of the URL to fetch available update data for a project.
- *
- * @param $project
- *   The array of project information from update_get_projects().
- *
- * @return
- *   The base of the URL used for fetching available update data. This does
- *   not include the path elements to specify a particular project, version,
- *   site_key, etc.
- *
- * @see _update_build_fetch_url()
- */
-function _upgrade_status_get_fetch_url_base($project) {
-  return isset($project['info']['project status url']) ? $project['info']['project status url'] : variable_get('update_fetch_url', UPDATE_DEFAULT_URL);
-}
-
-/**
- * Performs any notifications that should be done once cron fetches new data.
- *
- * This method checks the status of the site using the new data and, depending
- * on the configuration of the site, notifies administrators via e-mail if there
- * are new releases or missing security updates.
- *
- * @see update_requirements()
- */
-function _upgrade_status_cron_notify() {
-  module_load_install('update');
-  $status = update_requirements('runtime');
-  $params = array();
-  $notify_all = (variable_get('update_notification_threshold', 'all') == 'all');
-  foreach (array('core', 'contrib') as $report_type) {
-    $type = 'update_' . $report_type;
-    if (isset($status[$type]['severity'])
-        && ($status[$type]['severity'] == REQUIREMENT_ERROR || ($notify_all && $status[$type]['reason'] == UPDATE_NOT_CURRENT))) {
-      $params[$report_type] = $status[$type]['reason'];
-    }
-  }
-  if (!empty($params)) {
-    $notify_list = variable_get('update_notify_emails', '');
-    if (!empty($notify_list)) {
-      $default_language = language_default();
-      foreach ($notify_list as $target) {
-        if ($target_user = user_load_by_mail($target)) {
-          $target_language = user_preferred_language($target_user);
-        }
-        else {
-          $target_language = $default_language;
-        }
-        $message = drupal_mail('update', 'status_notify', $target, $target_language, $params);
-        // Track when the last mail was successfully sent to avoid sending
-        // too many e-mails.
-        if ($message['result']) {
-          variable_set('update_last_email_notification', REQUEST_TIME);
-        }
-      }
-    }
-  }
-}
-
-/**
- * Parses the XML of the Drupal release history info files.
- *
- * @param $raw_xml
- *   A raw XML string of available release data for a given project.
- *
- * @return
- *   Array of parsed data about releases for a given project, or NULL if there
- *   was an error parsing the string.
- */
-function upgrade_status_parse_xml($raw_xml) {
-  try {
-    $xml = new SimpleXMLElement($raw_xml);
-  }
-  catch (Exception $e) {
-    // SimpleXMLElement::__construct produces an E_WARNING error message for
-    // each error found in the XML data and throws an exception if errors
-    // were detected. Catch any exception and return failure (NULL).
-    return;
-  }
-  // If there is no valid project data, the XML is invalid, so return failure.
-  if (!isset($xml->short_name)) {
-    return;
-  }
-  $short_name = (string) $xml->short_name;
-  $data = array();
-  foreach ($xml as $k => $v) {
-    $data[$k] = (string) $v;
-  }
-  $data['releases'] = array();
-  if (isset($xml->releases)) {
-    foreach ($xml->releases->children() as $release) {
-      $version = (string) $release->version;
-      $data['releases'][$version] = array();
-      foreach ($release->children() as $k => $v) {
-        $data['releases'][$version][$k] = (string) $v;
-      }
-      $data['releases'][$version]['terms'] = array();
-      if ($release->terms) {
-        foreach ($release->terms->children() as $term) {
-          if (!isset($data['releases'][$version]['terms'][(string) $term->name])) {
-            $data['releases'][$version]['terms'][(string) $term->name] = array();
-          }
-          $data['releases'][$version]['terms'][(string) $term->name][] = (string) $term->value;
-        }
-      }
-    }
-  }
-  return $data;
 }
