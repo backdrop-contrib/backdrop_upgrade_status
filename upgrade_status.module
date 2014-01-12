@@ -9,7 +9,7 @@
 /**
  * Default version of core we want to query for.
  */
-define('UPGRADE_STATUS_CORE_VERSION', '7.x');
+define('UPGRADE_STATUS_CORE_VERSION', '8.x');
 
 /**
  * Project has a new release available, but it is not a security release.
