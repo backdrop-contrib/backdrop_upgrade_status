@@ -77,43 +77,109 @@ function upgrade_status_theme() {
 }
 
 /**
- * Internal helper to try to get the update information from the cache
- * if possible, and to refresh the cache when necessary.
+ * Tries to get update information from cache and refreshes it when necessary.
  *
  * In addition to checking the cache lifetime, this function also ensures that
  * there are no .info files for enabled modules or themes that have a newer
  * modification timestamp than the last time we checked for available update
- * data. If any .info file was modified, it almost certainly means a new
- * version of something was installed. Without fresh available update data,
- * the logic in update_calculate_project_data() will be wrong and produce
- * confusing, bogus results.
+ * data. If any .info file was modified, it almost certainly means a new version
+ * of something was installed. Without fresh available update data, the logic in
+ * update_calculate_project_data() will be wrong and produce confusing, bogus
+ * results.
  *
  * @param $refresh
- *   Boolean to indicate if this method should refresh the cache automatically
- *   if there's no data.
+ *   (optional) Boolean to indicate if this method should refresh the cache
+ *   automatically if there's no data. Defaults to FALSE.
+ *
+ * @return
+ *   Array of data about available releases, keyed by project shortname.
  *
  * @see update_refresh()
  * @see update_get_projects()
  */
-function upgrade_status_get_available($refresh = FALSE) {
-  module_load_include('inc', 'upgrade_status', 'upgrade_status.compare');
-  $available = array();
+function update_get_available($refresh = FALSE) {
+  module_load_include('inc', 'update', 'update.compare');
+  $needs_refresh = FALSE;
 
-  if (!$refresh && ($cache = _update_cache_get('upgrade_status_available_releases')) && $cache->expire > time()) {
-    $available = $cache->data;
+  // Grab whatever data we currently have cached in the DB.
+  $available = _update_get_cached_available_releases();
+  $num_avail = count($available);
+
+  $projects = update_get_projects();
+  foreach ($projects as $key => $project) {
+    // If there's no data at all, we clearly need to fetch some.
+    if (empty($available[$key])) {
+      update_create_fetch_task($project);
+      $needs_refresh = TRUE;
+      continue;
+    }
+
+    // See if the .info file is newer than the last time we checked for data,
+    // and if so, mark this project's data as needing to be re-fetched. Any
+    // time an admin upgrades their local installation, the .info file will
+    // be changed, so this is the only way we can be sure we're not showing
+    // bogus information right after they upgrade.
+    if ($project['info']['_info_file_ctime'] > $available[$key]['last_fetch']) {
+      $available[$key]['fetch_status'] = UPDATE_FETCH_PENDING;
+    }
+
+    // If we have project data but no release data, we need to fetch. This
+    // can be triggered when we fail to contact a release history server.
+    if (empty($available[$key]['releases'])) {
+      $available[$key]['fetch_status'] = UPDATE_FETCH_PENDING;
+    }
+
+    // If we think this project needs to fetch, actually create the task now
+    // and remember that we think we're missing some data.
+    if (!empty($available[$key]['fetch_status']) && $available[$key]['fetch_status'] == UPDATE_FETCH_PENDING) {
+      update_create_fetch_task($project);
+      $needs_refresh = TRUE;
+    }
   }
-  else {
-    $available = upgrade_status_refresh();
+
+  if ($needs_refresh && $refresh) {
+    // Attempt to drain the queue of fetch tasks.
+    update_fetch_data();
+    // After processing the queue, we've (hopefully) got better data, so pull
+    // the latest from the cache again and use that directly.
+    $available = _update_get_cached_available_releases();
   }
+
   return $available;
 }
 
 /**
- * Wrapper to load the include file and then refresh the release data.
+ * Creates a new fetch task after loading the necessary include file.
+ *
+ * @param $project
+ *   Associative array of information about a project. See update_get_projects()
+ *   for the keys used.
+ *
+ * @see _update_create_fetch_task()
  */
-function upgrade_status_refresh() {
-  module_load_include('inc', 'upgrade_status', 'upgrade_status.fetch');
-  return _upgrade_status_refresh();
+function update_create_fetch_task($project) {
+  module_load_include('inc', 'update', 'update.fetch');
+  return _update_create_fetch_task($project);
+}
+
+/**
+ * Refreshes the release data after loading the necessary include file.
+ *
+ * @see _update_refresh()
+ */
+function update_refresh() {
+  module_load_include('inc', 'update', 'update.fetch');
+  return _update_refresh();
+}
+
+/**
+ * Attempts to fetch update data after loading the necessary include file.
+ *
+ * @see _update_fetch_data()
+ */
+function update_fetch_data() {
+  module_load_include('inc', 'update', 'update.fetch');
+  return _update_fetch_data();
 }
 
 /**
