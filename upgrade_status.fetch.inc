@@ -138,10 +138,12 @@ function _upgrade_status_process_fetch_task($project) {
   if (!empty($data)) {
     $available = update_parse_xml($data);
     // @todo: Purge release data we don't need (http://drupal.org/node/238950).
-    if (!empty($available)) {
+    // US: Projects with no upgrades will return an empty list, but that doesn't
+    // mean we failed.
+#    if (!empty($available)) {
       // Only if we fetched and parsed something sane do we return success.
       $success = TRUE;
-    }
+#    }
   }
   else {
     $available['project_status'] = 'not-fetched';
