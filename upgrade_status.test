@@ -22,7 +22,7 @@
 /**
  * Defines some shared functions used by all update tests.
  */
-class UpdateTestHelper extends DrupalWebTestCase {
+class UpgradeStatusTestHelper extends DrupalWebTestCase {
 
   /**
    * Refreshes the update status based on the desired available update scenario.
@@ -60,13 +60,13 @@ class UpdateTestHelper extends DrupalWebTestCase {
 /**
  * Tests behavior related to discovering and listing updates to Drupal core.
  */
-class UpdateCoreTestCase extends UpdateTestHelper {
+class UpgradeStatusCoreTestCase extends UpgradeStatusTestHelper {
 
   public static function getInfo() {
     return array(
-      'name' => 'Update core functionality',
-      'description' => 'Tests the Update Manager module through a series of functional tests using mock XML data.',
-      'group' => 'Update',
+      'name' => 'Upgrade Status core functionality',
+      'description' => 'Tests the Upgrade Status module through a series of functional tests using mock XML data.',
+      'group' => 'Upgrade Status',
     );
   }
 
@@ -277,13 +277,13 @@ class UpdateCoreTestCase extends UpdateTestHelper {
 /**
  * Tests behavior related to handling updates to contributed modules and themes.
  */
-class UpdateTestContribCase extends UpdateTestHelper {
+class UpgradeStatusTestContribCase extends UpgradeStatusTestHelper {
 
   public static function getInfo() {
     return array(
-      'name' => 'Update contrib functionality',
-      'description' => 'Tests how the Update Manager module handles contributed modules and themes in a series of functional tests using mock XML data.',
-      'group' => 'Update',
+      'name' => 'Upgrade Status contrib functionality',
+      'description' => 'Tests how the Upgrade Status module handles contributed modules and themes in a series of functional tests using mock XML data.',
+      'group' => 'Upgrade Status',
     );
   }
 
@@ -644,13 +644,13 @@ class UpdateTestContribCase extends UpdateTestHelper {
 /**
  * Tests project upload and extract functionality.
  */
-class UpdateTestUploadCase extends UpdateTestHelper {
+class UpgradeStatusTestUploadCase extends UpgradeStatusTestHelper {
 
   public static function getInfo() {
     return array(
       'name' => 'Upload and extract module functionality',
-      'description' => 'Tests the Update Manager module\'s upload and extraction functionality.',
-      'group' => 'Update',
+      'description' => 'Tests the Upgrade Status module\'s upload and extraction functionality.',
+      'group' => 'Upgrade Status',
     );
   }
 
@@ -745,13 +745,13 @@ class UpdateTestUploadCase extends UpdateTestHelper {
 /**
  * Tests update functionality unrelated to the database.
  */
-class UpdateCoreUnitTestCase extends DrupalUnitTestCase {
+class UpgradeStatusCoreUnitTestCase extends DrupalUnitTestCase {
 
   public static function getInfo() {
     return array(
       'name' => "Unit tests",
       'description' => 'Test update funcionality unrelated to the database.',
-      'group' => 'Update',
+      'group' => 'Upgrade Status',
     );
   }
 
