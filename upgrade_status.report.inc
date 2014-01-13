@@ -46,6 +46,10 @@ function theme_upgrade_status_report($variables) {
   $last = variable_get('upgrade_status_last_check', 0);
   $output = theme('upgrade_status_last_check', array('last' => $last));
 
+  // US: Load Update module's data as a fallback in case there is no release info
+  // for a project (so we can link to the project).
+  $current_data = update_get_available(TRUE);
+
   // US: Add the core version selector form.
   $form = drupal_get_form('upgrade_status_core_version_form');
   $output .= drupal_render($form);
@@ -58,7 +62,8 @@ function theme_upgrade_status_report($variables) {
   $header = array();
   $rows = array();
 
-  $notification_level = variable_get('update_notification_threshold', 'all');
+  // US: We don't do anything with notifications in this module.
+#  $notification_level = variable_get('update_notification_threshold', 'all');
 
   // Create an array of status values keyed by module or theme name, since
   // we'll need this while generating the report if we have to cross reference
@@ -70,8 +75,15 @@ function theme_upgrade_status_report($variables) {
   }
 
   foreach ($data as $project) {
+    // US: Skip upgrade_status. Doesn't make sense to display it.
+    if ($project['name'] == 'upgrade_status') {
+      continue;
+    }
     switch ($project['status']) {
+      // US: Stable releases and projects moved into core are also good news.
       case UPDATE_CURRENT:
+      case UPGRADE_STATUS_STABLE:
+      case UPGRADE_STATUS_CORE:
         $class = 'ok';
         $icon = theme('image', array('path' => 'misc/watchdog-ok.png', 'width' => 18, 'height' => 18, 'alt' => t('ok'), 'title' => t('ok')));
         break;
@@ -79,13 +91,23 @@ function theme_upgrade_status_report($variables) {
       case UPDATE_FETCH_PENDING:
       case UPDATE_NOT_FETCHED:
         $class = 'unknown';
-        $icon = theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('warning'), 'title' => t('warning')));
+        // US: Unknown means not ported; thus, use an error icon.
+#        $icon = theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('warning'), 'title' => t('warning')));
+        $icon = theme('image', array('path' => 'misc/watchdog-error.png', 'width' => 18, 'height' => 18, 'alt' => t('error'), 'title' => t('error')));
         break;
+      // US: Not used/not possible here.
       case UPDATE_NOT_SECURE:
       case UPDATE_REVOKED:
       case UPDATE_NOT_SUPPORTED:
         $class = 'error';
         $icon = theme('image', array('path' => 'misc/watchdog-error.png', 'width' => 18, 'height' => 18, 'alt' => t('error'), 'title' => t('error')));
+        break;
+      // US: It doesn't make sense to output a whole page of warning symbols,
+      // so we just colorize as a warning without the icon. This allows us to
+      // warn about projects moved into core and other important info.
+      case UPGRADE_STATUS_DEVELOPMENT:
+        $class = 'warning';
+        $icon = '';
         break;
       case UPDATE_NOT_CHECKED:
       case UPDATE_NOT_CURRENT:
@@ -93,6 +115,10 @@ function theme_upgrade_status_report($variables) {
         $class = 'warning';
         $icon = theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('warning'), 'title' => t('warning')));
         break;
+    }
+    // US: Special handling for project moved into core.
+    if (!empty($project['in_core_note'])) {
+      $icon = theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('warning'), 'title' => t('warning')));
     }
 
     $row = '<div class="version-status">';
@@ -110,6 +136,17 @@ function theme_upgrade_status_report($variables) {
         $row .= check_plain($project['title']);
       }
     }
+    // US: Couldn't find this project's data for the next version of Drupal core.
+    // Let's try the current one instead.
+    elseif (isset($current_data[$project['name']]) && isset($current_data[$project['name']]['title'])) {
+      if (isset($current_data[$project['name']]['link'])) {
+        $row .= l($current_data[$project['name']]['title'], $current_data[$project['name']]['link']);
+      }
+      else {
+        $row .= check_plain($current_data[$project['name']]['title']);
+      }
+    }
+    // Otherwise, just print the name.
     else {
       $row .= check_plain($project['name']);
     }
@@ -118,6 +155,14 @@ function theme_upgrade_status_report($variables) {
       $row .= ' <span class="version-date">(' . format_date($project['datestamp'], 'custom', 'Y-M-d') . ')</span>';
     }
     $row .= "</div>\n";
+
+    // US: Special handling for projects moved into core.
+    if (!empty($project['in_core_note'])) {
+      $row .= "<div class=\"core-notice\">\n";
+      $row .= '<p>'. t('In Drupal core since @version', array('@version' => $project['in_core_since'])) .'</p>';
+      $row .= '<p>'. $project['in_core_note'] .'</p>';
+      $row .= '</div>';
+    }
 
     $versions_inner = '';
     $security_class = array();
