@@ -581,6 +581,10 @@ function upgrade_status_moved_into_core(&$projects, $project) {
       $projects[$project]['in_core_note'] = t('There is no database upgrade path for sites that used the 5.x version of the user_status module to migrate the message templates to the new settings in core. Furthermore, the place-holders available in these templates are different in 6.x core. Therefore, users will have to re-enter their message templates into the core settings at admin/user/settings.');
       break;
 
+    case 'views':
+      $projects[$project]['in_core_since'] = '8.x';
+      break;
+
     default:
       $core = FALSE;
   }
