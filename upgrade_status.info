@@ -2,4 +2,3 @@ name = Upgrade status
 description = Checks to see if the installed modules are available for the next major version of Drupal.
 core = 7.x
 dependencies[] = update
-files[] = upgrade_status.test
