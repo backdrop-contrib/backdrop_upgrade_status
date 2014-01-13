@@ -322,11 +322,12 @@ function upgrade_status_calculate_project_update_status($project, &$project_data
 
   // If we don't know what to recommend, there's nothing we can report.
   // Bail out early.
-  if (!isset($project_data['recommended'])) {
-    $project_data['status'] = UPDATE_UNKNOWN;
-    $project_data['reason'] = t('No available releases found');
-    return;
-  }
+  // US: Commenting this out causes core to work again. Hm.
+#  if (!isset($project_data['recommended'])) {
+#    $project_data['status'] = UPDATE_UNKNOWN;
+#    $project_data['reason'] = t('No available releases found');
+#    return;
+#  }
 
   // US: Ignore dev snapshot handling.
 
