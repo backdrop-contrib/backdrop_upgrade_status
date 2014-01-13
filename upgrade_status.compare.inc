@@ -26,14 +26,14 @@ module_load_include('inc', 'update', 'update.compare');
  * @return
  *   An array of installed projects with current update status information.
  *
- * @see update_get_available()
+ * @see upgrade_status_get_available()
  * @see update_get_projects()
  * @see update_process_project_info()
  * @see update_project_cache()
  */
 function upgrade_status_calculate_project_data($available) {
   // Retrieve the projects from cache, if present.
-  $projects = update_project_cache('update_project_data');
+  $projects = update_project_cache('upgrade_status_project_data');
   // If $projects is empty, then the cache must be rebuilt.
   // Otherwise, return the cached data and skip the rest of the function.
   if (!empty($projects)) {
@@ -43,7 +43,7 @@ function upgrade_status_calculate_project_data($available) {
   update_process_project_info($projects);
   foreach ($projects as $project => $project_info) {
     if (isset($available[$project])) {
-      update_calculate_project_update_status($project, $projects[$project], $available[$project]);
+      upgrade_status_calculate_project_update_status($project, $projects[$project], $available[$project]);
     }
     else {
       $projects[$project]['status'] = UPDATE_UNKNOWN;
@@ -56,7 +56,7 @@ function upgrade_status_calculate_project_data($available) {
   drupal_alter('update_status', $projects);
 
   // Cache the site's update status for at most 1 hour.
-  _update_cache_set('update_project_data', $projects, REQUEST_TIME + 3600);
+  _update_cache_set('upgrade_status_project_data', $projects, REQUEST_TIME + 3600);
   return $projects;
 }
 
