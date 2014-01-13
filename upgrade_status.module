@@ -105,7 +105,7 @@ function upgrade_status_get_available($refresh = FALSE) {
   $needs_refresh = FALSE;
 
   // Grab whatever data we currently have cached in the DB.
-  $available = _update_get_cached_available_releases();
+  $available = _upgrade_status_get_cached_available_releases();
   $num_avail = count($available);
 
   $projects = update_get_projects();
@@ -145,7 +145,7 @@ function upgrade_status_get_available($refresh = FALSE) {
     upgrade_status_fetch_data();
     // After processing the queue, we've (hopefully) got better data, so pull
     // the latest from the cache again and use that directly.
-    $available = _update_get_cached_available_releases();
+    $available = _upgrade_status_get_cached_available_releases();
   }
 
   return $available;
@@ -183,6 +183,29 @@ function upgrade_status_refresh() {
 function upgrade_status_fetch_data() {
   module_load_include('inc', 'upgrade_status', 'upgrade_status.fetch');
   return _upgrade_status_fetch_data();
+}
+
+/**
+ * Returns all currently cached data about available releases for all projects.
+ *
+ * @return
+ *   Array of data about available releases, keyed by project shortname.
+ */
+function _upgrade_status_get_cached_available_releases() {
+  $data = array();
+  $cache_items = _update_get_cache_multiple('upgrade_status_available_releases');
+  foreach ($cache_items as $cid => $cache) {
+    $cache->data['last_fetch'] = $cache->created;
+    if ($cache->expire < REQUEST_TIME) {
+      $cache->data['fetch_status'] = UPDATE_FETCH_PENDING;
+    }
+    // The project shortname is embedded in the cache ID, even if there's no
+    // data for this project in the DB at all, so use that for the indexes in
+    // the array.
+    $parts = explode('::', $cid, 2);
+    $data[$parts[1]] = $cache->data;
+  }
+  return $data;
 }
 
 /**
