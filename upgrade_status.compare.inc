@@ -311,6 +311,7 @@ function upgrade_status_calculate_project_update_status($project, &$project_data
   // US: Check new Drupal core improvements, regardless of what's figured out
   // below.
   if (upgrade_status_moved_into_core($projects, $project)) {
+    $project_data += $projects[$project];
     $project_data['status'] = UPGRADE_STATUS_CORE;
     $project_data['reason'] = t('In core');
   }
