@@ -167,7 +167,7 @@ function theme_upgrade_status_report($variables) {
     $versions_inner = '';
     $security_class = array();
     $version_class = array();
-    if (isset($project['recommended'])) {
+    if (isset($project['recommended']) && (empty($project['in_core_complete']))) {
       if ($project['status'] != UPDATE_CURRENT || $project['existing_version'] !== $project['recommended']) {
 
         // First, figure out what to recommend.

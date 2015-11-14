@@ -237,25 +237,29 @@ function theme_upgrade_status_last_check($variables) {
  * Assign custom upgrade information for certain modules.
  *
  * @param $projects
- *   Array of projects from upgrade_status_calculate_project_data().
+ *   Array of projects from upgrade_status_calculate_project_data(). This
+ *   parameter is passed by reference, and metadata for the project can added
+ *   to the $projects[$project] array for use later. Three additional keys are
+ *   supported:
+ *   - in_core_since: The major version since which the module is in core.
+ *   - in_core_complete: Boolean flag indicating whether the complete
+ *     functionality of the project is in core. Set this to FALSE when the core
+ *     replacement does not include the full functionality of the project.
+ *   - in_core_note: Note to display to the user. This should be succinct and
+ *     describe:
+ *     - What core module or API replaces the project, if the module was not
+ *       moved directly into core with the same name.
+ *     - What functionality of the project is not included in core, if the
+ *       'in_core_complete' flag is false.
  * @param $project
  *   Project name to check.
+ *
  * @return
  *   TRUE if module has been moved into core.
- *
- * @todo Handle partial core additions, e.g.
- *   - Token
- *   - CTools: AJAX framework
- *   - Taxonomy image
- *   - Better Formats, Filter by node type
- *   For cleanly coded and separated modules, allowing to target sub-modules in
- *   a project might be sufficient already.
- *
- * @todo Check whether 'help' keys make sense. Users having those modules
- *   installed should already know what the modules are doing. This help info
- *   was kept, because the work was done, but it might not make sense at all.
  */
 function upgrade_status_moved_into_core(&$projects, $project) {
+  // Specifying a case for the module in this switch statement will mark it as
+  // included in core on the status report.
   $core = TRUE;
   switch ($project) {
     case 'ahah_helper':
@@ -531,9 +535,11 @@ function upgrade_status_moved_into_core(&$projects, $project) {
 
     case 'views':
       $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
       break;
 
     default:
+      // Any other module is not included in core.
       $core = FALSE;
   }
   return $core;
