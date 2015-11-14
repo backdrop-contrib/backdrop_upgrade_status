@@ -117,7 +117,7 @@ function theme_upgrade_status_report($variables) {
         break;
     }
     // US: Special handling for project moved into core.
-    if (!empty($project['in_core_note'])) {
+    if (empty($project['in_core_complete'])) {
       $icon = theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('warning'), 'title' => t('warning')));
     }
 
