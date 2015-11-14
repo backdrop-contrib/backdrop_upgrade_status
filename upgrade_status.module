@@ -262,6 +262,179 @@ function upgrade_status_moved_into_core(&$projects, $project) {
   // included in core on the status report.
   $core = TRUE;
   switch ($project) {
+
+    case 'admin_language':
+    case 'entity_translation':
+    case 'fallback_language_negotiation':
+    case 'i18n':
+    case 'i18nviews':
+    case 'l10n_install':
+    case 'l10n_update':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by core localization functionality, the core Language module, and the core Configuration, Content, and Interface Translation modules.');
+      break;
+
+    case 'admin_views':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('Integrated with the core Views module. No comment admin view in 8.0.x.');
+      break;
+
+    case 'bean':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by the core Custom Block module.');
+      break;
+
+    case 'breakpoint':
+    case 'breakpoints':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
+    case 'cachetags':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by core APIs.');
+      break;
+
+    case 'caption_filter':
+    case 'float_filter':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by functionality in the core Editor module.');
+      break;
+
+    case 'ckeditor':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
+    case 'ctools':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('Mostly replaced by core APIs, including modal dialogs, exportables, and plugins. Excludes <a href="@url">Page Manager</a> and Form Wizard.', array('@url' => 'https://www.drupal.org/project/page_manager'));
+      break;
+
+    case 'date':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('No recurring dates support or integrated start and end dates.');
+      break;
+
+    case 'edit':
+    case 'quickedit':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
+    case 'email':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('E-mail address contact forms are not supported by core.');
+      break;
+
+    case 'entityreference':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
+    case 'entity':
+    case 'entity_view_mode':
+    case 'file_entity':
+    case 'hidden_field':
+    case 'title':
+    case 'user_picture_field':
+    case 'uuid':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by core Entity system functionality.');
+      break;
+
+    case 'features':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('The original intended functionality of the Features module is not provided by core, but the core Configuration system provides support for importing, exporting, and overriding site configuration.');
+
+    case 'link':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('No support for internal links.');
+      break;
+
+    case 'migrate':
+    case 'migrate_d2d':
+    case 'migrate_drupal':
+      $projects[$project]['in_core_since'] = '8.x';
+      break;
+
+    case 'module_filter':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('A search functionality is included on the core modules page. The re-designed modules page in the 2.x branch is not in core.');
+      break;
+
+    case 'navbar':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by the updated core Toolbar module.');
+      break;
+
+    case 'phone':
+    case 'telephone':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
+    case 'picture':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by the core Responsive Image module.');
+      break;
+
+    case 'elements':
+    case 'placeholder':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by HTML5 form API functionality.');
+      break;
+
+    case 'restws':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by the core REST module.');
+      break;
+
+    case 'services':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('The core REST module provides most of the functionality from previous versions of the Services module.');
+      break;
+
+    case 'stringoverrides':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('The core Interface Translation module allows custom translations to be provided for strings in any language, including English.');
+      break;
+
+    case 'transliteration':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('Replaced by core APIs. No direct support for transliterating path aliases or file names.');
+      break;
+
+    case 'variable':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by the core Configuration system.');
+      break;
+
+    case 'views':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
+    case 'views_bulk_operations':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('The core Views module provides bulk operations on simple actions only. No support for batch operations or configurable actions.');
+      break;
+
+    case 'wysiwyg':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('API support added to the core "Editor" module. No support for multiple text editors per text format.');
+      break;
+
     case 'ahah_helper':
       $projects[$project]['in_core_since'] = '7.x';
       $projects[$project]['help'] = t('Allows Drupal modules to implement AHAH/AJAX functionality without touching JavaScript. Entirely covered by the new AJAX framework in Drupal 7, which is based on <a href="@ctools-url">CTools</a>.', array(
@@ -531,11 +704,6 @@ function upgrade_status_moved_into_core(&$projects, $project) {
 
     case 'view_unpublished':
       $projects[$project]['in_core_since'] = '7.x';
-      break;
-
-    case 'views':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_complete'] = TRUE;
       break;
 
     default:
