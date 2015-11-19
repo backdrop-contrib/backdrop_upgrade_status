@@ -437,14 +437,14 @@ function upgrade_status_moved_into_core(&$projects, $project) {
 
     case 'ahah_helper':
       $projects[$project]['in_core_since'] = '7.x';
-      $projects[$project]['help'] = t('Allows Drupal modules to implement AHAH/AJAX functionality without touching JavaScript. Entirely covered by the new AJAX framework in Drupal 7, which is based on <a href="@ctools-url">CTools</a>.', array(
+      $projects[$project]['in_core_note'] = t('Allows Drupal modules to implement AHAH/AJAX functionality without touching JavaScript. Entirely covered by the new AJAX framework in Drupal 7, which is based on <a href="@ctools-url">CTools</a>.', array(
         '@ctools-url' => 'http://drupal.org/project/ctools',
       ));
       break;
 
     case 'autoload':
       $projects[$project]['in_core_since'] = '7.x';
-      $projects[$project]['help'] = t('Allows Drupal modules to lazy-load any class that has not been loaded yet. A major performance improvement in Drupal 7, and the only part of the <a href="@issue-url">Registry</a> that was introduced earlier, but later removed from Drupal 7.', array(
+      $projects[$project]['in_core_note'] = t('Allows Drupal modules to lazy-load any class that has not been loaded yet. A major performance improvement in Drupal 7, and the only part of the <a href="@issue-url">Registry</a> that was introduced earlier, but later removed from Drupal 7.', array(
         '@issue-url' => 'http://drupal.org/node/221964',
       ));
       break;
@@ -453,21 +453,21 @@ function upgrade_status_moved_into_core(&$projects, $project) {
     case 'automaticmenu':
     case 'automenu':
       $projects[$project]['in_core_since'] = '7.x';
-      $projects[$project]['help'] = t('When creating new content, Drupal 7 automatically takes over the title of the content as menu link title, while still allowing you to alter it.');
+      $projects[$project]['in_core_note'] = t('When creating new content, Drupal 7 automatically takes over the title of the content as menu link title, while still allowing you to alter it.');
       break;
 
     case 'admin_hover':
     case 'block_edit':
     case 'contextual':
       $projects[$project]['in_core_since'] = '7.x';
-      $projects[$project]['help'] = t('The new <a href="@issue-url">Contextual links</a> module in Drupal 7 allows you to manage page elements from the page you are looking at, i.e., you have direct access to "Edit" and "Delete" pages for content, or "Configure" pages for blocks, "List links" for menu blocks, etc. Every module can integrate with Contextual module.', array(
+      $projects[$project]['in_core_note'] = t('The new <a href="@issue-url">Contextual links</a> module in Drupal 7 allows you to manage page elements from the page you are looking at, i.e., you have direct access to "Edit" and "Delete" pages for content, or "Configure" pages for blocks, "List links" for menu blocks, etc. Every module can integrate with Contextual module.', array(
         '@issue-url' => 'http://drupal.org/node/473268',
       ));
       break;
 
     case 'adminrole':
       $projects[$project]['in_core_since'] = '7.x';
-      $projects[$project]['help'] = t('The <a href="@issue-url">administration role</a> is based on regular Drupal user roles and every user role can be configured to be the administration role. All new permissions (and only new) are automatically granted to the configured administration role. Permissions can still be removed from the role.', array(
+      $projects[$project]['in_core_note'] = t('The <a href="@issue-url">administration role</a> is based on regular Drupal user roles and every user role can be configured to be the administration role. All new permissions (and only new) are automatically granted to the configured administration role. Permissions can still be removed from the role.', array(
         '@issue-url' => 'http://drupal.org/node/480660',
       ));
       break;
@@ -527,7 +527,7 @@ function upgrade_status_moved_into_core(&$projects, $project) {
     case 'dbtng':
     case 'transaction':
       $projects[$project]['in_core_since'] = '7.x';
-      $projects[$project]['help'] = t('Drupal 7 implements an entirely new <a href="@issue-url">database layer</a>, which allows Drupal to work with any database. Modules are able to alter most database queries and there is support for transactions.', array(
+      $projects[$project]['in_core_note'] = t('Drupal 7 implements an entirely new <a href="@issue-url">database layer</a>, which allows Drupal to work with any database. Modules are able to alter most database queries and there is support for transactions.', array(
         '@issue-url' => 'http://drupal.org/node/225450',
       ));
       break;
@@ -540,13 +540,13 @@ function upgrade_status_moved_into_core(&$projects, $project) {
     case 'elements':
     case 'element_themehook':
       $projects[$project]['in_core_since'] = '7.x';
-      $projects[$project]['help'] = t('In Drupal 7, almost all content is generated as "renderable array", which allows to consider any element on a page as atomic, alterable, and themeable element that can be still be altered until it is rendered into a string.');
+      $projects[$project]['in_core_note'] = t('In Drupal 7, almost all content is generated as "renderable array", which allows to consider any element on a page as atomic, alterable, and themeable element that can be still be altered until it is rendered into a string.');
       break;
 
     case 'hook_file':
     case 'storage_api':
       $projects[$project]['in_core_since'] = '7.x';
-      $projects[$project]['help'] = t('Drupal 7 natively uses PHP 5 stream wrappers, which allow to store and access files in almost any location, even remotely. There is also a clean separation between the public and private filesystem, and both can be used at the same time.');
+      $projects[$project]['in_core_note'] = t('Drupal 7 natively uses PHP 5 stream wrappers, which allow to store and access files in almost any location, even remotely. There is also a clean separation between the public and private filesystem, and both can be used at the same time.');
       break;
 
     case 'filefield':
