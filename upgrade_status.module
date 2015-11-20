@@ -349,6 +349,11 @@ function _upgrade_status_d8_core(&$projects, $project) {
       $projects[$project]['in_core_note'] = t('No recurring dates support or integrated start and end dates.');
       break;
 
+    case 'date_popup_authored':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
     case 'edit':
     case 'quickedit':
       $projects[$project]['in_core_since'] = '8.x';
