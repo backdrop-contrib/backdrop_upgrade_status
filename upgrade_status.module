@@ -271,7 +271,8 @@ function upgrade_status_moved_into_core(&$projects, $project) {
       break;
 
     case '8.x':
-      $core = _upgrade_status_d7_core($projects, $project) ||  _upgrade_status_d8_core($projects, $project);
+      $core = _upgrade_status_d7_core($projects, $project);
+      $core = _upgrade_status_d8_core($projects, $project);
       break;
   }
 
