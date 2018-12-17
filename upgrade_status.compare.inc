@@ -388,6 +388,11 @@ function upgrade_status_obsolete(&$projects, $project) {
   $obsolete = TRUE;
 
   switch ($project) {
+    case 'bundle_copy':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'field_tools';
+      break;
+
     case 'content_profile':
       $projects[$project]['obsolete_since'] = '7.x';
       $projects[$project]['replaced_by'][0]['name'] = 'profile2';
