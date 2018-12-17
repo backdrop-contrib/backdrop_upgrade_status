@@ -27,6 +27,11 @@ define('UPGRADE_STATUS_STABLE', 5);
 define('UPGRADE_STATUS_CORE', 5000);
 
 /**
+ * Project has become obsolete by an alternative.
+ */
+define('UPGRADE_STATUS_OBSOLETE', 3000);
+
+/**
  * Implementation of hook_help().
  */
 function upgrade_status_help($path, $arg) {

@@ -84,6 +84,9 @@ function theme_upgrade_status_report($variables) {
       case UPDATE_CURRENT:
       case UPGRADE_STATUS_STABLE:
       case UPGRADE_STATUS_CORE:
+      // @todo: Colour obsolete modules according to their replacement project
+      // info in $data.
+      case UPGRADE_STATUS_OBSOLETE:
         $class = 'ok';
         $icon = theme('image', array('path' => 'misc/watchdog-ok.png', 'width' => 18, 'height' => 18, 'alt' => t('ok'), 'title' => t('ok')));
         break;
@@ -109,6 +112,10 @@ function theme_upgrade_status_report($variables) {
         $class = 'warning';
         $icon = '';
         break;
+      case UPGRADE_STATUS_OBSOLETE:
+        $row .= '<span class="current">'. t('Made obsolete') .'</span>';
+        break;
+
       case UPDATE_NOT_CHECKED:
       case UPDATE_NOT_CURRENT:
       default:
@@ -237,8 +244,17 @@ function theme_upgrade_status_report($variables) {
       $row .= "</div>\n";  // extra div.
     }
 
-    $row .= '<div class="includes">';
-    sort($project['includes']);
+    if (isset($project['replaced_by'])) {
+      $row .= '<div class="includes">';
+      $replacements = array();
+      foreach ($project['replaced_by'] as $replacement) {
+        $replacements[] = t('!name @version', array('!name' => l($data[$replacement['name']]['title'], $data[$replacement['name']]['link']), '@version' => $data[$replacement['name']]['recommended']));
+      }
+      $replaced = implode(', ', $replacements);
+      $row .= t('Replaced by: !replaced', array('!replaced' => $replaced));
+      $row .= "</div>\n";
+    }
+
     if (!empty($project['disabled'])) {
       sort($project['disabled']);
       // Make sure we start with a clean slate for each project in the report.
@@ -249,6 +265,8 @@ function theme_upgrade_status_report($variables) {
       $row .= theme('item_list', array('items' => $includes_items));
     }
     else {
+      $row .= '<div class="includes">';
+      sort($project['includes']);
       $row .= t('Includes: %includes', array('%includes' => implode(', ', $project['includes'])));
     }
     $row .= "</div>\n";

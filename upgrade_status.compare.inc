@@ -43,10 +43,27 @@ function upgrade_status_calculate_project_data($available) {
     return $projects->data;
   }
   $projects = update_get_projects();
+
+  // US: Handle obsolete projects.
+  foreach ($projects as $key => $project) {
+    if (upgrade_status_obsolete($projects, $key)) {
+      // Add the project that makes this one obsolete to the list of those to
+      // grab information about.
+      foreach ($projects[$key]['replaced_by'] as $replacement) {
+        $projects[$replacement['name']] = $available[$replacement['name']];
+      }
+    }
+  }
+
   update_process_project_info($projects);
   foreach ($projects as $project => $project_info) {
     if (isset($available[$project])) {
       upgrade_status_calculate_project_update_status($project, $projects[$project], $available[$project]);
+    }
+    // US: Check if the project is obsolete.
+    elseif (upgrade_status_obsolete($projects, $project)) {
+      $projects[$project]['status'] = UPGRADE_STATUS_OBSOLETE;
+      $projects[$project]['reason'] = t('Made obsolete by');
     }
     else {
       $projects[$project]['status'] = UPDATE_UNKNOWN;
@@ -353,4 +370,48 @@ function upgrade_status_calculate_project_update_status($project, &$project_data
         $project_data['reason'] = t('Invalid info');
       }
   }
+}
+
+/**
+ * Return status and notice about modules that have been made obsolete.
+ *
+ * Assign custom upgrade information for certain modules.
+ *
+ * @param $projects
+ *   Array of projects from upgrade_status_calculate_project_data().
+ * @param $project
+ *   Project name to check.
+ * @return
+ *   TRUE if module has been made obsolete by an alternative.
+ */
+function upgrade_status_obsolete(&$projects, $project) {
+  $obsolete = TRUE;
+
+  switch ($project) {
+    case 'content_profile':
+      $projects[$project]['obsolete_since'] = '7.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'profile2';
+      break;
+
+    case 'fckeditor':
+      $projects[$project]['obsolete_since'] = '5.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'ckeditor';
+      break;
+
+    case 'nodewords':
+      $projects[$project]['obsolete_since'] = '7.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'metatag';
+      $projects[$project]['replaced_by'][1]['name'] = 'metatags_quick';
+      break;
+
+    case 'path_redirect':
+      $projects[$project]['obsolete_since'] = '7.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'redirect';
+      break;
+
+    default:
+      $obsolete = FALSE;
+  }
+
+  return $obsolete;
 }

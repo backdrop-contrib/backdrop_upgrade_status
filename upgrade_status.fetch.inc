@@ -190,6 +190,20 @@ function _upgrade_status_refresh() {
 
   $projects = update_get_projects();
 
+  // US: Special handling for obsolete projects.
+  // Add replacement modules to the list of projects to get XML data for.
+  foreach ($projects as $key => $project) {
+    if (upgrade_status_obsolete($projects, $key)) {
+      // Add the project that makes this one obsolete to the list of those to
+      // grab information about.
+      foreach ($projects[$key]['replaced_by'] as $replacement) {
+        $projects[$replacement['name']] = array(
+          'name' => $replacement['name'],
+        );
+      }
+    }
+  }
+
   // Now that we have the list of projects, we should also clear our cache of
   // available release data, since even if we fail to fetch new data, we need
   // to clear out the stale data at this point.
