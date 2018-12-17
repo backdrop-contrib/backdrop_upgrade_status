@@ -398,6 +398,11 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][0]['name'] = 'ckeditor';
       break;
 
+    case 'field_collection':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'paragraphs';
+      break;
+
     case 'nodewords':
       $projects[$project]['obsolete_since'] = '7.x';
       $projects[$project]['replaced_by'][0]['name'] = 'metatag';
