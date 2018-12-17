@@ -47,14 +47,14 @@ function upgrade_status_menu() {
   $items['admin/reports/updates/upgrade'] = array(
     'title' => 'Upgrade status',
     'page callback' => 'upgrade_status_status',
-    'access callback' => 'update_manager_access',
+    'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
     'file' => 'upgrade_status.report.inc'
   );
   $items['admin/reports/updates/upgrade/check'] = array(
     'page callback' => 'upgrade_status_manual_status',
-    'access callback' => 'update_manager_access',
+    'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
     'file' => 'upgrade_status.fetch.inc'
   );
