@@ -405,6 +405,14 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][0]['name'] = 'profile2';
       break;
 
+    case 'ddf':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'conditional_fields';
+      $projects[$project]['replaced_by'][1]['name'] = 'business_rules';
+      $projects[$project]['replaced_by'][2]['name'] = 'field_states_ui';
+      $projects[$project]['replaced_by'][3]['name'] = 'fico';
+      break;
+
     case 'entityreference_view_widget':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'entity_browser';
