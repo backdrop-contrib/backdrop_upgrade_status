@@ -438,6 +438,11 @@ function _upgrade_status_d8_core(&$projects, $project) {
       $projects[$project]['in_core_note'] = t('Replaced by the core REST module.');
       break;
 
+    case 'schemaorg':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('The default RDF mappings of Drupal core have been updated to include schema.org in Drupal 8. Also, a lot of the backend code of this module was ported into Drupal 8 core. The user interface that allows one to set the mappings now lives in the <a href="@url">RDF UI</a> module.', array('@url' => 'https://www.drupal.org/project/rdfui'));
+      break;
+
     case 'services':
       $projects[$project]['in_core_since'] = '8.x';
       $projects[$project]['in_core_note'] = t('The core REST module provides most of the functionality from previous versions of the Services module.');
