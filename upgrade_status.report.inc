@@ -69,16 +69,22 @@ function theme_upgrade_status_report($variables) {
   // we'll need this while generating the report if we have to cross reference
   // anything (e.g. subthemes which have base themes missing an update).
   foreach ($data as $project) {
+    if (empty($project['includes'])){
+      $project['includes'] = array();
+    }
     foreach ($project['includes'] as $key => $name) {
       $status[$key] = $project['status'];
     }
   }
 
   foreach ($data as $project) {
-    // US: Skip upgrade_status. Doesn't make sense to display it.
-    if ($project['name'] == 'upgrade_status') {
+    // Skip future version replacements and this module, which would cause
+    // confusion if it showed up.
+    if ((isset($project['api_version']) && (strtok($project['api_version'], ".") > strtok(VERSION, "."))) ||
+       ($project['name'] == 'upgrade_status')) {
       continue;
     }
+
     switch ($project['status']) {
       // US: Stable releases and projects moved into core are also good news.
       case UPDATE_CURRENT:

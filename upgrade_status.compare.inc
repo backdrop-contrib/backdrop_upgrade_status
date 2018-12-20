@@ -51,6 +51,7 @@ function upgrade_status_calculate_project_data($available) {
       // grab information about.
       foreach ($projects[$key]['replaced_by'] as $replacement) {
         $projects[$replacement['name']] = $available[$replacement['name']];
+        $projects[$replacement['name']]['info'] = array();
       }
     }
   }
