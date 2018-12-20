@@ -242,10 +242,11 @@ function upgrade_status_calculate_project_update_status($project, &$project_data
     $project_data['status'] = UPDATE_FETCH_PENDING;
     $project_data['reason'] = t('No available update data');
     $project_data['fetch_status'] = $available['fetch_status'];
-    return;
   }
 
-  // US: Of course, not yet ported don't have any releases. :) Remove handling.
+  if (empty($available['releases'])) {
+    $available['releases'] = array();
+  }
 
   foreach ($available['releases'] as $version => $release) {
 
