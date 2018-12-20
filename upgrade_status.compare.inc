@@ -390,6 +390,11 @@ function upgrade_status_obsolete(&$projects, $project) {
   $obsolete = TRUE;
 
   switch ($project) {
+    case 'admin_menu':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'admin_toolbar';
+      break;
+
     case 'bundle_copy':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'field_tools';
