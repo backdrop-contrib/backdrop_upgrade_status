@@ -405,6 +405,11 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][0]['name'] = 'profile2';
       break;
 
+    case 'entityreference_view_widget':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'entity_browser';
+      break;
+
     case 'fckeditor':
       $projects[$project]['obsolete_since'] = '5.x';
       $projects[$project]['replaced_by'][0]['name'] = 'ckeditor';
