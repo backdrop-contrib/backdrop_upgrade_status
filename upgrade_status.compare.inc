@@ -413,6 +413,11 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][3]['name'] = 'fico';
       break;
 
+    case 'entityreference_filter':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'verf';
+      break;
+
     case 'entityreference_view_widget':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'entity_browser';
@@ -426,6 +431,33 @@ function upgrade_status_obsolete(&$projects, $project) {
     case 'field_collection':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'paragraphs';
+      break;
+
+    case 'form_save':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'hotkeys_for_save';
+      break;
+
+    case 'google_chart_tools':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'charts';
+      break;
+
+    case 'hierarchical_select':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'cshs';
+      $projects[$project]['replaced_by'][1]['name'] = 'menu_link_weight';
+      $projects[$project]['replaced_by'][2]['name'] = 'shs';
+      break;
+
+    case 'messaging':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'courier';
+      break;
+
+    case 'nodeaccess_userreference':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'access_by_ref';
       break;
 
     case 'nodewords':

@@ -704,6 +704,12 @@ function _upgrade_status_d7_core(&$projects, $project) {
       $projects[$project]['in_core_note'] = t('Advanced jQuery UI features (like Theme Roller support) are not in Drupal core.');
       break;
 
+    case 'jquery_update':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('No longer needed in Drupal 8, which ships with the latest version of the library.  The plan is to continue increasing the shipped version, with backwards compatibility, in minor releases.');
+      $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
     case 'login_security':
       $projects[$project]['in_core_since'] = '7.x';
       $projects[$project]['in_core_complete'] = TRUE;
@@ -715,6 +721,11 @@ function _upgrade_status_d7_core(&$projects, $project) {
     case 'menuless_nodetype':
     case 'ctm':
       $projects[$project]['in_core_since'] = '7.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
+    case 'multiupload_filefield_widget':
+      $projects[$project]['in_core_since'] = '8.x';
       $projects[$project]['in_core_complete'] = TRUE;
       break;
 
