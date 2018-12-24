@@ -346,12 +346,17 @@ function _upgrade_status_d8_core(&$projects, $project) {
 
     case 'ctools':
       $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_note'] = t('Mostly replaced by core APIs, including modal dialogs, exportables, and plugins. Excludes <a href="@url">Page Manager</a> and Form Wizard.', array('@url' => 'https://www.drupal.org/project/page_manager'));
+      $projects[$project]['in_core_note'] = t('Mostly replaced by core APIs, including modal dialogs, exportables, and plugins. Excludes <a href="@url">Page Manager</a> and Form Wizard.', array(
+        '@url' => 'https://www.drupal.org/project/page_manager',
+      ));
       break;
 
     case 'date':
       $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_note'] = t('No recurring dates support or integrated start and end dates.');
+      $projects[$project]['in_core_note'] = t('No recurring dates support. See <a href="@extras">Datetime Extras: Provide a field for repeating / recuring dates</a> and <a href="@field">Recurring Dates Field</a>', array(
+        '@extras' => 'https://www.drupal.org/project/datetime_extras/issues/2775249',
+        '@field' => 'https://www.drupal.org/project/date_recur',
+      ));
       break;
 
     case 'date_popup_authored':
@@ -432,6 +437,11 @@ function _upgrade_status_d8_core(&$projects, $project) {
       $projects[$project]['in_core_note'] = t('Replaced by HTML5 form API functionality.');
       break;
 
+    case 'references':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
     case 'restws':
       $projects[$project]['in_core_since'] = '8.x';
       $projects[$project]['in_core_complete'] = TRUE;
@@ -440,7 +450,9 @@ function _upgrade_status_d8_core(&$projects, $project) {
 
     case 'schemaorg':
       $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_note'] = t('The default RDF mappings of Drupal core have been updated to include schema.org in Drupal 8. Also, a lot of the backend code of this module was ported into Drupal 8 core. The user interface that allows one to set the mappings now lives in the <a href="@url">RDF UI</a> module.', array('@url' => 'https://www.drupal.org/project/rdfui'));
+      $projects[$project]['in_core_note'] = t('The default RDF mappings of Drupal core have been updated to include schema.org in Drupal 8. Also, a lot of the backend code of this module was ported into Drupal 8 core. The user interface that allows one to set the mappings now lives in the <a href="@url">RDF UI</a> module.', array(
+        '@url' => 'https://www.drupal.org/project/rdfui',
+      ));
       break;
 
     case 'services':
@@ -472,6 +484,19 @@ function _upgrade_status_d8_core(&$projects, $project) {
     case 'views_bulk_operations':
       $projects[$project]['in_core_since'] = '8.x';
       $projects[$project]['in_core_note'] = t('The core Views module provides bulk operations on simple actions only. No support for batch operations or configurable actions.');
+      break;
+
+    case 'views_datasource':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('The basic functionality is in core, but some advanced features (such as outputting a Views attachment as JSON) are not.');
+      break;
+
+    case 'views_between_dates_filter':
+      $projects[$project]['in_core_since'] = '8.6';
+      $projects[$project]['in_core_note'] = t('While <a href="@change_record">Views integration for the Datetime Range module</a> is now in core, <a href="@granularity">Views Date Filter Datetime Granularity Option</a> is still missing, but will hopefully land in core soon.', array(
+        '@change_record' => 'https://www.drupal.org/node/2857691',
+        '@granularity' => 'https://www.drupal.org/project/drupal/issues/2868014',
+      ));
       break;
 
     case 'wysiwyg':
@@ -705,6 +730,7 @@ function _upgrade_status_d7_core(&$projects, $project) {
       break;
 
     case 'jquery_update':
+    case 'jqmulti':
       $projects[$project]['in_core_since'] = '8.x';
       $projects[$project]['in_core_note'] = t('No longer needed in Drupal 8, which ships with the latest version of the library.  The plan is to continue increasing the shipped version, with backwards compatibility, in minor releases.');
       $projects[$project]['in_core_complete'] = TRUE;
@@ -825,6 +851,22 @@ function _upgrade_status_d7_core(&$projects, $project) {
     case 'view_unpublished':
       $projects[$project]['in_core_since'] = '7.x';
       $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
+    case 'workflow':
+      $projects[$project]['in_core_since'] = '8.5';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('See the <a href="@url">Content Moderation documentation</a>.', array(
+        '@url' => 'https://www.drupal.org/docs/8/core/modules/content-moderation/overview',
+      ));
+      break;
+
+    case 'wysiwyg_filter':
+      $projects[$project]['in_core_since'] = '8.0';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('See the <a href="@url">Text Editor documentation</a>.', array(
+        '@url' => 'https://www.drupal.org/docs/8/core/modules/editor/overview',
+      ));
       break;
 
     default:

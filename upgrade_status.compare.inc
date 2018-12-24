@@ -429,6 +429,7 @@ function upgrade_status_obsolete(&$projects, $project) {
       break;
 
     case 'field_collection':
+    case 'field_collection_views':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'paragraphs';
       break;
@@ -450,6 +451,12 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][2]['name'] = 'shs';
       break;
 
+    case 'jqeasing':
+    case 'jquery_plugin':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'libraries';
+      break;
+
     case 'messaging':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'courier';
@@ -469,6 +476,17 @@ function upgrade_status_obsolete(&$projects, $project) {
     case 'path_redirect':
       $projects[$project]['obsolete_since'] = '7.x';
       $projects[$project]['replaced_by'][0]['name'] = 'redirect';
+      break;
+
+    case 'print':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'entity_print';
+      $projects[$project]['replaced_by'][1]['name'] = 'printable';
+      break;
+
+    case 'views_export_xls':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'xls_serialization';
       break;
 
     default:
