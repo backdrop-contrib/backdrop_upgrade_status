@@ -395,6 +395,7 @@ function _upgrade_status_d8_core(&$projects, $project) {
     case 'features':
       $projects[$project]['in_core_since'] = '8.x';
       $projects[$project]['in_core_note'] = t('The original intended functionality of the Features module is not provided by core, but the core Configuration system provides support for importing, exporting, and overriding site configuration.');
+      break;
 
     case 'link':
       $projects[$project]['in_core_since'] = '8.x';
