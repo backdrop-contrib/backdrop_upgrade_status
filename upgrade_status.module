@@ -397,6 +397,18 @@ function _upgrade_status_d8_core(&$projects, $project) {
       $projects[$project]['in_core_note'] = t('The original intended functionality of the Features module is not provided by core, but the core Configuration system provides support for importing, exporting, and overriding site configuration.');
       break;
 
+    case 'field_extrawidgets':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('Fields can be hidden natively from the Form Display configuration. To make fields read-only, use the <a href="@url">Read-only Field Widget</a> module.', array(
+        '@url' => 'https://www.drupal.org/project/readonly_field_widget',
+      ));
+      break;
+
+    case 'field_formatter_settings':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
     case 'link':
       $projects[$project]['in_core_since'] = '8.x';
       $projects[$project]['in_core_note'] = t('No support for internal links.');
@@ -417,6 +429,12 @@ function _upgrade_status_d8_core(&$projects, $project) {
       $projects[$project]['in_core_since'] = '8.x';
       $projects[$project]['in_core_complete'] = TRUE;
       $projects[$project]['in_core_note'] = t('Replaced by the updated core Toolbar module.');
+      break;
+
+    case 'options_element':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Taxonomy Term Reference fields have much better usability with fewer drawbacks.');
       break;
 
     case 'phone':

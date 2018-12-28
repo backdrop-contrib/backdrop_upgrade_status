@@ -395,9 +395,30 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][0]['name'] = 'admin_toolbar';
       break;
 
+    case 'auto_nodetitle':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'auto_entitylabel';
+      break;
+
     case 'bundle_copy':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'field_tools';
+      break;
+
+    case 'calendar':
+    case 'fullcalendar':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'fullcalendar_view';
+      break;
+
+    case 'cnr':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'cer';
+      break;
+
+    case 'colors':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'colorapi';
       break;
 
     case 'content_profile':
@@ -413,9 +434,20 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][3]['name'] = 'fico';
       break;
 
+    case 'editableviews':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'views_entity_form_field';
+      break;
+
     case 'entityreference_filter':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'verf';
+      break;
+
+    case 'entityreference_prepopulate':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'prepopulate';
+      $projects[$project]['replaced_by'][1]['name'] = 'referer_to_entity_reference';
       break;
 
     case 'entityreference_view_widget':
@@ -430,8 +462,14 @@ function upgrade_status_obsolete(&$projects, $project) {
 
     case 'field_collection':
     case 'field_collection_views':
+    case 'multifield':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'paragraphs';
+      break;
+
+    case 'field_conditional_state':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'conditional_fields';
       break;
 
     case 'form_save':
@@ -439,7 +477,14 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][0]['name'] = 'hotkeys_for_save';
       break;
 
+    case 'global_filter':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'simple_global_filter';
+      break;
+
     case 'google_chart_tools':
+    case 'highcharts':
+    case 'charts_graphs':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'charts';
       break;
@@ -458,8 +503,14 @@ function upgrade_status_obsolete(&$projects, $project) {
       break;
 
     case 'messaging':
+    case 'notifications':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'courier';
+      break;
+
+    case 'node_clone':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'entity_clone';
       break;
 
     case 'nodeaccess_userreference':
@@ -473,6 +524,11 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][1]['name'] = 'metatags_quick';
       break;
 
+    case 'og':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'group';
+      break;
+
     case 'path_redirect':
       $projects[$project]['obsolete_since'] = '7.x';
       $projects[$project]['replaced_by'][0]['name'] = 'redirect';
@@ -482,6 +538,11 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'entity_print';
       $projects[$project]['replaced_by'][1]['name'] = 'printable';
+      break;
+
+    case 'views_arguments_extras':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'views_arg_order_sort';
       break;
 
     case 'views_export_xls':
