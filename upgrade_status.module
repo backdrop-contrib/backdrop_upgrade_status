@@ -518,6 +518,12 @@ function _upgrade_status_d8_core(&$projects, $project) {
       ));
       break;
 
+    case 'views_filters_populate':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('When adding a filter, select Combine Fields Filter from the Global category.');
+      break;
+
     case 'wysiwyg':
       $projects[$project]['in_core_since'] = '8.x';
       $projects[$project]['in_core_note'] = t('API support added to the core "Editor" module. No support for multiple text editors per text format.');

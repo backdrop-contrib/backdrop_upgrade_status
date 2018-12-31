@@ -445,14 +445,18 @@ function upgrade_status_obsolete(&$projects, $project) {
       break;
 
     case 'entityreference_prepopulate':
+    case 'nodereference_url':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'prepopulate';
       $projects[$project]['replaced_by'][1]['name'] = 'referer_to_entity_reference';
       break;
 
     case 'entityreference_view_widget':
+    case 'references_dialog':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'entity_browser';
+      $projects[$project]['replaced_by'][1]['name'] = 'inline_entity_form';
+      $projects[$project]['replaced_by'][2]['name'] = 'entityconnect';
       break;
 
     case 'fckeditor':
@@ -508,6 +512,11 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][0]['name'] = 'courier';
       break;
 
+    case 'node_convert':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'convert_bundles';
+      break;
+
     case 'node_clone':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'entity_clone';
@@ -538,6 +547,27 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'entity_print';
       $projects[$project]['replaced_by'][1]['name'] = 'printable';
+      break;
+
+    case 'search_api_db':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'search_api';
+      break;
+
+    case 'taxonomy_csv':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'term_csv_export_import';
+      $projects[$project]['replaced_by'][1]['name'] = 'taxonomy_manager';
+      $projects[$project]['replaced_by'][2]['name'] = 'migrate_source_csv';
+      $projects[$project]['replaced_by'][3]['name'] = 'taxonomy_import';
+      $projects[$project]['replaced_by'][4]['name'] = 'hti';
+      $projects[$project]['replaced_by'][5]['name'] = 'term_csv_tree_import';
+      break;
+
+    case 'track_field_changes':
+    case 'nodechanges':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'changed_fields';
       break;
 
     case 'views_arguments_extras':
