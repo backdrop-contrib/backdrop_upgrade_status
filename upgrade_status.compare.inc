@@ -390,6 +390,11 @@ function upgrade_status_obsolete(&$projects, $project) {
   $obsolete = TRUE;
 
   switch ($project) {
+    case 'addressfield':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'address';
+      break;
+
     case 'admin_menu':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'admin_toolbar';
@@ -400,6 +405,11 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][0]['name'] = 'auto_entitylabel';
       break;
 
+    case 'better_formats':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'allowed_formats';
+      break;
+
     case 'bundle_copy':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'field_tools';
@@ -407,11 +417,13 @@ function upgrade_status_obsolete(&$projects, $project) {
 
     case 'calendar':
     case 'fullcalendar':
+    case 'fullcalendar_create':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'fullcalendar_view';
       break;
 
     case 'cnr':
+    case 'nodereferrer':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'cer';
       break;
@@ -424,6 +436,12 @@ function upgrade_status_obsolete(&$projects, $project) {
     case 'content_profile':
       $projects[$project]['obsolete_since'] = '7.x';
       $projects[$project]['replaced_by'][0]['name'] = 'profile2';
+      break;
+
+    case 'data_export_import':
+    case 'node_export':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'content_sync';
       break;
 
     case 'ddf':
@@ -459,6 +477,11 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][2]['name'] = 'entityconnect';
       break;
 
+    case 'facetapi':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'facets';
+      break;
+
     case 'fckeditor':
       $projects[$project]['obsolete_since'] = '5.x';
       $projects[$project]['replaced_by'][0]['name'] = 'ckeditor';
@@ -487,8 +510,10 @@ function upgrade_status_obsolete(&$projects, $project) {
       break;
 
     case 'google_chart_tools':
-    case 'highcharts':
     case 'charts_graphs':
+    case 'charts_graphs_flot':
+    case 'highcharts':
+    case 'visualization':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'charts';
       break;
@@ -506,10 +531,32 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][0]['name'] = 'libraries';
       break;
 
+    case 'location':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'address';
+      $projects[$project]['replaced_by'][1]['name'] = 'geofield';
+      $projects[$project]['replaced_by'][2]['name'] = 'geocoder';
+      $projects[$project]['replaced_by'][3]['name'] = 'geolocation';
+      break;
+
+    case 'megamenu':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'menu_item_extras';
+      $projects[$project]['replaced_by'][1]['name'] = 'we_megamenu';
+      $projects[$project]['replaced_by'][2]['name'] = 'tb_megamenu';
+      $projects[$project]['replaced_by'][3]['name'] = 'ultimenu';
+      $projects[$project]['replaced_by'][4]['name'] = 'simple_megamenu';
+      break;
+
     case 'messaging':
     case 'notifications':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'courier';
+      break;
+
+    case 'menu_item_visibility':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'menu_link_content_visibility';
       break;
 
     case 'node_convert':
@@ -518,6 +565,7 @@ function upgrade_status_obsolete(&$projects, $project) {
       break;
 
     case 'node_clone':
+    case 'replicate':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'entity_clone';
       break;
@@ -538,6 +586,11 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][0]['name'] = 'group';
       break;
 
+    case 'panels_extra_styles':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'panels_extra_styles_d8';
+      break;
+
     case 'path_redirect':
       $projects[$project]['obsolete_since'] = '7.x';
       $projects[$project]['replaced_by'][0]['name'] = 'redirect';
@@ -547,6 +600,11 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'entity_print';
       $projects[$project]['replaced_by'][1]['name'] = 'printable';
+      break;
+
+    case 'responsive_dropdown_menus':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'responsive_menu';
       break;
 
     case 'search_api_db':
@@ -564,10 +622,20 @@ function upgrade_status_obsolete(&$projects, $project) {
       $projects[$project]['replaced_by'][5]['name'] = 'term_csv_tree_import';
       break;
 
+    case 'textformatter':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'list_formatter';
+      break;
+
     case 'track_field_changes':
     case 'nodechanges':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'changed_fields';
+      break;
+
+    case 'user_dashboard':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'homebox';
       break;
 
     case 'views_arguments_extras':
@@ -576,8 +644,15 @@ function upgrade_status_obsolete(&$projects, $project) {
       break;
 
     case 'views_export_xls':
+    case 'views_data_export_phpexcel':
       $projects[$project]['obsolete_since'] = '8.x';
       $projects[$project]['replaced_by'][0]['name'] = 'xls_serialization';
+      $projects[$project]['replaced_by'][1]['name'] = 'vbo_export';
+      break;
+
+    case 'wikitools':
+      $projects[$project]['obsolete_since'] = '8.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'freelinking';
       break;
 
     default:

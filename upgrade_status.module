@@ -383,7 +383,6 @@ function _upgrade_status_d8_core(&$projects, $project) {
     case 'entity':
     case 'entity_view_mode':
     case 'file_entity':
-    case 'hidden_field':
     case 'title':
     case 'user_picture_field':
     case 'uuid':
@@ -398,6 +397,10 @@ function _upgrade_status_d8_core(&$projects, $project) {
       break;
 
     case 'field_extrawidgets':
+    case 'hidden_field':
+    case 'field_hidden':
+    case 'hidden_widget':
+    case 'formfilter':
       $projects[$project]['in_core_since'] = '8.x';
       $projects[$project]['in_core_note'] = t('Fields can be hidden natively from the Form Display configuration. To make fields read-only, use the <a href="@url">Read-only Field Widget</a> module.', array(
         '@url' => 'https://www.drupal.org/project/readonly_field_widget',
@@ -406,6 +409,12 @@ function _upgrade_status_d8_core(&$projects, $project) {
 
     case 'field_formatter_settings':
       $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
+    case 'fieldable_panels_panes':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('Custom block types provide all of the functionality that is necessary.');
       $projects[$project]['in_core_complete'] = TRUE;
       break;
 
@@ -435,6 +444,15 @@ function _upgrade_status_d8_core(&$projects, $project) {
       $projects[$project]['in_core_since'] = '8.x';
       $projects[$project]['in_core_complete'] = TRUE;
       $projects[$project]['in_core_note'] = t('Taxonomy Term Reference fields have much better usability with fewer drawbacks.');
+      break;
+
+    case 'panels':
+    case 'panelizer':
+      $projects[$project]['in_core_since'] = '8.5';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Use the <a href="@url">Layout Builder</a> module.', array(
+        '@url' => 'https://www.drupal.org/node/2924128',
+      ));
       break;
 
     case 'phone':
@@ -490,12 +508,14 @@ function _upgrade_status_d8_core(&$projects, $project) {
       break;
 
     case 'variable':
+    case 'defaultconfig':
       $projects[$project]['in_core_since'] = '8.x';
       $projects[$project]['in_core_complete'] = TRUE;
       $projects[$project]['in_core_note'] = t('Replaced by the core Configuration system.');
       break;
 
     case 'views':
+    case 'extra_columns':
       $projects[$project]['in_core_since'] = '8.x';
       $projects[$project]['in_core_complete'] = TRUE;
       break;
@@ -602,6 +622,11 @@ function _upgrade_status_d7_core(&$projects, $project) {
       ));
       break;
 
+    case 'advuser':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      break;
+
     case 'block_node_visibility':
       $projects[$project]['in_core_since'] = '7.x';
       $projects[$project]['in_core_complete'] = TRUE;
@@ -649,6 +674,12 @@ function _upgrade_status_d7_core(&$projects, $project) {
       $projects[$project]['in_core_complete'] = TRUE;
       break;
 
+    case 'content_dependency':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Use the Relationship feature in Views.');
+      break;
+
     case 'content_taxonomy':
     case 'field_taxonomy':
     case 'term_fields':
@@ -669,6 +700,15 @@ function _upgrade_status_d7_core(&$projects, $project) {
       $projects[$project]['in_core_complete'] = TRUE;
       $projects[$project]['in_core_note'] = t('Drupal 7 implements an entirely new <a href="@issue-url">database layer</a>, which allows Drupal to work with any database. Modules are able to alter most database queries and there is support for transactions.', array(
         '@issue-url' => 'http://drupal.org/node/225450',
+      ));
+      break;
+
+    case 'dragndrop_upload':
+      $projects[$project]['in_core_since'] = 'TBD';
+      $projects[$project]['in_core_note'] = t('In development for addition to Drupal core.  See <a href="@issue-url">File Field design update</a> for details. In the meantime, <a href="@contrib1">Plupload integration</a> and/or <a href="@contrib2">PlUPload File Widget</a> can be used.', array(
+        '@issue-url' => 'https://www.drupal.org/node/2113931',
+        '@contrib1' => 'https://www.drupal.org/project/plupload',
+        '@contrib2' => 'https://www.drupal.org/project/plupload_widget',
       ));
       break;
 
@@ -709,6 +749,14 @@ function _upgrade_status_d7_core(&$projects, $project) {
     case 'user_default_filter':
       $projects[$project]['in_core_complete'] = TRUE;
       $projects[$project]['in_core_since'] = '7.x';
+      break;
+
+    case 'ife':
+      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_note'] = t('See <a href="@url">the documentation</a>.', array(
+        '@url' => 'https://www.drupal.org/docs/8/core/modules/inline-form-errors/inline-form-errors-module-overview',
+      ));
+      $projects[$project]['in_core_complete'] = TRUE;
       break;
 
     case 'image':
@@ -773,6 +821,11 @@ function _upgrade_status_d7_core(&$projects, $project) {
       $projects[$project]['in_core_note'] = t('Drupal core provides no UI. If required, the internal variables may be configured using the <a href="@flood-control-url">Flood control</a> module.', array(
         '@flood-control-url' => 'http://drupal.org/project/flood_control',
       ));
+      break;
+
+    case 'media':
+      $projects[$project]['in_core_since'] = '8.4';
+      $projects[$project]['in_core_complete'] = TRUE;
       break;
 
     case 'menuless_nodetype':
@@ -885,10 +938,21 @@ function _upgrade_status_d7_core(&$projects, $project) {
       break;
 
     case 'workflow':
+    case 'revisioning':
+    case 'workbench_files':
+    case 'workbench_media':
+    case 'workbench_moderation':
       $projects[$project]['in_core_since'] = '8.5';
       $projects[$project]['in_core_complete'] = TRUE;
       $projects[$project]['in_core_note'] = t('See the <a href="@url">Content Moderation documentation</a>.', array(
         '@url' => 'https://www.drupal.org/docs/8/core/modules/content-moderation/overview',
+      ));
+      break;
+
+    case 'workspace':
+      $projects[$project]['in_core_since'] = '8.6';
+      $projects[$project]['in_core_note'] = t('Renamed to <a href="@workspaces">Workspaces</a>.', array(
+        '@workspaces' => 'https://www.drupal.org/node/2968491',
       ));
       break;
 
