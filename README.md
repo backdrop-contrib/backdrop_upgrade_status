@@ -31,14 +31,3 @@ Install as usual. See [the Drupal 6 instructions](https://drupal.org/node/70151)
 ## Usage
 
 Go to Administer >> Reports >> Available updates >> Upgrade status and check the status of your installed modules.
-
-## Contact
-
-Current maintainers:
-
-* Daniel F. Kudwien (sun) - dev@unleashedmind.com
-
-This project has been sponsored by:
-
-* [UNLEASHED MIND](http://www.unleashedmind.com): Specialized in consulting and planning of Drupal powered sites, UNLEASHED MIND offers installation, development, theming, customization, and hosting to get you started. Visit them for more information.
-
