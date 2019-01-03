@@ -7,6 +7,7 @@ Upgrade Status module was designed to provide an easy way tell when your website
 * Available: A stable release of this project is available.
 * In development: A development release of this project is available, which can be installed for testing purposes.
 * Not ported yet: There are no releases available for this project.
+* Replaced by: A list of other modules that have superseded this one.
 
 Clicking on any of the modules' boxes will expand the area and show you a link to download the new version of the project, as well as read its release notes.
 
