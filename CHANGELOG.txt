@@ -30,14 +30,14 @@ Upgrade Status 5.x-1.3, 2008-08-17
 Upgrade Status 5.x-1.2, 2008-06-08
 ----------------------------------
 #265062 by webchick, sun: Added select to choose target version of Drupal core.
-Moved core functions of this module into separate upgrade_status.admin.inc.
+Moved core functions of this module into separate backdrop_upgrade_status.admin.inc.
 #265419 by sun: Fixed clicking on project title/link toggles collapse status.
 #265061 by webchick, sun: Added title and link for not (yet) upgraded modules.
 
 
 Upgrade Status 5.x-1.1, 2008-05-31
 ----------------------------------
-#264980 by sun: Removed upgrade_status from list output.
+#264980 by sun: Removed backdrop_upgrade_status from list output.
 Added pointer to Coder module to help porting modules.
 Fixed wrong URL for manually updating.
 Removed superfluous help text.

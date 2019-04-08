@@ -26,16 +26,16 @@ module_load_include('inc', 'update', 'update.compare');
  * @return
  *   An array of installed projects with current update status information.
  *
- * @see upgrade_status_get_available()
+ * @see backdrop_upgrade_status_get_available()
  * @see update_get_projects()
  * @see update_process_project_info()
  * @see update_project_cache()
  */
-function upgrade_status_calculate_project_data($available) {
+function backdrop_upgrade_status_calculate_project_data($available) {
   // Retrieve the projects from cache, if present.
-#  $projects = update_project_cache('upgrade_status_project_data');
+#  $projects = update_project_cache('backdrop_upgrade_status_project_data');
   // US: Directly use private cache getter to skip Update's cache invalidation.
-  $projects = _update_cache_get('upgrade_status_project_data');
+  $projects = _update_cache_get('backdrop_upgrade_status_project_data');
   // If $projects is empty, then the cache must be rebuilt.
   // Otherwise, return the cached data and skip the rest of the function.
   if (!empty($projects)) {
@@ -46,7 +46,7 @@ function upgrade_status_calculate_project_data($available) {
 
   // US: Handle obsolete projects.
   foreach ($projects as $key => $project) {
-    if (upgrade_status_obsolete($projects, $key)) {
+    if (backdrop_upgrade_status_obsolete($projects, $key)) {
       // Add the project that makes this one obsolete to the list of those to
       // grab information about.
       foreach ($projects[$key]['replaced_by'] as $replacement) {
@@ -59,11 +59,11 @@ function upgrade_status_calculate_project_data($available) {
   update_process_project_info($projects);
   foreach ($projects as $project => $project_info) {
     if (isset($available[$project])) {
-      upgrade_status_calculate_project_update_status($project, $projects[$project], $available[$project]);
+      backdrop_upgrade_status_calculate_project_update_status($project, $projects[$project], $available[$project]);
     }
     // US: Check if the project is obsolete.
-    elseif (upgrade_status_obsolete($projects, $project)) {
-      $projects[$project]['status'] = UPGRADE_STATUS_OBSOLETE;
+    elseif (backdrop_upgrade_status_obsolete($projects, $project)) {
+      $projects[$project]['status'] = BACKDROP_UPGRADE_STATUS_OBSOLETE;
       $projects[$project]['reason'] = t('Made obsolete by');
     }
     else {
@@ -77,10 +77,10 @@ function upgrade_status_calculate_project_data($available) {
   drupal_alter('update_status', $projects);
 
   // US: Same for us, afterwards.
-  drupal_alter('upgrade_status', $projects);
+  drupal_alter('backdrop_upgrade_status', $projects);
 
   // Cache the site's update status for at most 1 hour.
-  _update_cache_set('upgrade_status_project_data', $projects, REQUEST_TIME + 3600);
+  _update_cache_set('backdrop_upgrade_status_project_data', $projects, REQUEST_TIME + 3600);
   return $projects;
 }
 
@@ -147,7 +147,7 @@ function upgrade_status_calculate_project_data($available) {
  * @param $available
  *   Data about available project releases of a specific project.
  */
-function upgrade_status_calculate_project_update_status($project, &$project_data, $available) {
+function backdrop_upgrade_status_calculate_project_update_status($project, &$project_data, $available) {
   foreach (array('title', 'link') as $attribute) {
     if (!isset($project_data[$attribute]) && isset($available[$attribute])) {
       $project_data[$attribute] = $available[$attribute];
@@ -317,7 +317,7 @@ function upgrade_status_calculate_project_update_status($project, &$project_data
   if (!isset($project_data['recommended']) && isset($project_data['latest_version'])) {
     $project_data['recommended'] = $project_data['latest_version'];
     // US: No recommended version means there's a dev snapshot.
-    $project_data['status'] = UPGRADE_STATUS_DEVELOPMENT;
+    $project_data['status'] = BACKDROP_UPGRADE_STATUS_DEVELOPMENT;
     $project_data['reason'] = t('In development');
   }
 
@@ -329,9 +329,9 @@ function upgrade_status_calculate_project_update_status($project, &$project_data
 
   // US: Check new Drupal core improvements, regardless of what's figured out
   // below.
-  if (upgrade_status_moved_into_core($projects, $project)) {
+  if (backdrop_upgrade_status_moved_into_core($projects, $project)) {
     $project_data += $projects[$project];
-    $project_data['status'] = UPGRADE_STATUS_CORE;
+    $project_data['status'] = BACKDROP_UPGRADE_STATUS_CORE;
     $project_data['reason'] = t('In core');
   }
 
@@ -357,14 +357,14 @@ function upgrade_status_calculate_project_update_status($project, &$project_data
   switch ($project_data['install_type']) {
     case 'official':
     case 'dev':
-      $project_data['status'] = UPGRADE_STATUS_STABLE;
+      $project_data['status'] = BACKDROP_UPGRADE_STATUS_STABLE;
       $project_data['reason'] = t('Available');
       break;
 
     default:
       // US: A project without releases may be in core.
-      if (upgrade_status_moved_into_core($projects, $project)) {
-        $project_data['status'] = UPGRADE_STATUS_CORE;
+      if (backdrop_upgrade_status_moved_into_core($projects, $project)) {
+        $project_data['status'] = BACKDROP_UPGRADE_STATUS_CORE;
         $project_data['reason'] = t('In core');
       }
       else {
@@ -380,13 +380,13 @@ function upgrade_status_calculate_project_update_status($project, &$project_data
  * Assign custom upgrade information for certain modules.
  *
  * @param $projects
- *   Array of projects from upgrade_status_calculate_project_data().
+ *   Array of projects from backdrop_upgrade_status_calculate_project_data().
  * @param $project
  *   Project name to check.
  * @return
  *   TRUE if module has been made obsolete by an alternative.
  */
-function upgrade_status_obsolete(&$projects, $project) {
+function backdrop_upgrade_status_obsolete(&$projects, $project) {
   $obsolete = TRUE;
 
   switch ($project) {

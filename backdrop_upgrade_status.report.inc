@@ -10,14 +10,14 @@ module_load_include('inc', 'update', 'update.report');
 /**
  * Page callback: Generates a page about the update status of projects.
  *
- * @see upgrade_status_menu()
+ * @see backdrop_upgrade_status_menu()
  */
-function upgrade_status_status() {
+function backdrop_upgrade_status_status() {
   // US: Don't pass TRUE to check cache only.
-  if ($available = upgrade_status_get_available()) {
-    module_load_include('inc', 'upgrade_status', 'upgrade_status.compare');
-    $data = upgrade_status_calculate_project_data($available);
-    return theme('upgrade_status_report', array('data' => $data));
+  if ($available = backdrop_upgrade_status_get_available()) {
+    module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.compare');
+    $data = backdrop_upgrade_status_calculate_project_data($available);
+    return theme('backdrop_upgrade_status_report', array('data' => $data));
   }
   else {
     // US: Inlined _update_no_data().
@@ -25,9 +25,9 @@ function upgrade_status_status() {
     $destination = drupal_get_destination();
     $data = t('No upgrade information available. <a href="@run_cron">Run cron</a> or <a href="@check_manually">check manually</a>.', array(
       '@run_cron' => url('admin/reports/status/run-cron', array('query' => $destination)),
-      '@check_manually' => url('admin/reports/updates/upgrade/check', array('query' => $destination)),
+      '@check_manually' => url('admin/reports/updates/backdrop-upgrade/check', array('query' => $destination)),
     ));
-    return theme('upgrade_status_report', array('data' => $data));
+    return theme('backdrop_upgrade_status_report', array('data' => $data));
   }
 }
 
@@ -40,18 +40,18 @@ function upgrade_status_status() {
  *
  * @ingroup themeable
  */
-function theme_upgrade_status_report($variables) {
+function theme_backdrop_upgrade_status_report($variables) {
   $data = $variables['data'];
 
-  $last = variable_get('upgrade_status_last_check', 0);
-  $output = theme('upgrade_status_last_check', array('last' => $last));
+  $last = variable_get('backdrop_upgrade_status_last_check', 0);
+  $output = theme('backdrop_upgrade_status_last_check', array('last' => $last));
 
   // US: Load Update module's data as a fallback in case there is no release info
   // for a project (so we can link to the project).
   $current_data = update_get_available(TRUE);
 
   // US: Add the core version selector form.
-  $form = drupal_get_form('upgrade_status_core_version_form');
+  $form = drupal_get_form('backdrop_upgrade_status_core_version_form');
   $output .= drupal_render($form);
 
   if (!is_array($data)) {
@@ -81,18 +81,18 @@ function theme_upgrade_status_report($variables) {
     // Skip future version replacements and this module, which would cause
     // confusion if it showed up.
     if ((isset($project['api_version']) && (strtok($project['api_version'], ".") > strtok(VERSION, "."))) ||
-       ($project['name'] == 'upgrade_status')) {
+       ($project['name'] == 'backdrop_upgrade_status')) {
       continue;
     }
 
     switch ($project['status']) {
       // US: Stable releases and projects moved into core are also good news.
       case UPDATE_CURRENT:
-      case UPGRADE_STATUS_STABLE:
-      case UPGRADE_STATUS_CORE:
+      case BACKDROP_UPGRADE_STATUS_STABLE:
+      case BACKDROP_UPGRADE_STATUS_CORE:
       // @todo: Colour obsolete modules according to their replacement project
       // info in $data.
-      case UPGRADE_STATUS_OBSOLETE:
+      case BACKDROP_UPGRADE_STATUS_OBSOLETE:
         $class = 'ok';
         $icon = theme('image', array('path' => 'misc/watchdog-ok.png', 'width' => 18, 'height' => 18, 'alt' => t('ok'), 'title' => t('ok')));
         break;
@@ -114,11 +114,11 @@ function theme_upgrade_status_report($variables) {
       // US: It doesn't make sense to output a whole page of warning symbols,
       // so we just colorize as a warning without the icon. This allows us to
       // warn about projects moved into core and other important info.
-      case UPGRADE_STATUS_DEVELOPMENT:
+      case BACKDROP_UPGRADE_STATUS_DEVELOPMENT:
         $class = 'warning';
         $icon = '';
         break;
-      case UPGRADE_STATUS_OBSOLETE:
+      case BACKDROP_UPGRADE_STATUS_OBSOLETE:
         $row .= '<span class="current">'. t('Made obsolete') .'</span>';
         break;
 
@@ -135,7 +135,7 @@ function theme_upgrade_status_report($variables) {
     }
 
     $row = '<div class="version-status">';
-    $status_label = theme('upgrade_status_status_label', array('status' => $project['status'], 'project' => $project));
+    $status_label = theme('backdrop_upgrade_status_status_label', array('status' => $project['status'], 'project' => $project));
     $row .= !empty($status_label) ? $status_label : check_plain($project['reason']);
     $row .= '<span class="icon">' . $icon . '</span>';
     $row .= "</div>\n";
@@ -286,7 +286,7 @@ function theme_upgrade_status_report($variables) {
           case UPDATE_NOT_SECURE:
           case UPDATE_REVOKED:
           case UPDATE_NOT_SUPPORTED:
-            $base_themes[] = t('%base_theme (!base_label)', array('%base_theme' => $base_theme, '!base_label' => theme('upgrade_status_status_label', array('status' => $status[$base_key]))));
+            $base_themes[] = t('%base_theme (!base_label)', array('%base_theme' => $base_theme, '!base_label' => theme('backdrop_upgrade_status_status_label', array('status' => $status[$base_key]))));
             break;
 
           default:
@@ -347,7 +347,7 @@ function theme_upgrade_status_report($variables) {
  * @see update_calculate_project_data()
  * @ingroup themeable
  */
-function theme_upgrade_status_status_label($variables) {
+function theme_backdrop_upgrade_status_status_label($variables) {
   $project = $variables['project'];
 
   switch ($variables['status']) {
@@ -362,7 +362,7 @@ function theme_upgrade_status_status_label($variables) {
     // Although unsupported releases should actually be unsupported, we treat
     // them like development releases, since many maintainers merely use this
     // additional flag to hide the release from novice Drupal users.
-    case UPGRADE_STATUS_DEVELOPMENT:
+    case BACKDROP_UPGRADE_STATUS_DEVELOPMENT:
     case UPDATE_NOT_SUPPORTED:
 #      return '<span class="not-supported">' . t('Not supported!') . '</span>';
       // US: Additionally output the "development stage" of a project; alpha,
@@ -377,11 +377,11 @@ function theme_upgrade_status_status_label($variables) {
     // US: Good news for us means that a stable release is available...
 #    case UPDATE_CURRENT:
 #      return '<span class="current">' . t('Up to date') . '</span>';
-    case UPGRADE_STATUS_STABLE:
+    case BACKDROP_UPGRADE_STATUS_STABLE:
       return '<span class="current">'. t('Available') .'</span>';
 
     // US: ...or that a module's been moved into core.
-    case UPGRADE_STATUS_CORE:
+    case BACKDROP_UPGRADE_STATUS_CORE:
       return '<span class="current">'. t('In core') .'</span>';
   }
 }
