@@ -301,62 +301,38 @@ function _backdrop_upgrade_status_d8_core(&$projects, $project) {
   $core = TRUE;
   switch ($project) {
 
-    case 'admin_language':
-    case 'entity_translation':
-    case 'fallback_language_negotiation':
-    case 'i18n':
-    case 'i18nviews':
-    case 'l10n_install':
-    case 'l10n_update':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Replaced by core localization functionality, the core Language module, and the core Configuration, Content, and Interface Translation modules.');
-      break;
-
     case 'admin_views':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_note'] = t('Integrated with the core Views module. No comment admin view in 8.0.x.');
       break;
 
     case 'bean':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Replaced by the core Custom Block module.');
-      break;
-
-    case 'breakpoint':
-    case 'breakpoints':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      break;
-
-    case 'cachetags':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Replaced by core APIs.');
+      $projects[$project]['in_core_note'] = t('Replaced by the core Custom Block module and pageless node functionality.');
       break;
 
     case 'caption_filter':
     case 'float_filter':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
       $projects[$project]['in_core_note'] = t('Replaced by functionality in the core Editor module.');
       break;
 
     case 'ckeditor':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
       break;
 
     case 'ctools':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_note'] = t('Mostly replaced by core APIs, including modal dialogs, exportables, and plugins. Excludes <a href="@url">Page Manager</a> and Form Wizard.', array(
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Mostly replaced by core APIs, including modal dialogs, dropbuttons, exportables and page handlers (from <a href="@url">Page Manager</a> and Form Wizard.', array(
         '@url' => 'https://www.drupal.org/project/page_manager',
       ));
       break;
 
     case 'date':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_note'] = t('No recurring dates support. See <a href="@extras">Datetime Extras: Provide a field for repeating / recuring dates</a> and <a href="@field">Recurring Dates Field</a>', array(
         '@extras' => 'https://www.drupal.org/project/datetime_extras/issues/2775249',
         '@field' => 'https://www.drupal.org/project/date_recur',
@@ -364,199 +340,155 @@ function _backdrop_upgrade_status_d8_core(&$projects, $project) {
       break;
 
     case 'date_popup_authored':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
       break;
 
-    case 'edit':
-    case 'quickedit':
-      $projects[$project]['in_core_since'] = '8.x';
+    case 'uuid':
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
       break;
 
     case 'email':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_note'] = t('E-mail address contact forms are not supported by core.');
-      break;
-
-    case 'entityreference':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_complete'] = TRUE;
       break;
 
     case 'entity':
     case 'entity_view_mode':
-    case 'file_entity':
-    case 'title':
-    case 'user_picture_field':
-    case 'uuid':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
       $projects[$project]['in_core_note'] = t('Replaced by core Entity system functionality.');
       break;
 
     case 'features':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_note'] = t('The original intended functionality of the Features module is not provided by core, but the core Configuration system provides support for importing, exporting, and overriding site configuration.');
       break;
 
+    // @todo: is this true in Backdrop?
     case 'field_extrawidgets':
     case 'hidden_field':
     case 'field_hidden':
     case 'hidden_widget':
     case 'formfilter':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_note'] = t('Fields can be hidden natively from the Form Display configuration. To make fields read-only, use the <a href="@url">Read-only Field Widget</a> module.', array(
-        '@url' => 'https://www.drupal.org/project/readonly_field_widget',
-      ));
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Fields can be hidden natively from the Form Display configuration.');
       break;
 
-    case 'field_formatter_settings':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      break;
+    // case 'field_formatter_settings':
+      // $projects[$project]['in_core_since'] = '1.x';
+      // $projects[$project]['in_core_complete'] = TRUE;
+      // break;
 
+    // @todo: is this true in Backdrop?
     case 'fieldable_panels_panes':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_note'] = t('Custom block types provide all of the functionality that is necessary.');
       $projects[$project]['in_core_complete'] = TRUE;
       break;
 
     case 'link':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_note'] = t('No support for internal links.');
       break;
 
-    case 'migrate':
-    case 'migrate_d2d':
-    case 'migrate_drupal':
-      $projects[$project]['in_core_since'] = '8.x';
-      break;
-
     case 'module_filter':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_note'] = t('A search functionality is included on the core modules page. The re-designed modules page in the 2.x branch is not in core.');
       break;
 
     case 'navbar':
-      $projects[$project]['in_core_since'] = '8.x';
+    case 'admin_menu':
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Replaced by the updated core Toolbar module.');
+      $projects[$project]['in_core_note'] = t('Replaced by the core Admin Bar module.');
       break;
 
     case 'options_element':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Taxonomy Term Reference fields have much better usability with fewer drawbacks.');
       break;
 
     case 'panels':
-    case 'panelizer':
       $projects[$project]['in_core_since'] = '8.5';
       $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Use the <a href="@url">Layout Builder</a> module.', array(
-        '@url' => 'https://www.drupal.org/node/2924128',
-      ));
+      $projects[$project]['in_core_note'] = t('Functionality provided by the Layout module. Panel nodes are not provided in core.');
+      break;
+
+    case 'pathauto':
+      $projects[$project]['in_core_since'] = '8.5';
+      $projects[$project]['in_core_complete'] = TRUE;
       break;
 
     case 'phone':
     case 'telephone':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
       break;
 
-    case 'picture':
-      $projects[$project]['in_core_since'] = '8.x';
+    case 'project_browser':
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Replaced by the core Responsive Image module.');
+      $projects[$project]['in_core_note'] = t('Replaced by core Installer module.');
+      break;
+
+    case 'redirect':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
       break;
 
     case 'elements':
     case 'placeholder':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
       $projects[$project]['in_core_note'] = t('Replaced by HTML5 form API functionality.');
       break;
 
-    case 'references':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      break;
-
-    case 'restws':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Replaced by the core REST module.');
-      break;
-
-    case 'schemaorg':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_note'] = t('The default RDF mappings of Drupal core have been updated to include schema.org in Drupal 8. Also, a lot of the backend code of this module was ported into Drupal 8 core. The user interface that allows one to set the mappings now lives in the <a href="@url">RDF UI</a> module.', array(
-        '@url' => 'https://www.drupal.org/project/rdfui',
-      ));
-      break;
-
-    case 'services':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_note'] = t('The core REST module provides most of the functionality from previous versions of the Services module.');
-      break;
-
-    case 'stringoverrides':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_note'] = t('The core Interface Translation module allows custom translations to be provided for strings in any language, including English.');
-      break;
-
     case 'transliteration':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_note'] = t('Replaced by core APIs. No direct support for transliterating path aliases or file names.');
       break;
 
     case 'variable':
     case 'defaultconfig':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
       $projects[$project]['in_core_note'] = t('Replaced by the core Configuration system.');
       break;
 
     case 'views':
     case 'extra_columns':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
       break;
 
     case 'views_bulk_operations':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_note'] = t('The core Views module provides bulk operations on simple actions only. No support for batch operations or configurable actions.');
       break;
 
+    // @todo: is this true in Backdrop?
     case 'views_datasource':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_note'] = t('The basic functionality is in core, but some advanced features (such as outputting a Views attachment as JSON) are not.');
       break;
 
-    case 'views_between_dates_filter':
-      $projects[$project]['in_core_since'] = '8.6';
-      $projects[$project]['in_core_note'] = t('While <a href="@change_record">Views integration for the Datetime Range module</a> is now in core, <a href="@granularity">Views Date Filter Datetime Granularity Option</a> is still missing, but will hopefully land in core soon.', array(
-        '@change_record' => 'https://www.drupal.org/node/2857691',
-        '@granularity' => 'https://www.drupal.org/project/drupal/issues/2868014',
-      ));
-      break;
-
+    // @todo: is this true in Backdrop?
     case 'views_filters_populate':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
       $projects[$project]['in_core_note'] = t('When adding a filter, select Combine Fields Filter from the Global category.');
       break;
 
     case 'views_responsive_grid':
-      $projects[$project]['in_core_since'] = '8.x';
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('This module will not be ported for Drupal 8. Views grids in core have been replaced with DIVs.');
       break;
 
     case 'wysiwyg':
-      $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_note'] = t('API support added to the core "Editor" module. No support for multiple text editors per text format.');
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('API support added to the core "Editor" module.');
       break;
 
       // Also correct information about D7 modules.
