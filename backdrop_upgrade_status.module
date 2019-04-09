@@ -31,6 +31,11 @@ define('BACKDROP_UPGRADE_STATUS_CORE', 5000);
 define('BACKDROP_UPGRADE_STATUS_OBSOLETE', 3000);
 
 /**
+ * Project has become obsolete by an alternative.
+ */
+define('BACKDROP_UPGRADE_UPDATE_DEFAULT_URL', 'https://updates.backdropcms.org/release-history');
+
+/**
  * Implementation of hook_help().
  */
 function backdrop_upgrade_status_help($path, $arg) {

@@ -16,7 +16,9 @@ function backdrop_upgrade_status_status() {
   // US: Don't pass TRUE to check cache only.
   if ($available = backdrop_upgrade_status_get_available()) {
     module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.compare');
+    dpm($available);
     $data = backdrop_upgrade_status_calculate_project_data($available);
+    dpm($data);
     return theme('backdrop_upgrade_status_report', array('data' => $data));
   }
   else {
@@ -76,12 +78,12 @@ function theme_backdrop_upgrade_status_report($variables) {
       $status[$key] = $project['status'];
     }
   }
+  dpm($data);
 
   foreach ($data as $project) {
     // Skip future version replacements and this module, which would cause
     // confusion if it showed up.
-    if ((isset($project['api_version']) && (strtok($project['api_version'], ".") > strtok(VERSION, "."))) ||
-       ($project['name'] == 'backdrop_upgrade_status')) {
+    if (isset($project['api_version']) || ($project['name'] == 'backdrop_upgrade_status')) {
       continue;
     }
 

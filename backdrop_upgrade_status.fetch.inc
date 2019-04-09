@@ -125,11 +125,13 @@ function _backdrop_upgrade_status_process_fetch_task($project) {
   // US: However, we want to check against a future core version.
   $version = variable_get('backdrop_upgrade_status_core_version', BACKDROP_UPGRADE_STATUS_CORE_VERSION);
   $url = _backdrop_upgrade_status_build_fetch_url($project, $version);
+  $url_backdrop = _backdrop_upgrade_status_build_fetch_url_backdrop($project, '1.x');
   $fetch_url_base = _update_get_fetch_url_base($project);
   $project_name = $project['name'];
+    //dpm($xml_backdrop->data);
 
   if (empty($fail[$fetch_url_base]) || $fail[$fetch_url_base] < $max_fetch_attempts) {
-    $xml = drupal_http_request($url);
+    $xml = drupal_http_request($url_backdrop);
     if (!isset($xml->error) && isset($xml->data)) {
       $data = $xml->data;
     }
@@ -285,6 +287,12 @@ function _backdrop_upgrade_status_build_fetch_url($project, $version) {
 
   // US: Remove all handling around $site_key; we don't want to pollute project
   // usage statistics, so we don't use any of it.
+
+  return $url;
+}
+function _backdrop_upgrade_status_build_fetch_url_backdrop($project, $version) {
+  $name = $project['name'];
+  $url = BACKDROP_UPGRADE_UPDATE_DEFAULT_URL . '/' . $name . '/1.x';
 
   return $url;
 }

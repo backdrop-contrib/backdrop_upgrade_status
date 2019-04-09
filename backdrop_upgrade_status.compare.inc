@@ -32,6 +32,7 @@ module_load_include('inc', 'update', 'update.compare');
  * @see update_project_cache()
  */
 function backdrop_upgrade_status_calculate_project_data($available) {
+  dpm($available);
   // Retrieve the projects from cache, if present.
 #  $projects = update_project_cache('backdrop_upgrade_status_project_data');
   // US: Directly use private cache getter to skip Update's cache invalidation.
@@ -390,270 +391,275 @@ function backdrop_upgrade_status_obsolete(&$projects, $project) {
   $obsolete = TRUE;
 
   switch ($project) {
-    case 'addressfield':
+    case 'profile2':
       $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'address';
+      $projects[$project]['replaced_by'][0]['name'] = 'profile';
       break;
 
-    case 'admin_menu':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'admin_toolbar';
-      break;
+    // case 'addressfield':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'address';
+      // break;
 
-    case 'auto_nodetitle':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'auto_entitylabel';
-      break;
+    // case 'admin_menu':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'admin_bar';
+      // break;
 
-    case 'better_formats':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'allowed_formats';
-      break;
+    // case 'auto_nodetitle':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'auto_entitylabel';
+      // break;
 
-    case 'bundle_copy':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'field_tools';
-      break;
+    // case 'better_formats':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'allowed_formats';
+      // break;
 
-    case 'calendar':
-    case 'fullcalendar':
-    case 'fullcalendar_create':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'fullcalendar_view';
-      break;
+    // case 'bundle_copy':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'field_tools';
+      // break;
 
-    case 'cnr':
-    case 'nodereferrer':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'cer';
-      break;
+    // case 'calendar':
+    // case 'fullcalendar':
+    // case 'fullcalendar_create':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'fullcalendar_view';
+      // break;
 
-    case 'colors':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'colorapi';
-      break;
+    // case 'cnr':
+    // case 'nodereferrer':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'cer';
+      // break;
 
-    case 'content_profile':
-      $projects[$project]['obsolete_since'] = '7.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'profile2';
-      break;
+    // case 'colors':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'colorapi';
+      // break;
 
-    case 'data_export_import':
-    case 'node_export':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'content_sync';
-      break;
+    // case 'content_profile':
+      // $projects[$project]['obsolete_since'] = '7.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'profile2';
+      // break;
 
-    case 'ddf':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'conditional_fields';
-      $projects[$project]['replaced_by'][1]['name'] = 'business_rules';
-      $projects[$project]['replaced_by'][2]['name'] = 'field_states_ui';
-      $projects[$project]['replaced_by'][3]['name'] = 'fico';
-      break;
+    // case 'data_export_import':
+    // case 'node_export':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'content_sync';
+      // break;
 
-    case 'editableviews':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'views_entity_form_field';
-      break;
+    // case 'ddf':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'conditional_fields';
+      // $projects[$project]['replaced_by'][1]['name'] = 'business_rules';
+      // $projects[$project]['replaced_by'][2]['name'] = 'field_states_ui';
+      // $projects[$project]['replaced_by'][3]['name'] = 'fico';
+      // break;
 
-    case 'entityreference_filter':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'verf';
-      break;
+    // case 'editableviews':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'views_entity_form_field';
+      // break;
 
-    case 'entityreference_prepopulate':
-    case 'nodereference_url':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'prepopulate';
-      $projects[$project]['replaced_by'][1]['name'] = 'referer_to_entity_reference';
-      break;
+    // case 'entityreference_filter':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'verf';
+      // break;
 
-    case 'entityreference_view_widget':
-    case 'references_dialog':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'entity_browser';
-      $projects[$project]['replaced_by'][1]['name'] = 'inline_entity_form';
-      $projects[$project]['replaced_by'][2]['name'] = 'entityconnect';
-      break;
+    // case 'entityreference_prepopulate':
+    // case 'nodereference_url':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'prepopulate';
+      // $projects[$project]['replaced_by'][1]['name'] = 'referer_to_entity_reference';
+      // break;
 
-    case 'facetapi':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'facets';
-      break;
+    // case 'entityreference_view_widget':
+    // case 'references_dialog':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'entity_browser';
+      // $projects[$project]['replaced_by'][1]['name'] = 'inline_entity_form';
+      // $projects[$project]['replaced_by'][2]['name'] = 'entityconnect';
+      // break;
 
-    case 'fckeditor':
-      $projects[$project]['obsolete_since'] = '5.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'ckeditor';
-      break;
+    // case 'facetapi':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'facets';
+      // break;
 
-    case 'field_collection':
-    case 'field_collection_views':
-    case 'multifield':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'paragraphs';
-      break;
+    // case 'fckeditor':
+      // $projects[$project]['obsolete_since'] = '5.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'ckeditor';
+      // break;
 
-    case 'field_conditional_state':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'conditional_fields';
-      break;
+    // case 'field_collection':
+    // case 'field_collection_views':
+    // case 'multifield':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'paragraphs';
+      // break;
 
-    case 'form_save':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'hotkeys_for_save';
-      break;
+    // case 'field_conditional_state':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'conditional_fields';
+      // break;
 
-    case 'global_filter':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'simple_global_filter';
-      break;
+    // case 'form_save':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'hotkeys_for_save';
+      // break;
 
-    case 'google_chart_tools':
-    case 'charts_graphs':
-    case 'charts_graphs_flot':
-    case 'highcharts':
-    case 'visualization':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'charts';
-      break;
+    // case 'global_filter':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'simple_global_filter';
+      // break;
 
-    case 'hierarchical_select':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'cshs';
-      $projects[$project]['replaced_by'][1]['name'] = 'menu_link_weight';
-      $projects[$project]['replaced_by'][2]['name'] = 'shs';
-      break;
+    // case 'google_chart_tools':
+    // case 'charts_graphs':
+    // case 'charts_graphs_flot':
+    // case 'highcharts':
+    // case 'visualization':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'charts';
+      // break;
 
-    case 'jqeasing':
-    case 'jquery_plugin':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'libraries';
-      break;
+    // case 'hierarchical_select':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'cshs';
+      // $projects[$project]['replaced_by'][1]['name'] = 'menu_link_weight';
+      // $projects[$project]['replaced_by'][2]['name'] = 'shs';
+      // break;
 
-    case 'location':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'address';
-      $projects[$project]['replaced_by'][1]['name'] = 'geofield';
-      $projects[$project]['replaced_by'][2]['name'] = 'geocoder';
-      $projects[$project]['replaced_by'][3]['name'] = 'geolocation';
-      break;
+    // case 'jqeasing':
+    // case 'jquery_plugin':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'libraries';
+      // break;
 
-    case 'megamenu':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'menu_item_extras';
-      $projects[$project]['replaced_by'][1]['name'] = 'we_megamenu';
-      $projects[$project]['replaced_by'][2]['name'] = 'tb_megamenu';
-      $projects[$project]['replaced_by'][3]['name'] = 'ultimenu';
-      $projects[$project]['replaced_by'][4]['name'] = 'simple_megamenu';
-      break;
+    // case 'location':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'address';
+      // $projects[$project]['replaced_by'][1]['name'] = 'geofield';
+      // $projects[$project]['replaced_by'][2]['name'] = 'geocoder';
+      // $projects[$project]['replaced_by'][3]['name'] = 'geolocation';
+      // break;
 
-    case 'messaging':
-    case 'notifications':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'courier';
-      break;
+    // case 'megamenu':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'menu_item_extras';
+      // $projects[$project]['replaced_by'][1]['name'] = 'we_megamenu';
+      // $projects[$project]['replaced_by'][2]['name'] = 'tb_megamenu';
+      // $projects[$project]['replaced_by'][3]['name'] = 'ultimenu';
+      // $projects[$project]['replaced_by'][4]['name'] = 'simple_megamenu';
+      // break;
 
-    case 'menu_item_visibility':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'menu_link_content_visibility';
-      break;
+    // case 'messaging':
+    // case 'notifications':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'courier';
+      // break;
 
-    case 'node_convert':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'convert_bundles';
-      break;
+    // case 'menu_item_visibility':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'menu_link_content_visibility';
+      // break;
 
-    case 'node_clone':
-    case 'replicate':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'entity_clone';
-      break;
+    // case 'node_convert':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'convert_bundles';
+      // break;
 
-    case 'nodeaccess_userreference':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'access_by_ref';
-      break;
+    // case 'node_clone':
+    // case 'replicate':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'entity_clone';
+      // break;
 
-    case 'nodewords':
-      $projects[$project]['obsolete_since'] = '7.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'metatag';
-      $projects[$project]['replaced_by'][1]['name'] = 'metatags_quick';
-      break;
+    // case 'nodeaccess_userreference':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'access_by_ref';
+      // break;
 
-    case 'og':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'group';
-      break;
+    // case 'nodewords':
+      // $projects[$project]['obsolete_since'] = '7.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'metatag';
+      // $projects[$project]['replaced_by'][1]['name'] = 'metatags_quick';
+      // break;
 
-    case 'panels_extra_styles':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'panels_extra_styles_d8';
-      break;
+    // case 'og':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'group';
+      // break;
 
-    case 'path_redirect':
-      $projects[$project]['obsolete_since'] = '7.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'redirect';
-      break;
+    // case 'panels_extra_styles':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'panels_extra_styles_d8';
+      // break;
 
-    case 'print':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'entity_print';
-      $projects[$project]['replaced_by'][1]['name'] = 'printable';
-      break;
+    // case 'path_redirect':
+      // $projects[$project]['obsolete_since'] = '7.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'redirect';
+      // break;
 
-    case 'responsive_dropdown_menus':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'responsive_menu';
-      break;
+    // case 'print':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'entity_print';
+      // $projects[$project]['replaced_by'][1]['name'] = 'printable';
+      // break;
 
-    case 'search_api_db':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'search_api';
-      break;
+    // case 'responsive_dropdown_menus':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'responsive_menu';
+      // break;
 
-    case 'taxonomy_csv':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'term_csv_export_import';
-      $projects[$project]['replaced_by'][1]['name'] = 'taxonomy_manager';
-      $projects[$project]['replaced_by'][2]['name'] = 'migrate_source_csv';
-      $projects[$project]['replaced_by'][3]['name'] = 'taxonomy_import';
-      $projects[$project]['replaced_by'][4]['name'] = 'hti';
-      $projects[$project]['replaced_by'][5]['name'] = 'term_csv_tree_import';
-      break;
+    // case 'search_api_db':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'search_api';
+      // break;
 
-    case 'textformatter':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'list_formatter';
-      break;
+    // case 'taxonomy_csv':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'term_csv_export_import';
+      // $projects[$project]['replaced_by'][1]['name'] = 'taxonomy_manager';
+      // $projects[$project]['replaced_by'][2]['name'] = 'migrate_source_csv';
+      // $projects[$project]['replaced_by'][3]['name'] = 'taxonomy_import';
+      // $projects[$project]['replaced_by'][4]['name'] = 'hti';
+      // $projects[$project]['replaced_by'][5]['name'] = 'term_csv_tree_import';
+      // break;
 
-    case 'track_field_changes':
-    case 'nodechanges':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'changed_fields';
-      break;
+    // case 'textformatter':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'list_formatter';
+      // break;
 
-    case 'user_dashboard':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'homebox';
-      break;
+    // case 'track_field_changes':
+    // case 'nodechanges':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'changed_fields';
+      // break;
 
-    case 'views_arguments_extras':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'views_arg_order_sort';
-      break;
+    // case 'user_dashboard':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'homebox';
+      // break;
 
-    case 'views_export_xls':
-    case 'views_data_export_phpexcel':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'xls_serialization';
-      $projects[$project]['replaced_by'][1]['name'] = 'vbo_export';
-      break;
+    // case 'views_arguments_extras':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'views_arg_order_sort';
+      // break;
 
-    case 'wikitools':
-      $projects[$project]['obsolete_since'] = '8.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'freelinking';
-      break;
+    // case 'views_export_xls':
+    // case 'views_data_export_phpexcel':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'xls_serialization';
+      // $projects[$project]['replaced_by'][1]['name'] = 'vbo_export';
+      // break;
+
+    // case 'wikitools':
+      // $projects[$project]['obsolete_since'] = '8.x';
+      // $projects[$project]['replaced_by'][0]['name'] = 'freelinking';
+      // break;
 
     default:
       $obsolete = FALSE;
