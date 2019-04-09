@@ -172,7 +172,7 @@ function theme_backdrop_upgrade_status_report($variables) {
     // US: Special handling for projects moved into core.
     if (!empty($project['in_core_note'])) {
       $row .= "<div class=\"core-notice\">\n";
-      $row .= '<p>'. t('In Drupal core since @version', array('@version' => $project['in_core_since'])) .'</p>';
+      $row .= '<p>'. t('In Backdrop core since @version', array('@version' => $project['in_core_since'])) .'</p>';
       $row .= '<p>'. $project['in_core_note'] .'</p>';
       $row .= '</div>';
     }
