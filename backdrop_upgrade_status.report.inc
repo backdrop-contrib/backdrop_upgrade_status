@@ -16,9 +16,7 @@ function backdrop_upgrade_status_status() {
   // US: Don't pass TRUE to check cache only.
   if ($available = backdrop_upgrade_status_get_available()) {
     module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.compare');
-    dpm($available);
     $data = backdrop_upgrade_status_calculate_project_data($available);
-    dpm($data);
     return theme('backdrop_upgrade_status_report', array('data' => $data));
   }
   else {
@@ -52,10 +50,6 @@ function theme_backdrop_upgrade_status_report($variables) {
   // for a project (so we can link to the project).
   $current_data = update_get_available(TRUE);
 
-  // US: Add the core version selector form.
-  $form = drupal_get_form('backdrop_upgrade_status_core_version_form');
-  $output .= drupal_render($form);
-
   if (!is_array($data)) {
     $output .= '<p>' . $data . '</p>';
     return $output;
@@ -78,7 +72,6 @@ function theme_backdrop_upgrade_status_report($variables) {
       $status[$key] = $project['status'];
     }
   }
-  dpm($data);
 
   foreach ($data as $project) {
     // Skip future version replacements and this module, which would cause
