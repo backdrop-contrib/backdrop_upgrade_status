@@ -32,7 +32,6 @@ module_load_include('inc', 'update', 'update.compare');
  * @see update_project_cache()
  */
 function backdrop_upgrade_status_calculate_project_data($available) {
-  dpm($available);
   // Retrieve the projects from cache, if present.
 #  $projects = update_project_cache('backdrop_upgrade_status_project_data');
   // US: Directly use private cache getter to skip Update's cache invalidation.
@@ -242,7 +241,7 @@ function backdrop_upgrade_status_calculate_project_update_status($project, &$pro
   // whatever data we have (e.g. project title and link), and move on.
   if (!empty($available['fetch_status']) && $available['fetch_status'] == UPDATE_FETCH_PENDING) {
     $project_data['status'] = UPDATE_FETCH_PENDING;
-    $project_data['reason'] = t('No available update data');
+    $project_data['reason'] = t('Not yet available for Backdrop CMS.');
     $project_data['fetch_status'] = $available['fetch_status'];
   }
 

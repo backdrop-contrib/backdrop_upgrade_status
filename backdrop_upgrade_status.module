@@ -326,7 +326,7 @@ function _backdrop_upgrade_status_d8_core(&$projects, $project) {
 
     case 'ctools':
       $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('Mostly replaced by core APIs, including modal dialogs, dropbuttons, exportables and page handlers (from <a href="@url">Page Manager</a> and Form Wizard.', array(
+      $projects[$project]['in_core_note'] = t('Mostly replaced by core APIs, including modal dialogs, dropbuttons, exportables and page handlers (from <a href="@url">Page Manager</a>). Excludes plugins and Form Wizard.', array(
         '@url' => 'https://www.drupal.org/project/page_manager',
       ));
       break;

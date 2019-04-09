@@ -94,7 +94,12 @@ function theme_backdrop_upgrade_status_report($variables) {
       case UPDATE_UNKNOWN:
       case UPDATE_FETCH_PENDING:
       case UPDATE_NOT_FETCHED:
-        $class = 'unknown';
+        if (isset($project['replaced_by'])) {
+          $class = 'warning';
+        }
+        else {
+          $class = 'unknown';
+        }
         // US: Unknown means not ported; thus, use an error icon.
 #        $icon = theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('warning'), 'title' => t('warning')));
         $icon = theme('image', array('path' => 'misc/watchdog-error.png', 'width' => 18, 'height' => 18, 'alt' => t('error'), 'title' => t('error')));

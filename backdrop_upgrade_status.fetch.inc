@@ -128,7 +128,6 @@ function _backdrop_upgrade_status_process_fetch_task($project) {
   $url_backdrop = _backdrop_upgrade_status_build_fetch_url_backdrop($project, '1.x');
   $fetch_url_base = _update_get_fetch_url_base($project);
   $project_name = $project['name'];
-    //dpm($xml_backdrop->data);
 
   if (empty($fail[$fetch_url_base]) || $fail[$fetch_url_base] < $max_fetch_attempts) {
     $xml = drupal_http_request($url_backdrop);
