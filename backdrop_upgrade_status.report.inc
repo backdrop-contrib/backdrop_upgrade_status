@@ -73,7 +73,6 @@ function theme_backdrop_upgrade_status_report($variables) {
     }
   }
 
-  dpm($data);
   foreach ($data as $project) {
     // Skip future version replacements and this module, which would cause
     // confusion if it showed up.
