@@ -83,7 +83,7 @@ function theme_backdrop_upgrade_status_report($variables) {
   foreach ($data as $project) {
     // Skip future version replacements and this module, which would cause
     // confusion if it showed up.
-    if (isset($project['api_version']) || ($project['name'] == 'backdrop_upgrade_status')) {
+    if (isset($project['api_version']) || $project['name'] == 'backdrop_upgrade_status' || $project['name'] == 'drupal') {
       continue;
     }
 
@@ -319,7 +319,7 @@ function theme_backdrop_upgrade_status_report($variables) {
   }
 
   $project_types = array(
-    'core' => t('Drupal core'),
+    // 'core' => t('Drupal core'),
     'module' => t('Modules'),
     'theme' => t('Themes'),
     'module-disabled' => t('Disabled modules'),
