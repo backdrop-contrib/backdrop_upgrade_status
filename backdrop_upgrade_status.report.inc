@@ -73,6 +73,7 @@ function theme_backdrop_upgrade_status_report($variables) {
     }
   }
 
+  dpm($data);
   foreach ($data as $project) {
     // Skip future version replacements and this module, which would cause
     // confusion if it showed up.
@@ -370,9 +371,13 @@ function theme_backdrop_upgrade_status_status_label($variables) {
       $type = $project['releases'][$project['recommended']]['version'];
       return '<span class="not-current">'. t('In development: %type', array('%type' => $type)) .'</span>';
 
-    // US: Not applicable.
-#    case UPDATE_NOT_CURRENT:
-#      return '<span class="not-current">' . t('Update available') . '</span>';
+      case UPDATE_UNKNOWN:
+      case UPDATE_FETCH_PENDING:
+      case UPDATE_NOT_FETCHED:
+      if (isset($project['replaced_by'])) {
+        return '<span class="current">' . t('Replaced in Backdrop') . '</span>';
+      }
+      return NULL;
 
     // US: Good news for us means that a stable release is available...
 #    case UPDATE_CURRENT:
