@@ -50,6 +50,14 @@ function backdrop_upgrade_status_help($path, $arg) {
 }
 
 /**
+ * Implements hook_cron().
+ */
+function backdrop_upgrade_status_cron() {
+  module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.fetch');
+  backdrop_upgrade_status_manual_status();
+}
+
+/**
  * Implementation of hook_menu().
  */
 function backdrop_upgrade_status_menu() {
