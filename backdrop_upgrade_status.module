@@ -289,7 +289,7 @@ function backdrop_upgrade_status_moved_into_core(&$projects, $project) {
 
     case '8.x':
       $d7_core = _backdrop_upgrade_status_d7_core($projects, $project);
-      $d8_core = _backdrop_upgrade_status_d8_core($projects, $project);
+      $d8_core = _backdrop_upgrade_status_backdrop_core($projects, $project);
       $core = $d7_core || $d8_core;
       break;
   }
@@ -298,58 +298,381 @@ function backdrop_upgrade_status_moved_into_core(&$projects, $project) {
 }
 
 /**
- * Modules in core in Drupal 8.
+ * Modules in core in Backdrop CMS.
  *
  * @see upgrades_status_moved_into_core()
  */
-function _backdrop_upgrade_status_d8_core(&$projects, $project) {
+function _backdrop_upgrade_status_backdrop_core(&$projects, $project) {
+
+  // Language used below...
+  // - "Moved into core" means the whole module was plunked in.
+  // - "Integrated into" means the code/feature was moved into a core module.
+  // - "Replaced by" means something else can/should be used.
+  // -
+
 
   // Specifying a case for the module in this switch statement will mark it as
   // included in core on the status report.
   $core = TRUE;
+
   switch ($project) {
+
+    case 'admin_menu':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by the core Admin Bar module.');
+      break;
 
     case 'admin_views':
       $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('Integrated with the core Views module. No comment admin view in 8.0.x.');
+      $projects[$project]['in_core_note'] = t('Replaced by core views as of 1.0. The Comments listing is not yet a view.');
+      break;
+
+    case 'automenu':
+    case 'auto_menu_settings':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Integrated into core Node module in v 1.15. Per content-type defaults not included.');
       break;
 
     case 'bean':
       $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Replaced by page-less nodes placed as blocks as of v1.11');
+      break;
+
+    case 'block_class':
+      $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Replaced by the core Custom Block module and pageless node functionality.');
+      $projects[$project]['in_core_note'] = t('Integrated into core Block module since v1.0');
+      break;
+
+    case 'blockify':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by core blocks as of v1.7');
+      break;
+
+    case 'boolean_formatter':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into core List module in v1.15');
+      break;
+
+    case 'bt_cbc':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Partially replaced by core blocks: added Hero block in v1.5, and Contact block in v1.12');
       break;
 
     case 'caption_filter':
-    case 'float_filter':
       $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Replaced by functionality in the core Editor module.');
+      $projects[$project]['in_core_note'] = t('Integrated into the core CKEditor module in v1.2');
       break;
 
     case 'ckeditor':
       $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by core CKEditory module as of v1.2. Reconfiguration will be necessary.');
       break;
+
+    case 'ckeditor_link':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Integrated into core CKEditor module in v1.7');
+      break;
+
+    case 'ckeditor_media':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Partially integrated into the core CKEditor module in 1.11');
+      break;
+
+    case 'ckeditor_upload':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Integrated into CKEditor module in v1.0 (images) v1.10 (files)');
+      break;
+
+    case 'comment_closer':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into Comment module as of v1.10');
+      break;
+
+    case 'contact_block':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into Contact module as of v1.12');
+      break;
+
+    case 'context':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Replaced by the context-aware Layout module since v1.0');
 
     case 'ctools':
       $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('Mostly replaced by core APIs, including modal dialogs, dropbuttons, exportables and page handlers (from <a href="@url">Page Manager</a>). Excludes plugins and Form Wizard.', array(
+      $projects[$project]['in_core_note'] = t('Mostly replaced by core APIs including: modal dialogs, dropbuttons, cofiguration exportables and page handlers (from <a href="@url">Page Manager</a>). Excludes plugins and Form Wizard.', array(
         '@url' => 'https://www.drupal.org/project/page_manager',
       ));
       break;
 
     case 'date':
       $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('No recurring dates support. See <a href="@extras">Datetime Extras: Provide a field for repeating / recuring dates</a> and <a href="@field">Recurring Dates Field</a>', array(
-        '@extras' => 'https://www.drupal.org/project/datetime_extras/issues/2775249',
-        '@field' => 'https://www.drupal.org/project/date_recur',
+      $projects[$project]['in_core_note'] = t('Module partially moved into core in v1.2. <a href="@repeat">Date Repeat</a> remains in contrib', array(
+        '@repeat' => 'https://github.com/backdrop-contrib/date_repeat',
       ));
       break;
 
     case 'date_popup_authored':
       $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into Date module in v1.2');
+      break;
+
+    case 'defaultconfig':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by core Configuration Management system since v1.0');
+      break;
+
+    case 'diff':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Diff engine included as part of Configuration Management system since v1.0');
+      break;
+
+    case 'direct_upload':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Replaced by better Rich-Text image/file upload options added in v1.7');
+      break;
+
+    case 'display_suite':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Partially replaced by Layout module since v1.0. Layouts for non-page displays not yet supported.');
+      break;
+
+    case 'elements':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into core System module since v1.0');
+      break;
+
+    case 'email':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Module moved into core in v1.2. E-mail address contact forms are not supported by core.');
+      break;
+
+    case 'email_registration':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into core User module since v1.0');
+      break;
+
+    case 'entity':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into core Entity module since v1.0');
+      break;
+
+    case 'entity_view_mode':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into core Field UI module in v1.6');
+      break;
+
+    case 'extra_columns':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Partially replaced by default views as of 1.0. The Comments listing is not yet a view.');
+      break;
+
+    case 'features':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Partially replaced by core Configuration Management system since v1.0. Feaure-set bundles and overridden status not yet supported.');
+      break;
+
+    case 'fieldable_panels_panes':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Replaced by page-less nodes placed as blocks as of v1.11');
+      break;
+
+    case 'fieldblock':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into Field module as of v1.3.');
+      break;
+
+    case 'field_formatter_settings':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into Field module as of v1.3.');
+      break;
+
+    case 'file_entity':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into File module since v1.0 and v1.6');
+      break;
+
+    case 'float_filter':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into the core CKEditor module in v1.2');
+      break;
+
+    case 'html5_tools':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into core System module since v1.0');
+      break;
+
+    case 'insert':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into the core CKEditor module since v1.0');
+      break;
+
+    case 'instantfilter':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by search box on the modules page since v1.0');
+      break;
+
+    case 'image_mobile_camera':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into the core File module as of v1.4');
+      break;
+
+    case 'imce_wysiwyg':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by the core CKEditor module in v1.2');
+      break;
+
+    case 'link':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Module moved into core as of v1.2');
+      break;
+
+    case 'live_preview':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by new content preview in core Node module as of v1.11');
+      break;
+
+    case 'media':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Partially replaced by core File, CKEditor, and System modules since v1.0');
+      break;
+
+    case 'menu_block':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Partially integrated into System module Menu blocks as of v1.5. Settings other than depth not supported yet.');
+      break;
+
+    case 'menu_translation':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Integrated into core Menu module in v1.10');
+      break;
+
+    case 'module_filter':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Partially integrated into System module since v1.0. A search box is included on the modules page since v1.0');
+      break;
+
+    case 'navbar':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by the core Admin Bar module since v1.0');
+      break;
+
+    case 'options_element':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into core Field module in v1.12');
+      break;
+
+    case 'page_preview':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by new content preview in core Node module as of v1.11');
+      break;
+
+    case 'panels':
+      $projects[$project]['in_core_since'] = '8.5';
+      $projects[$project]['in_core_note'] = t('Partially replaced by Layout module since v1.0. Panel nodes are not provided in core.');
+      break;
+
+    case 'panels_everywhere':
+      $projects[$project]['in_core_since'] = '8.5';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by Layout module since v1.0. Panel nodes are not provided in core.');
+      break;
+
+    case 'pathauto':
+      $projects[$project]['in_core_since'] = '8.5';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into core Path module in v1.11');
+      break;
+
+    case 'placeholder':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into core System module since v1.0');
+      break;
+
+    case 'project_browser':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by core Installer module in v1.4');
+      break;
+
+    case 'rabbit_hole':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into core Node module (as page-less nodes) in v1.11');
+      break;
+
+    case 'redirect':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Module moved into core in v1.4');
+      break;
+
+    case 'role_assign':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into User module in v1.6');
+      break;
+
+    case 'scheduler':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into core Node module in v1.10');
+      break;
+
+    case 'smartmenus':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by core System drop-down menus in v1.5 + v1.6');
+      break;
+
+    case 'strongarm':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by core Configuration Management system in v1.0');
+      break;
+
+    case 'sueperfish':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Replaced by core System drop-down menus in v1.5 + v1.6');
+      break;
+
+    case 'token':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Module moved into core in v1.2');
+      break;
+
+    case 'transliteration':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Integrated into core APIs. No direct support for transliterating path aliases or file names.');
       break;
 
     case 'uuid':
@@ -357,136 +680,26 @@ function _backdrop_upgrade_status_d8_core(&$projects, $project) {
       $projects[$project]['in_core_complete'] = TRUE;
       break;
 
-    case 'email':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('E-mail address contact forms are not supported by core.');
-      break;
-
-    case 'entity':
-    case 'entity_view_mode':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Replaced by core Entity system functionality.');
-      break;
-
-    case 'features':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('The original intended functionality of the Features module is not provided by core, but the core Configuration system provides support for importing, exporting, and overriding site configuration.');
-      break;
-
-    // @todo: is this true in Backdrop?
-    case 'field_extrawidgets':
-    case 'hidden_field':
-    case 'field_hidden':
-    case 'hidden_widget':
-    case 'formfilter':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('Fields can be hidden natively from the Form Display configuration.');
-      break;
-
-    // case 'field_formatter_settings':
-      // $projects[$project]['in_core_since'] = '1.x';
-      // $projects[$project]['in_core_complete'] = TRUE;
-      // break;
-
-    // @todo: is this true in Backdrop?
-    case 'fieldable_panels_panes':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('Custom block types provide all of the functionality that is necessary.');
-      $projects[$project]['in_core_complete'] = TRUE;
-      break;
-
-    case 'link':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('No support for internal links.');
-      break;
-
-    case 'module_filter':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('A search functionality is included on the core modules page. The re-designed modules page in the 2.x branch is not in core.');
-      break;
-
-    case 'navbar':
-    case 'admin_menu':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Replaced by the core Admin Bar module.');
-      break;
-
-    case 'options_element':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      break;
-
-    case 'panels':
-      $projects[$project]['in_core_since'] = '8.5';
-      $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Functionality provided by the Layout module. Panel nodes are not provided in core.');
-      break;
-
-    case 'pathauto':
-      $projects[$project]['in_core_since'] = '8.5';
-      $projects[$project]['in_core_complete'] = TRUE;
-      break;
-
-    case 'phone':
-    case 'telephone':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      break;
-
-    case 'project_browser':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Replaced by core Installer module.');
-      break;
-
-    case 'redirect':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      break;
-
-    case 'elements':
-    case 'placeholder':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Replaced by HTML5 form API functionality.');
-      break;
-
-    case 'transliteration':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('Replaced by core APIs. No direct support for transliterating path aliases or file names.');
-      break;
-
     case 'variable':
-    case 'defaultconfig':
       $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('Replaced by the core Configuration system.');
+      $projects[$project]['in_core_note'] = t('Replaced by the core Configuration Management system since v1.0');
+      break;
+
+    case 'vertical_tabs_responsive':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_complete'] = TRUE;
+      $projects[$project]['in_core_note'] = t('Integrated into core themes in v1.2');
       break;
 
     case 'views':
-    case 'extra_columns':
       $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
       break;
 
     case 'views_bulk_operations':
       $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('The core Views module provides bulk operations on simple actions only. No support for batch operations or configurable actions.');
-      break;
-
-    // @todo: is this true in Backdrop?
-    case 'views_datasource':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('The basic functionality is in core, but some advanced features (such as outputting a Views attachment as JSON) are not.');
-      break;
-
-    // @todo: is this true in Backdrop?
-    case 'views_filters_populate':
-      $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_complete'] = TRUE;
-      $projects[$project]['in_core_note'] = t('When adding a filter, select Combine Fields Filter from the Global category.');
+      $projects[$project]['in_core_note'] = t('The core Views module provides bulk operations on simple actions. No support for batch operations or configurable actions.');
       break;
 
     case 'views_responsive_grid':
@@ -496,7 +709,7 @@ function _backdrop_upgrade_status_d8_core(&$projects, $project) {
 
     case 'wysiwyg':
       $projects[$project]['in_core_since'] = '1.x';
-      $projects[$project]['in_core_note'] = t('API support added to the core "Editor" module.');
+      $projects[$project]['in_core_note'] = t('Rich-Text Editor is closely integrated with text formats as of v1.2. Reconfiguration will be necessary.');
       break;
 
       // Also correct information about D7 modules.
@@ -510,6 +723,7 @@ function _backdrop_upgrade_status_d8_core(&$projects, $project) {
       // Any other module is not included in core.
       $core = FALSE;
   }
+
   return $core;
 }
 
@@ -853,11 +1067,6 @@ function _backdrop_upgrade_status_d7_core(&$projects, $project) {
     case 'vocabperms':
       $projects[$project]['in_core_since'] = '7.x';
       $projects[$project]['in_core_complete'] = TRUE;
-      break;
-
-    case 'token':
-      $projects[$project]['in_core_since'] = '7.x';
-      $projects[$project]['in_core_note'] = t('Backdrop core does not provide a user interface to browse tokens (in forms).');
       break;
 
     case 'url_alter':
