@@ -448,7 +448,7 @@ function _backdrop_upgrade_status_backdrop_core(&$projects, $project) {
       $projects[$project]['in_core_note'] = t('Module moved into core in v1.2. E-mail address contact forms are not supported by core.');
       break;
 
-    case 'email_regitration':
+    case 'email_registration':
       $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
       $projects[$project]['in_core_note'] = t('Integrated into core User module since v1.0');
