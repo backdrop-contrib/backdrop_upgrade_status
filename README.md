@@ -43,12 +43,6 @@ Usage
 Go to Administer >> Reports >> Available updates >> Backdrop upgrade status,
 and check the status of your installed modules.
 
-License
--------
-
-This project is GPL v2 software. See the LICENSE.txt file in this directory
-for complete text.
-
 Current Maintainers
 -------------------
 
