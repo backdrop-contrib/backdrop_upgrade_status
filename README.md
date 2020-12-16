@@ -43,10 +43,17 @@ Usage
 Go to Administer >> Reports >> Available updates >> Backdrop upgrade status,
 and check the status of your installed modules.
 
+License
+-------
+
+This project is GPL v2 software.
+
 Current Maintainers
 -------------------
 
-[Herb v/d Dool](https://www.drupal.org/u/nubeli)
+* [Herb v/d Dool](https://www.drupal.org/u/nubeli)
+* [laryn](https://www.drupal.org/u/laryn)
+* [jenlampton](https://www.drupal.org/u/jenlampton)
 
 Credit
 ------
@@ -61,4 +68,4 @@ This project had been sponsored on Drupal by:
 * [UNLEASHED MIND](http://www.unleashedmind.com): Specialized in consulting and
 planning of Drupal powered sites, UNLEASHED MIND offers installation, development, theming, customization, and hosting to get you started. Visit them for more information.
 
-Ported by [docwilmot](https://github.com/docwilmot)
+Ported by [docwilmot](https://github.com/docwilmot).
