@@ -549,6 +549,11 @@ function _backdrop_upgrade_status_backdrop_core(&$projects, $project) {
       $projects[$project]['in_core_note'] = t('Module moved into core as of v1.2');
       break;
 
+    case 'linkit':
+      $projects[$project]['in_core_since'] = '1.x';
+      $projects[$project]['in_core_note'] = t('Partially in core.');
+      break;
+
     case 'live_preview':
       $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
@@ -658,7 +663,7 @@ function _backdrop_upgrade_status_backdrop_core(&$projects, $project) {
       $projects[$project]['in_core_note'] = t('Replaced by core Configuration Management system in v1.0');
       break;
 
-    case 'sueperfish':
+    case 'superfish':
       $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_complete'] = TRUE;
       $projects[$project]['in_core_note'] = t('Replaced by core System drop-down menus in v1.5 + v1.6');
