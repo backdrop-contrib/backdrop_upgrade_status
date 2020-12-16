@@ -96,13 +96,13 @@ function theme_backdrop_upgrade_status_report($variables) {
       case UPDATE_NOT_FETCHED:
         if (isset($project['replaced_by'])) {
           $class = 'warning';
+          $icon = theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('warning'), 'title' => t('warning')));
         }
         else {
           $class = 'unknown';
+          // US: Unknown means not ported; thus, use an error icon.
+          $icon = theme('image', array('path' => 'misc/watchdog-error.png', 'width' => 18, 'height' => 18, 'alt' => t('error'), 'title' => t('error')));
         }
-        // US: Unknown means not ported; thus, use an error icon.
-#        $icon = theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('warning'), 'title' => t('warning')));
-        $icon = theme('image', array('path' => 'misc/watchdog-error.png', 'width' => 18, 'height' => 18, 'alt' => t('error'), 'title' => t('error')));
         break;
       // US: Not used/not possible here.
       case UPDATE_NOT_SECURE:
@@ -130,7 +130,7 @@ function theme_backdrop_upgrade_status_report($variables) {
         break;
     }
     // US: Special handling for project moved into core.
-    if (empty($project['in_core_complete'])) {
+    if ($project['status'] == BACKDROP_UPGRADE_STATUS_CORE && empty($project['in_core_complete'])) {
       $icon = theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('warning'), 'title' => t('warning')));
     }
 
