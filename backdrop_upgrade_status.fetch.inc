@@ -289,9 +289,20 @@ function _backdrop_upgrade_status_build_fetch_url($project, $version) {
 
   return $url;
 }
+
+/**
+ * Get Backdrop Project Status URL.
+ *
+ * @param array $project
+ * @param string $version
+ *
+ * @return string
+ *   URL to XML of project releases.
+ */
 function _backdrop_upgrade_status_build_fetch_url_backdrop($project, $version) {
+  module_load_include('module', 'backdrop_upgrade_status', 'backdrop_upgrade_status');
   $name = $project['name'];
-  $url = BACKDROP_UPGRADE_UPDATE_DEFAULT_URL . '/' . $name . '/1.x';
+  $url = BACKDROP_UPGRADE_UPDATE_DEFAULT_URL . '/' . $name . '/' . $version;
 
   return $url;
 }
