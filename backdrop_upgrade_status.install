@@ -9,6 +9,25 @@
  * Implements hook_install().
  */
 function backdrop_upgrade_status_install() {
+  module_load_include('inc', 'system', 'system.queue');
   $queue = DrupalQueue::get('backdrop_upgrade_status_fetch_tasks', TRUE);
   $queue->createQueue();
 }
+
+/**
+ * @addtogroup updates-7.x
+ * @{
+ */
+
+/**
+ * Create a queue to store tasks for requests to fetch available update data.
+ */
+function backdrop_upgrade_status_update_7000() {
+  module_load_include('inc', 'system', 'system.queue');
+  $queue = DrupalQueue::get('backdrop_upgrade_status_fetch_tasks', TRUE);
+  $queue->createQueue();
+}
+
+/**
+ * @} End of "addtogroup updates-7.x".
+ */
