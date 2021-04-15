@@ -153,7 +153,7 @@ function _backdrop_upgrade_status_backdrop_core(&$projects, $project) {
       $projects[$project]['in_core_note'] = t('Replaced by better Rich-Text image/file upload options added in v1.7');
       break;
 
-    case 'display_suite':
+    case 'ds':
       $projects[$project]['in_core_since'] = '1.x';
       $projects[$project]['in_core_note'] = t('Partially replaced by Layout module since v1.0. Layouts for non-page displays not yet supported.');
       break;
