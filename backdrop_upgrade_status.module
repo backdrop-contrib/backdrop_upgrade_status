@@ -256,30 +256,36 @@ function theme_backdrop_upgrade_status_last_check($variables) {
  * @param $projects
  *   Array of projects from backdrop_upgrade_status_calculate_project_data(). This
  *   parameter is passed by reference, and metadata for the project can added
- *   to the $projects[$project] array for use later. Three additional keys are
+ *   to the $projects[$project] array for use later. Several additional keys are
  *   supported:
- *   - in_core_since: The major version since which the module is in core.
+ *   - in_core_since: The major version where the project was added into core.
+ *   - in_core_note: Note to display to the user. This should be succinct and
+ *     describe:
+ *     - If the project was "Moved", "Integrated", or "Replaced by" another.
+ *     - What core system, module, or API replaces the project.
+ *     - What minor version the project was added into.
  *   - in_core_complete: Boolean flag indicating whether the complete
  *     functionality of the project is in core. Set this to FALSE when the core
  *     replacement does not include the full functionality of the project.
- *   - in_core_note: Note to display to the user. This should be succinct and
- *     describe:
- *     - What core module or API replaces the project, if the module was not
- *       moved directly into core with the same name.
- *     - What functionality of the project is not included in core, if the
- *       'in_core_complete' flag is false.
+ *   - in_core_warning:
+ *     - If the 'in_core_complete' flag is false, what functionality of the
+ *       project is not included in core.
+ *     - Other things developers will need to know about updating this project.
+ *
  * @param $project
  *   Project name to check.
  *
  * @return
- *   TRUE if module has been moved into core.
+ *   TRUE if project has been moved into core.
+ *
+ * @see _backdrop_upgrade_status_backdrop_core().
  */
 function backdrop_upgrade_status_moved_into_core(&$projects, $project) {
 
   // Only include in core statuses for the configured major version and below.
   // Set the oldest version's data first, so that the latest version of core may
   // update the previous version's information.
-  // @todo What about modules moved into core and then back out?
+  // @todo What about projects moved into core and then back out?
   $core_version = variable_get('backdrop_upgrade_status_core_version', BACKDROP_UPGRADE_STATUS_CORE_VERSION);
 
   switch ($core_version) {
@@ -542,7 +548,7 @@ function _backdrop_upgrade_status_d7_core(&$projects, $project) {
     case 'jquery_update':
     case 'jqmulti':
       $projects[$project]['in_core_since'] = '8.x';
-      $projects[$project]['in_core_note'] = t('No longer needed in Backdrop, which ships with the latest version of the library.  The plan is to continue increasing the shipped version, with backwards compatibility, in minor releases.');
+      $projects[$project]['in_core_note'] = t('No longer needed in Backdrop. The plan is to continue increasing the bundled version of jQuery, with backwards compatibility, in minor releases.');
       $projects[$project]['in_core_complete'] = TRUE;
       break;
 
