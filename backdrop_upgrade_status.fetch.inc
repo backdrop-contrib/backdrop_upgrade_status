@@ -167,7 +167,7 @@ function _backdrop_upgrade_status_process_fetch_task($project) {
     $last_updated = $github_project_info['updated_at'];
     $branch = $github_project_info['default_branch'];
     */
-    $last_updated = '';
+    $last_updated = '0';
     $branch = '1.x';
 
     if ($response->code != '404') {
