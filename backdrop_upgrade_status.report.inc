@@ -211,7 +211,6 @@ function theme_backdrop_upgrade_status_report($variables) {
           ) {
             $version_class[] = 'version-recommended-strong';
           }
-          dpm($project['releases'][$project['recommended']]);
           $versions_inner .= theme('update_version', array('version' => $project['releases'][$project['recommended']], 'tag' => t('Recommended version:'), 'class' => $version_class));
         }
 
