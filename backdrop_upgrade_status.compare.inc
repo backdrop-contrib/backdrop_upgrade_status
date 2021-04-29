@@ -305,6 +305,15 @@ function backdrop_upgrade_status_calculate_project_update_status($project, &$pro
       }
     }
 
+    if ($version == 'dev') {
+      $project_data['releases']['dev'] = $release;
+      $project_data['dev_version'] = 'dev';
+      $project_data['latest_version'] = 'dev';
+      $project_data['recommended'] = 'dev';
+      $project_data['status'] = BACKDROP_UPGRADE_STATUS_DEVELOPMENT;
+      $project_data['reason'] = t('In development');
+    }
+
     // US: Don't stop searching, even if we hit the currently installed version.
 
     // US: Ignore dev snapshot handling.
@@ -314,19 +323,11 @@ function backdrop_upgrade_status_calculate_project_update_status($project, &$pro
 
   // If we were unable to find a recommended version, then make the latest
   // version the recommended version if possible.
-  if (!isset($project_data['recommended'])) {
+  if (!isset($project_data['recommended']) && isset($project_data['latest_version'])) {
+    $project_data['recommended'] = $project_data['latest_version'];
     // US: No recommended version means there's a dev snapshot.
     $project_data['status'] = BACKDROP_UPGRADE_STATUS_DEVELOPMENT;
     $project_data['reason'] = t('In development');
-
-    if (isset($project_data['latest_version'])) {
-      $project_data['recommended'] = $project_data['latest_version'];
-    }
-    else {
-      $project_data['recommended'] = $version;
-      $project_data['latest_version'] = $version;
-      $project_data['releases'][$version] = $release;
-    }
   }
 
   //
