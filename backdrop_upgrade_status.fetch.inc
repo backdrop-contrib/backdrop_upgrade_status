@@ -153,6 +153,53 @@ function _backdrop_upgrade_status_process_fetch_task($project) {
     }
   }
 
+
+  if (empty($available)) {
+    // Check GitHub for a project with the same name in backdrop-contrib.
+    $github = 'https://github.com/backdrop-contrib/' . $project['name'];
+    $response = drupal_http_request($github);
+
+    // @todo The GitHub API is rate-limited for unauthenticated requests.
+    /*
+    $githubapi = 'https://api.github.com/repos/backdrop-contrib/' . $project['name'];
+    $response = drupal_http_request($githubapi);
+    $github_project_info = json_decode($response['data']);
+    $last_updated = $github_project_info['updated_at'];
+    $branch = $github_project_info['default_branch'];
+    */
+    $last_updated = '';
+    $branch = '1.x';
+
+    if ($response->code != '404') {
+      // Create an available array matching what we'd get from b.org.
+      $available['title'] = $project['name'];
+      $available['short_name'] = $project['name'];
+      $available['link'] = $github;
+
+      $available['api_version'] = '1.x';
+      $available['recommended_major'] = 'dev';
+      $available['supported_majors'] = 'dev';
+      $available['default_major'] = 'dev';
+      $available['project_status'] = 'github';
+      $available['releases'] = array(
+        'dev' => array(
+          'name' => $project['name'] . '-dev',
+          'version' => 'dev',
+          'status' => 'published',
+          'date' => $last_updated,
+          'filesize' => '',
+          'security_update' => FALSE,
+          'version_major' => '1', // This needs to be 1 for the project to show.
+          'version_minor' => '0',
+          'version_patch' => '0',
+          'release_link' => 'https://github.com/backdrop-contrib/' . $project['name'],
+          'download_link' =>'https://github.com/backdrop-contrib/' . $project['name'],
+          //'download_link' =>'https://github.com/backdrop-contrib/' . $project['name'] . '/archive/refs/heads/' . $branch . '.zip',
+        ),
+      );
+    }
+  }
+
   $frequency = variable_get('update_check_frequency', 1);
   $cid = 'backdrop_upgrade_status_available_releases::' . $project_name;
   _update_cache_set($cid, $available, $now + (60 * 60 * 24 * $frequency));

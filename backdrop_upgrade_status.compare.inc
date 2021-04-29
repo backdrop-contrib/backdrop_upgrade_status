@@ -314,11 +314,19 @@ function backdrop_upgrade_status_calculate_project_update_status($project, &$pro
 
   // If we were unable to find a recommended version, then make the latest
   // version the recommended version if possible.
-  if (!isset($project_data['recommended']) && isset($project_data['latest_version'])) {
-    $project_data['recommended'] = $project_data['latest_version'];
+  if (!isset($project_data['recommended'])) {
     // US: No recommended version means there's a dev snapshot.
     $project_data['status'] = BACKDROP_UPGRADE_STATUS_DEVELOPMENT;
     $project_data['reason'] = t('In development');
+
+    if (isset($project_data['latest_version'])) {
+      $project_data['recommended'] = $project_data['latest_version'];
+    }
+    else {
+      $project_data['recommended'] = $version;
+      $project_data['latest_version'] = $version;
+      $project_data['releases'][$version] = $release;
+    }
   }
 
   //
@@ -357,8 +365,14 @@ function backdrop_upgrade_status_calculate_project_update_status($project, &$pro
   switch ($project_data['install_type']) {
     case 'official':
     case 'dev':
-      $project_data['status'] = BACKDROP_UPGRADE_STATUS_STABLE;
-      $project_data['reason'] = t('Available');
+      if ($available['project_status'] == 'github') {
+        $project_data['status'] = BACKDROP_UPGRADE_STATUS_DEVELOPMENT;
+        $project_data['reason'] = t('In development');
+      }
+      else {
+        $project_data['status'] = BACKDROP_UPGRADE_STATUS_STABLE;
+        $project_data['reason'] = t('Available');
+      }
       break;
 
     default:
