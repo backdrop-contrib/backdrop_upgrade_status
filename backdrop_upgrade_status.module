@@ -52,8 +52,16 @@ function backdrop_upgrade_status_help($path, $arg) {
  * Implements hook_cron().
  */
 function backdrop_upgrade_status_cron() {
+  // If the minimum lifetime hasn't been passed, skip.
+  $lifetime = REQUEST_TIME - variable_get('backdrop_upgrade_status_last_check', 0);
+  if ($lifetime < variable_get('backdrop_upgrade_status_lifetime', 86400)) {
+    return;
+  }
+
   module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.fetch');
   backdrop_upgrade_status_manual_status();
+
+  variable_set('backdrop_upgrade_status_last_check', REQUEST_TIME);
 }
 
 /**
@@ -74,6 +82,7 @@ function backdrop_upgrade_status_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'backdrop_upgrade_status.fetch.inc'
   );
+
   return $items;
 }
 

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Install, update, and uninstall functions for the Backdrop Upgrade Status module.
@@ -9,9 +8,21 @@
  * Implements hook_install().
  */
 function backdrop_upgrade_status_install() {
+  // Set default lifetime to one day.
+  variable_set('backdrop_upgrade_status_lifetime', 86400);
+
   module_load_include('inc', 'system', 'system.queue');
   $queue = DrupalQueue::get('backdrop_upgrade_status_fetch_tasks', TRUE);
   $queue->createQueue();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function backdrop_upgrade_status_uninstall() {
+  // Clean up our variables.
+  variable_del('backdrop_upgrade_status_last_check');
+  variable_del('backdrop_upgrade_status_lifetime');
 }
 
 /**
