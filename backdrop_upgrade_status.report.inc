@@ -394,3 +394,126 @@ function theme_backdrop_upgrade_status_status_label($variables) {
       return '<span class="current">'. t('In core') .'</span>';
   }
 }
+
+/**
+ * Generates an informational report showing everything you'll need to upgrade
+ * your site from Drupal to Backdrop CMS.
+ *
+ * @return array
+ *   Renderable tables with all the info!
+ */
+function backdrop_upgrade_info_report() {
+  $renderable = array();
+
+  // Get all the node types in the system.
+  $rows = array();
+  $node_types = node_type_get_names();
+  foreach ($node_types as $machine => $node_type) {
+    $count = db_query("SELECT count(nid) FROM {node} WHERE type = :machine", array(':machine' => $machine))->fetchField();
+    $rows[] = array(
+      'data' => array(
+        'type' => $node_type,
+        'machine' => $machine,
+        'count' => $count,
+      ),
+    );
+  }
+  $node_data = array(
+    'title' => t('Content types'),
+    'info' => t('This is a summary of the node types on the site.'),
+    'header' => array(t('Conent type'), t('Machine name'), t('Number of items')),
+    'rows' => $rows,
+  );
+  $renderable['nodes'] = backdrop_upgrade_info_report_data($node_data);
+
+  // Get all the taxonomy terms in the system.
+  $rows = array();
+  $term_types = taxonomy_get_vocabularies();
+  foreach ($term_types as $vid => $vocab) {
+    $count = db_query("SELECT count(tid) FROM {taxonomy_term_data} WHERE vid = :machine", array(':machine' => $vid))->fetchField();
+    $rows[] = array(
+      'data' => array(
+        'type' => $vocab->name,
+        'machine' => $vocab->machine_name,
+        'vid' => $vid,
+        'count' => $count,
+      ),
+    );
+  }
+  $term_data = array(
+    'title' => t('Vocabularies & Terms'),
+    'info' => t('This is a summary of the taxonomy terms on the site.'),
+    'header' => array(t('Vocabulary'), t('Machine name'), t('Vocabulary ID'), t('Number of terms')),
+    'rows' => $rows,
+  );
+  $renderable['terms'] = backdrop_upgrade_info_report_data($term_data);
+
+  // Get all the users in the system.
+
+  $rows = array();
+  $statuses = array(1 => t('Active'), 0 => t('Blocked'));
+  foreach ($statuses as $status => $label) {
+    $count = db_query("SELECT count(uid) FROM {users} WHERE status = :status", array(':status' => $status))->fetchField();
+    $rows[] = array(
+      'data' => array(
+        'type' => $label,
+        'machine' => $status,
+        'count' => $count,
+      ),
+    );
+  }
+
+  $user_data = array(
+    'title' => t('User accounts'),
+    'info' => t('This is a summary of the user accounts on the site.'),
+    'header' => array(t('User accounts'), t('Status'), t('Number of users')),
+    'rows' => $rows,
+  );
+  $renderable['users'] = backdrop_upgrade_info_report_data($user_data);
+
+  // Allow other modules to add things to the reports page.
+  drupal_alter('backdrop_upgrade_info', $renderable);
+
+  return $renderable;
+}
+
+/**
+ * Creates a fieldset with tabular data for the reports page.
+ *
+ * @param array $variables
+ *   Contains the following keys:
+ *   - title
+ *   - info
+ *   - header
+ *   - data
+ *
+ * @return array
+ *   Renderable fieldset.
+ */
+function backdrop_upgrade_info_report_data($variables) {
+  $title = $variables['title']; // has t().
+  $info = $variables['info']; // has t().
+  $header = $variables['header'];
+  $rows = $variables['rows'];
+
+  $fieldset = array(
+    '#type' => 'fieldset',
+    '#title' => $title,
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $fieldset['info'] = array(
+    '#type' => 'markup',
+    '#markup' => $info,
+  );
+  $fieldset['table'] = array(
+    '#type' => 'markup',
+    '#markup' => theme('table', array(
+      'header' => $header,
+      'rows' => $rows,
+      'attributes' => array('class' => array('backdrop-upgrade-table')),
+    )),
+  );
+
+  return $fieldset;
+}
