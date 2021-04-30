@@ -87,8 +87,9 @@ function backdrop_upgrade_status_menu() {
   // Add reports.
   $items['admin/reports/backdrop-upgrade'] = array(
     'title' => 'Backdrop upgrade report',
-    'description' => 'Report of site informaton useful in preparing for upgrade to Backdrop CMS',
-    'page callback' => 'backdrop_upgrade_status_report',
+    'description' => 'Report of site informaton useful in preparing for upgrade to Backdrop CMS.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('backdrop_upgrade_status_report'),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'backdrop_upgrade_status.report.inc'

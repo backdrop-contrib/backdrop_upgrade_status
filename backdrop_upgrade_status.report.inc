@@ -405,6 +405,28 @@ function theme_backdrop_upgrade_status_status_label($variables) {
 function backdrop_upgrade_status_report() {
   $renderable = array();
 
+  $renderable['intro'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Backdrop Upgrade to-do list!'),
+    '#collapsible' => TRUE,
+  );
+  $renderable['intro']['backdrop_upgrade_status_todo'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Preparation for upgrading to Backdrop CMS'),
+    '#options' => array(
+      1 => t('Disable and uninstall any modules that are not wanted anymore.'),
+      2 => t('Remove content and configuration that is not wanted anymore.'),
+      3 => t('Store all views in the database to have them converted automatically.'),
+    ),
+    '#default_value' => variable_get('backdrop_upgrade_status_todo', array()),
+  );
+  $renderable['intro']['save'] = array(
+    '#type' => 'button',
+    '#value' => t('Confirm status'),
+    '#disabled' => TRUE,
+  );
+
+
   // Get all the users in the system.
 
   $rows = array();
@@ -420,7 +442,7 @@ function backdrop_upgrade_status_report() {
     );
   }
   $user_data = array(
-    'title' => t('User accounts'),
+    'title' => t('User account data'),
     'info' => t('This is a summary of the user accounts on the site.'),
     'header' => array(t('User accounts'), t('Status'), t('Number of users')),
     'rows' => $rows,
@@ -441,7 +463,7 @@ function backdrop_upgrade_status_report() {
     );
   }
   $node_data = array(
-    'title' => t('Content types'),
+    'title' => t('Content type data'),
     'info' => t('This is a summary of the node types on the site.'),
     'header' => array(t('Conent type'), t('Machine name'), t('Number of items')),
     'rows' => $rows,
@@ -463,7 +485,7 @@ function backdrop_upgrade_status_report() {
     );
   }
   $term_data = array(
-    'title' => t('Vocabularies & Terms'),
+    'title' => t('Vocabulary & Term data'),
     'info' => t('This is a summary of the taxonomy terms on the site.'),
     'header' => array(t('Vocabulary'), t('Machine name'), t('Vocabulary ID'), t('Number of terms')),
     'rows' => $rows,
@@ -510,7 +532,7 @@ function backdrop_upgrade_status_report() {
   }
 
   $field_data = array(
-    'title' => t('Fields'),
+    'title' => t('Field data'),
     'info' => t('This is a summary of the fields on the site.'),
     'header' => array(t('Field name'), t('Field type'), t('Module'), t('Used in'), t('Number of values')),
     'rows' => $rows,
@@ -521,7 +543,7 @@ function backdrop_upgrade_status_report() {
   // Allow other modules to add things to the reports page.
   drupal_alter('backdrop_upgrade_status_report', $renderable);
 
-  return $renderable;
+  return system_settings_form($renderable);
 }
 
 /**
@@ -583,11 +605,53 @@ function paragraphs_backdrop_upgrade_status_report_alter(&$renderable) {
       ),
     );
   }
-  $term_data = array(
-    'title' => t('Paragraph Types'),
+  $paragraph_data = array(
+    'title' => t('Paragraph type data'),
     'info' => t('This is a summary of the paragraphs on the site.'),
     'header' => array(t('Paragraph type'), t('Machine name'), t('Number of paragraphs')),
     'rows' => $rows,
   );
-  $renderable['paragraphs'] = backdrop_upgrade_status_report_data($term_data);
+  $renderable['paragraphs'] = backdrop_upgrade_status_report_data($paragraph_data);
+}
+
+/**
+ * Implements hook_backdrop_upgrade_status_report_alter() on behalf of
+ * views module.
+ */
+function views_backdrop_upgrade_status_report_alter(&$renderable) {
+  // Get all the taxonomy terms in the system.
+  $rows = array();
+  $views = views_get_all_views();
+  dpm($views);
+  foreach ($views as $view) {
+    switch ($view->type) {
+      case t('Default'):
+      default:
+        $type = '<strong><span class="error">' . t('In code') . '</span></strong>';
+        break;
+
+      case t('Normal'):
+        $type = t('In database');
+        break;
+
+      case t('Overridden'):
+        $type = t('Database overriding code');
+        break;
+    }
+    $rows[] = array(
+      'data' => array(
+        'name' => $view->human_name,
+        'machine' => $view->name,
+        'state' => $type,
+        'description' => $view->description,
+      ),
+    );
+  }
+  $view_data = array(
+    'title' => t('Views data'),
+    'info' => t('This is a summary of the views on the site.'),
+    'header' => array(t('View name'), t('Machine name'), t('Storage state'), t('Description')),
+    'rows' => $rows,
+  );
+  $renderable['views'] = backdrop_upgrade_status_report_data($view_data);
 }
