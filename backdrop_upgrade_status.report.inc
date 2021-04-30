@@ -559,3 +559,30 @@ function backdrop_upgrade_status_report_data($variables) {
 
   return $fieldset;
 }
+
+/**
+ * Implements hook_backdrop_upgrade_status_report_alter() on behalf of
+ * paragraphs module.
+ */
+function paragraphs_backdrop_upgrade_status_report_alter(&$renderable) {
+  // Get all the taxonomy terms in the system.
+  $rows = array();
+  $bundles = paragraphs_bundle_load();
+  foreach ($bundles as $bundle) {
+    $count = db_query("SELECT count(item_id) FROM {paragraphs_item} WHERE bundle = :machine", array(':machine' => $bundle->bundle))->fetchField();
+    $rows[] = array(
+      'data' => array(
+        'type' => $bundle->name,
+        'machine' => $bundle->bundle,
+        'count' => $count,
+      ),
+    );
+  }
+  $term_data = array(
+    'title' => t('Paragraph Types'),
+    'info' => t('This is a summary of the paragraphs on the site.'),
+    'header' => array(t('Paragraph type'), t('Machine name'), t('Number of paragraphs')),
+    'rows' => $rows,
+  );
+  $renderable['paragraphs'] = backdrop_upgrade_status_report_data($term_data);
+}
