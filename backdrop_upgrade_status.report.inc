@@ -433,13 +433,17 @@ function backdrop_upgrade_status_report() {
   $statuses = array(1 => t('Active'), 0 => t('Blocked'));
   foreach ($statuses as $status => $label) {
     $count = db_query("SELECT count(uid) FROM {users} WHERE status = :status", array(':status' => $status))->fetchField();
-    $rows[] = array(
+    $row = array(
       'data' => array(
         'type' => $label,
         'machine' => $status,
         'count' => $count,
       ),
     );
+    if ($count == 0) {
+      $row['class'] = array('warning');
+    }
+    $rows[] = $row;
   }
   $user_data = array(
     'title' => t('User account data'),
@@ -454,13 +458,17 @@ function backdrop_upgrade_status_report() {
   $node_types = node_type_get_names();
   foreach ($node_types as $machine => $node_type) {
     $count = db_query("SELECT count(nid) FROM {node} WHERE type = :machine", array(':machine' => $machine))->fetchField();
-    $rows[] = array(
+    $row = array(
       'data' => array(
         'type' => $node_type,
         'machine' => $machine,
         'count' => $count,
       ),
     );
+    if ($count == 0) {
+      $row['class'] = array('warning');
+    }
+    $rows[] = $row;
   }
   $node_data = array(
     'title' => t('Content type data'),
@@ -475,7 +483,7 @@ function backdrop_upgrade_status_report() {
   $term_types = taxonomy_get_vocabularies();
   foreach ($term_types as $vid => $vocab) {
     $count = db_query("SELECT count(tid) FROM {taxonomy_term_data} WHERE vid = :machine", array(':machine' => $vid))->fetchField();
-    $rows[] = array(
+    $row = array(
       'data' => array(
         'type' => $vocab->name,
         'machine' => $vocab->machine_name,
@@ -483,6 +491,10 @@ function backdrop_upgrade_status_report() {
         'count' => $count,
       ),
     );
+    if ($count == 0) {
+      $row['class'] = array('warning');
+    }
+    $rows[] = $row;
   }
   $term_data = array(
     'title' => t('Vocabulary & Term data'),
@@ -521,6 +533,9 @@ function backdrop_upgrade_status_report() {
         $table = 'field_data_' . $field_name;
         $count = db_query("SELECT count(entity_id) FROM {$table}")->fetchField();
         $rows[$field_name]['data'][4] = $count;
+        if ($count == 0) {
+          $rows[$field_name]['class'] = array('warning');
+        }
       }
     }
   }
@@ -564,12 +579,13 @@ function backdrop_upgrade_status_report_data($variables) {
   $info = $variables['info']; // has t().
   $header = $variables['header'];
   $rows = $variables['rows'];
+  $collapsed = isset($variables['collapsed'])? $variables['collapsed']: TRUE;
 
   $fieldset = array(
     '#type' => 'fieldset',
     '#title' => $title,
     '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
+    '#collapsed' => $collapsed,
   );
   $fieldset['info'] = array(
     '#type' => 'markup',
@@ -597,13 +613,17 @@ function paragraphs_backdrop_upgrade_status_report_alter(&$renderable) {
   $bundles = paragraphs_bundle_load();
   foreach ($bundles as $bundle) {
     $count = db_query("SELECT count(item_id) FROM {paragraphs_item} WHERE bundle = :machine", array(':machine' => $bundle->bundle))->fetchField();
-    $rows[] = array(
+    $row = array(
       'data' => array(
         'type' => $bundle->name,
         'machine' => $bundle->bundle,
         'count' => $count,
       ),
     );
+    if ($count == 0) {
+      $row['class'] = array('warning');
+    }
+    $rows[] = $row;
   }
   $paragraph_data = array(
     'title' => t('Paragraph type data'),
@@ -637,7 +657,7 @@ function views_backdrop_upgrade_status_report_alter(&$renderable) {
         $type = t('Database overriding code');
         break;
     }
-    $rows[] = array(
+    $row = array(
       'data' => array(
         'name' => $view->human_name,
         'machine' => $view->name,
@@ -645,12 +665,17 @@ function views_backdrop_upgrade_status_report_alter(&$renderable) {
         'description' => $view->description,
       ),
     );
+    if ($type == t('In code')) {
+      $row['class'] = array('error');
+    }
+    $rows[] = $row;
   }
   $view_data = array(
     'title' => t('Views data'),
     'info' => t('All views should show as "In database" or "Databse overriding code" in order to be properly upgraded into Backdrop CMS.'),
     'header' => array(t('View name'), t('Machine name'), t('Storage state'), t('Description')),
     'rows' => $rows,
+    'collapsed' => FALSE,
   );
   $renderable['views'] = backdrop_upgrade_status_report_data($view_data);
 }
