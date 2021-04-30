@@ -494,6 +494,11 @@ function backdrop_upgrade_status_report() {
         // Add the current instance.
         $admin_path = _field_ui_bundle_admin_path($entity_type, $bundle);
         $rows[$field_name]['data'][3][] = $admin_path ? l($bundles[$entity_type][$bundle]['label'], $admin_path . '/fields') : $bundles[$entity_type][$bundle]['label'];
+
+        // Add the item count.
+        $table = 'field_data_' . $field_name;
+        $count = db_query("SELECT count(entity_id) FROM {$table}")->fetchField();
+        $rows[$field_name]['data'][4] = $count;
       }
     }
   }
@@ -507,7 +512,7 @@ function backdrop_upgrade_status_report() {
   $field_data = array(
     'title' => t('Fields'),
     'info' => t('This is a summary of the fields on the site.'),
-    'header' => array(t('Field name'), t('Field type'), t('Module'), t('Used in')),
+    'header' => array(t('Field name'), t('Field type'), t('Module'), t('Used in'), t('Number of values')),
     'rows' => $rows,
   );
   $renderable['fields'] = backdrop_upgrade_status_report_data($field_data);
