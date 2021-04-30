@@ -402,8 +402,30 @@ function theme_backdrop_upgrade_status_status_label($variables) {
  * @return array
  *   Renderable tables with all the info!
  */
-function backdrop_upgrade_info_report() {
+function backdrop_upgrade_status_report() {
   $renderable = array();
+
+  // Get all the users in the system.
+
+  $rows = array();
+  $statuses = array(1 => t('Active'), 0 => t('Blocked'));
+  foreach ($statuses as $status => $label) {
+    $count = db_query("SELECT count(uid) FROM {users} WHERE status = :status", array(':status' => $status))->fetchField();
+    $rows[] = array(
+      'data' => array(
+        'type' => $label,
+        'machine' => $status,
+        'count' => $count,
+      ),
+    );
+  }
+  $user_data = array(
+    'title' => t('User accounts'),
+    'info' => t('This is a summary of the user accounts on the site.'),
+    'header' => array(t('User accounts'), t('Status'), t('Number of users')),
+    'rows' => $rows,
+  );
+  $renderable['users'] = backdrop_upgrade_status_report_data($user_data);
 
   // Get all the node types in the system.
   $rows = array();
@@ -424,7 +446,7 @@ function backdrop_upgrade_info_report() {
     'header' => array(t('Conent type'), t('Machine name'), t('Number of items')),
     'rows' => $rows,
   );
-  $renderable['nodes'] = backdrop_upgrade_info_report_data($node_data);
+  $renderable['nodes'] = backdrop_upgrade_status_report_data($node_data);
 
   // Get all the taxonomy terms in the system.
   $rows = array();
@@ -446,33 +468,53 @@ function backdrop_upgrade_info_report() {
     'header' => array(t('Vocabulary'), t('Machine name'), t('Vocabulary ID'), t('Number of terms')),
     'rows' => $rows,
   );
-  $renderable['terms'] = backdrop_upgrade_info_report_data($term_data);
+  $renderable['terms'] = backdrop_upgrade_status_report_data($term_data);
 
-  // Get all the users in the system.
+  // Get all fields in the system.
+  $instances = field_info_instances();
+  $field_types = field_info_field_types();
+  $bundles = field_info_bundles();
 
+  $modules = system_rebuild_module_data();
   $rows = array();
-  $statuses = array(1 => t('Active'), 0 => t('Blocked'));
-  foreach ($statuses as $status => $label) {
-    $count = db_query("SELECT count(uid) FROM {users} WHERE status = :status", array(':status' => $status))->fetchField();
-    $rows[] = array(
-      'data' => array(
-        'type' => $label,
-        'machine' => $status,
-        'count' => $count,
-      ),
-    );
+  foreach ($instances as $entity_type => $type_bundles) {
+    foreach ($type_bundles as $bundle => $bundle_instances) {
+      foreach ($bundle_instances as $field_name => $instance) {
+        $field = field_info_field($field_name);
+
+        // Initialize the row if we encounter the field for the first time.
+        if (!isset($rows[$field_name])) {
+          $rows[$field_name]['class'] = $field['locked'] ? array('menu-disabled') : array('');
+          $rows[$field_name]['data'][0] = $field['locked'] ? t('@field_name (Locked)', array('@field_name' => $field_name)) : $field_name;
+          $rows[$field_name]['data'][1] = $field_types[$field['type']]['label'];
+          $module_name = $field_types[$field['type']]['module'];
+          $rows[$field_name]['data'][2] = $modules[$module_name]->info['name'];
+        }
+
+        // Add the current instance.
+        $admin_path = _field_ui_bundle_admin_path($entity_type, $bundle);
+        $rows[$field_name]['data'][3][] = $admin_path ? l($bundles[$entity_type][$bundle]['label'], $admin_path . '/fields') : $bundles[$entity_type][$bundle]['label'];
+      }
+    }
+  }
+  foreach ($rows as $field_name => $cell) {
+    $rows[$field_name]['data'][3] = implode(', ', $cell['data'][3]);
+  }
+  if (empty($rows)) {
+    $output = t('No fields have been defined yet.');
   }
 
-  $user_data = array(
-    'title' => t('User accounts'),
-    'info' => t('This is a summary of the user accounts on the site.'),
-    'header' => array(t('User accounts'), t('Status'), t('Number of users')),
+  $field_data = array(
+    'title' => t('Fields'),
+    'info' => t('This is a summary of the fields on the site.'),
+    'header' => array(t('Field name'), t('Field type'), t('Module'), t('Used in')),
     'rows' => $rows,
   );
-  $renderable['users'] = backdrop_upgrade_info_report_data($user_data);
+  $renderable['fields'] = backdrop_upgrade_status_report_data($field_data);
+
 
   // Allow other modules to add things to the reports page.
-  drupal_alter('backdrop_upgrade_info', $renderable);
+  drupal_alter('backdrop_upgrade_status_report', $renderable);
 
   return $renderable;
 }
@@ -490,7 +532,7 @@ function backdrop_upgrade_info_report() {
  * @return array
  *   Renderable fieldset.
  */
-function backdrop_upgrade_info_report_data($variables) {
+function backdrop_upgrade_status_report_data($variables) {
   $title = $variables['title']; // has t().
   $info = $variables['info']; // has t().
   $header = $variables['header'];
