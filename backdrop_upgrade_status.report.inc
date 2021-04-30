@@ -464,7 +464,7 @@ function backdrop_upgrade_status_report() {
   }
   $node_data = array(
     'title' => t('Content type data'),
-    'info' => t('This is a summary of the node types on the site.'),
+    'info' => t('Any conent types with zero itesm could be deleted.'),
     'header' => array(t('Conent type'), t('Machine name'), t('Number of items')),
     'rows' => $rows,
   );
@@ -486,7 +486,7 @@ function backdrop_upgrade_status_report() {
   }
   $term_data = array(
     'title' => t('Vocabulary & Term data'),
-    'info' => t('This is a summary of the taxonomy terms on the site.'),
+    'info' => t('Any vocabularies with zero terms could be deleted.'),
     'header' => array(t('Vocabulary'), t('Machine name'), t('Vocabulary ID'), t('Number of terms')),
     'rows' => $rows,
   );
@@ -533,7 +533,7 @@ function backdrop_upgrade_status_report() {
 
   $field_data = array(
     'title' => t('Field data'),
-    'info' => t('This is a summary of the fields on the site.'),
+    'info' => t('Any fields with zero values could be removed.'),
     'header' => array(t('Field name'), t('Field type'), t('Module'), t('Used in'), t('Number of values')),
     'rows' => $rows,
   );
@@ -607,7 +607,7 @@ function paragraphs_backdrop_upgrade_status_report_alter(&$renderable) {
   }
   $paragraph_data = array(
     'title' => t('Paragraph type data'),
-    'info' => t('This is a summary of the paragraphs on the site.'),
+    'info' => t('Any paragraph types with zero items could be deleted.'),
     'header' => array(t('Paragraph type'), t('Machine name'), t('Number of paragraphs')),
     'rows' => $rows,
   );
@@ -622,12 +622,11 @@ function views_backdrop_upgrade_status_report_alter(&$renderable) {
   // Get all the taxonomy terms in the system.
   $rows = array();
   $views = views_get_all_views();
-  dpm($views);
   foreach ($views as $view) {
     switch ($view->type) {
       case t('Default'):
       default:
-        $type = '<strong><span class="error">' . t('In code') . '</span></strong>';
+        $type = t('In code');
         break;
 
       case t('Normal'):
@@ -649,7 +648,7 @@ function views_backdrop_upgrade_status_report_alter(&$renderable) {
   }
   $view_data = array(
     'title' => t('Views data'),
-    'info' => t('This is a summary of the views on the site.'),
+    'info' => t('All views should show as "In database" or "Databse overriding code" in order to be properly upgraded into Backdrop CMS.'),
     'header' => array(t('View name'), t('Machine name'), t('Storage state'), t('Description')),
     'rows' => $rows,
   );
