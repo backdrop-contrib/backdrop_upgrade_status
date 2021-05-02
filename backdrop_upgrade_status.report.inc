@@ -405,20 +405,34 @@ function theme_backdrop_upgrade_status_status_label($variables) {
 function backdrop_upgrade_status_report() {
   $renderable = array();
 
+  $welcome = array(
+    t('This information should prove useful as you are evaluating an upgrade to Backdrop CMS for this site. This report should contain an overview for most of the content on this site.'),
+  );
+
+  $renderable['welcome'] = array(
+    '#type' => 'markup',
+    '#markup' => '<p>' . implode('</p><p>', $welcome) . '</p>',
+  );
+
   $renderable['intro'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Backdrop Upgrade to-do list!'),
+    '#title' => t('Backdrop Upgrade to-do list'),
+    '#description' => t('When you are ready to perform the upgrade, this list should walk you through the steps necessary to prepare your Drupal 7 database.'),
     '#collapsible' => TRUE,
   );
   $renderable['intro']['backdrop_upgrade_status_todo'] = array(
     '#type' => 'checkboxes',
-    '#title' => t('Preparation for upgrading to Backdrop CMS'),
+    '#title' => t('Database prep for upgrading to Backdrop CMS:'),
     '#options' => array(
-      1 => t('Disable and uninstall any modules that are not wanted anymore.'),
-      2 => t('Remove content and configuration that is not wanted anymore.'),
-      3 => t('Store all views in the database to have them converted automatically.'),
+      1 => t('Leave all modules integrated into Backdrop core <em>enabled</em>.'),
+      2 => t('Disable and uninstall any modules that are not wanted anymore.'),
+      3 => t('Disable (but do not uninstall) any modules that are not ready for Backdrop yet, but you plan to port after the upgrade.'),
+      4 => t('Remove content and configuration that is not wanted anymore.'),
+      5 => t('Store all views in the database to have them converted automatically.'),
+      6 => t('(If you have not yet ported your Drupal 7 theme to Backdrop) Swicth to Bartik for the upgrade.'),
     ),
-    '#default_value' => variable_get('backdrop_upgrade_status_todo', array()),
+    '#default_value' => variable_get('backdrop_upgrade_status_todo', array(1 => TRUE)),
+    '3'
   );
   $renderable['intro']['save'] = array(
     '#type' => 'button',
