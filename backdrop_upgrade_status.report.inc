@@ -420,19 +420,19 @@ function backdrop_upgrade_status_report() {
     '#description' => t('When you are ready to perform the upgrade, this list should walk you through the steps necessary to prepare your Drupal 7 database.'),
     '#collapsible' => TRUE,
   );
+  $default = variable_get('backdrop_upgrade_status_todo', array(1 => TRUE));
   $renderable['intro']['backdrop_upgrade_status_todo'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Database prep for upgrading to Backdrop CMS:'),
     '#options' => array(
-      1 => t('Leave all modules integrated into Backdrop core <em>enabled</em>.'),
+      1 => t('Modules that have been integrated into Backdrop core should be <em>enabled</em>.'),
       2 => t('Disable and uninstall any modules that are not wanted anymore.'),
       3 => t('Disable (but do not uninstall) any modules that are not ready for Backdrop yet, but you plan to port after the upgrade.'),
       4 => t('Remove content and configuration that is not wanted anymore.'),
       5 => t('Store all views in the database to have them converted automatically.'),
       6 => t('(If you have not yet ported your Drupal 7 theme to Backdrop) Swicth to Bartik for the upgrade.'),
     ),
-    '#default_value' => variable_get('backdrop_upgrade_status_todo', array(1 => TRUE)),
-    '3'
+    '#default_value' => $default,
   );
   $renderable['intro']['save'] = array(
     '#type' => 'button',
@@ -441,8 +441,232 @@ function backdrop_upgrade_status_report() {
   );
 
 
-  // Get all the users in the system.
+  // Get all module data.
+  $projects = system_rebuild_module_data();
+  // List of core modules removed from Backdrop, and what to do about it.
+  $removed_modules = array(
+    'aggregator' => array(
+      'class' => 'warning',
+      'rec' => t('Add the contrib version of Aggregtor module to Backdrop.'),
+    ),
+    'blog' => array(
+      'class' => 'error',
+      'rec' => t('Delete content, Convert to custom content type, or port to Backdrop.'),
+    ),
+    'dashboard' => array(
+      'class' => '',
+      'rec' => t('Alternaive core module provided. No action necessary.'),
+    ),
+    'forum' => array(
+      'class' => 'warning',
+      'rec' => t('Add the contrib version of Forum module to Backdrop.'),
+    ),
+    'help' => array(
+      'class' => 'warning', // Warning, because help is rarely necessary.
+      'rec' => t('Disable and Uninstall Help module, or port to Backdrop.)'),
+    ),
+    'openid' => array(
+      'class' => 'error',
+      'rec' => t('Port the OpenID modile to Backdrop, or Disable and Uninstall.'),
+    ),
+    'overlay' => array(
+      'class' => 'warning', // Warning, because overlay is rarely necessary.
+      'rec' => t('Disable and Uninstall Overlay module, or port to Backdrop.'),
+    ),
+    'php' => array(
+      'class' => 'error',
+      'rec' => t('Review all PHP code: delete or change format. Disable and Uninstall PHP Filter module.'),
+    ),
+    'poll' => array(
+      'class' => 'error',
+      'rec' => t('Port the Poll modile to Backdrop, or Disable and Uninstall.'),
+    ),
+    'profile' => array(
+      'class' => 'warning',
+      'rec' => t('Add the contrib version of Profile module to Backdrop.'),
+    ),
+    'rdf' => array(
+      'class' => 'warning', // Warning, because rdf is rarely necessary.
+      'rec' => t('Disable and Uninstall RDF module, or port to Backdrop.'),
+    ),
+    'shortcut' => array(
+      'class' => 'warning', // Warning, because shortcut is rarely necessary.
+      'rec' => t('Disable and Uninstall Shortcut module, or port to Backdrop.'),
+    ),
+    'statistics' => array(
+      'class' => 'warning', // Warning, because statistics is rarely necessary.
+      'rec' => t('Disable and Uninstall Statistics module, or port to Backdrop.'),
+    ),
+    'toolbar' => array(
+      'class' => '',
+      'rec' => t('Alternaive core module provided. No action necessary.'),
+    ),
+    'tracker' => array(
+      'class' => 'warning', // Warning, because tracker is rarely necessary.
+      'rec' => t('Disable and Uninstall Tracker module, or port to Backdrop.'),
+    ),
+    'trigger' => array(
+      'class' => 'warning',
+      'rec' => t('Add the contrib version of Trigger module to Backdrop.'),
+    )
+  );
 
+  // Get backdrop project data.
+  if ($available = backdrop_upgrade_status_get_available()) {
+    module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.compare');
+    $backdrop_data = backdrop_upgrade_status_calculate_project_data($available);
+  }
+
+  $collapsed = TRUE;
+  $core_modules = array();
+  $core_module_rows = array();
+  $contrib_modules = array();
+  $contrib_module_rows = array();
+  $last_project = '';
+  foreach ($projects as $project) {
+    $to_skip = array('views_ui', 'backdrop_upgrade_status');
+    if (in_array($project->name, $to_skip)) {
+      continue;
+    }
+
+    if ($project->type == 'module' && $project->status == 1) {
+
+      // Core modules.
+      if ($project->info['package'] == 'Core') {
+        $core_modules[$project->name] = $project;
+        if (array_key_exists($project->name, $removed_modules)) {
+          $backdrop_status = t('Removed from core');
+          $recommendation = $removed_modules[$project->name]['rec'];
+          if (!empty($removed_modules[$project->name]['class'])) {
+            $class = $removed_modules[$project->name]['class'];
+            $collapsed = FALSE;
+          }
+        }
+        else {
+          $backdrop_status = t('In core');
+          $recommendation = t('No action necessary');
+          $class = '';
+        }
+        $row = array(
+          'data' => array(
+            'name' => $project->info['name'],
+            'drupal' => t('In core'),
+            'backdrop' => $backdrop_status,
+            'rec' => $recommendation,
+          ),
+          'class' => isset($class) ? array($class) : array(),
+        );
+        $core_module_rows[] = $row;
+      }
+
+      // Contrib modules.
+      elseif (isset($project->info['version'])) {
+        if (isset($project->info['project']) && $project->info['project'] != $last_project) {
+          $drupal_version = '';
+          $backdrop_version = '';
+          $recommendation = '';
+          $class = '';
+          if (array_key_exists($project->name, $backdrop_data)) {
+
+            $drupal_version = '';
+            $version = $backdrop_data[$project->name]['info']['version'];
+            if (!empty($version)) {
+              $drupal_version = t('Version :version', array(':version' => $version));
+            }
+
+            switch ($backdrop_data[$project->name]['status']) {
+              case BACKDROP_UPGRADE_STATUS_CORE:
+                $backdrop_version = t('Integrated into Backdrop core.');
+                $recommendation = 'No action required.';
+                break;
+              case BACKDROP_UPGRADE_STATUS_STABLE;
+                $backdrop_version = t('Version :bversion', array(':bversion' => $backdrop_data[$project->name]['latest_version']));
+                $recommendation = 'Add the stable contrib version of :module to Backdrop.';
+                break;
+              case BACKDROP_UPGRADE_STATUS_DEVELOPMENT:
+                $backdrop_version = t('Version :bversion', array(':bversion' => $backdrop_data[$project->name]['latest_version']));
+                $recommendation = 'Add the development contrib version of :module to Backdrop.';
+                $class = 'warning';
+                break;
+              case UPDATE_UNKNOWN:
+                // fall-through intentional.
+              default:
+                $backdrop_version = t('Unknown');
+                $recommendation = 'Port the :module to Backdrop.';
+                $class = 'error';
+                break;
+            }
+          }
+
+          $row = array(
+            'data' => array(
+              'name' => $project->info['name'],
+              'drupal' => $drupal_version,
+              'backdrop' => $backdrop_version,
+              'note' => t($recommendation, array(':module' => $project->info['name'])),
+            ),
+            'class' => isset($class) ? array($class) : array(),
+          );
+          $contrib_module_rows[] = $row;
+        }
+      }
+
+      // Custom modules.
+      else {
+        $custom_modules[$project->name] = $project;
+        $row = array(
+          'data' => array(
+            'name' => $project->info['name'],
+            'drupal' => t('Custom?'),
+            'backdrop' => t('Unknown'),
+            'rec' => t('Port to Backdrop'),
+          ),
+          'class' => array('error'),
+        );
+        $custom_module_rows[] = $row;
+      }
+
+      // Save the last project so we don't include sub-modules in this list.
+      if (isset($project->info['project'])) {
+        $last_project = $project->info['project'];
+      }
+      else {
+        $last_project = $project->name;
+      }
+    }
+  }
+
+  $core_module_data = array(
+    'title' => t('Enabled Core Modules'),
+    'info' => t('This is a summary of the enabled core modules.'),
+    'header' => array(t('Module name'), t('Drupal status'), t('Backdrop status'), t('Recommendation')),
+    'rows' => $core_module_rows,
+    'collapsed' => $collapsed,
+  );
+  $renderable['core_modules'] = backdrop_upgrade_status_report_data($core_module_data);
+
+
+  if ($available) {
+    $contrib_module_data = array(
+      'title' => t('Enabled Contrib Modules'),
+      'info' => t('This is a summary of the enabled contributed modules.'),
+      'header' => array(t('Module name'), t('Drupal status'), t('Backdrop status'), t('Recommendation')),
+      'rows' => $contrib_module_rows,
+      'collapsed' => $collapsed,
+    );
+    $renderable['contrib_modules'] = backdrop_upgrade_status_report_data($contrib_module_data);
+  }
+
+  $custom_module_data = array(
+    'title' => t('Enabled Custom Modules'),
+    'info' => t('This is a summary of the enabled custom modules.'),
+    'header' => array(t('Module name'), t('Drupal status'), t('Backdrop status'), t('Recommendation')),
+    'rows' => $custom_module_rows,
+    'collapsed' => FALSE,
+  );
+  $renderable['custom_modules'] = backdrop_upgrade_status_report_data($custom_module_data);
+
+  // Get all the users in the system.
   $rows = array();
   $statuses = array(1 => t('Active'), 0 => t('Blocked'));
   foreach ($statuses as $status => $label) {
