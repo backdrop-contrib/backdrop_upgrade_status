@@ -9,7 +9,7 @@
  */
 function backdrop_upgrade_status_install() {
   // Set upgrade checklist values.
-  variable_get('backdrop_upgrade_status_todo', array(1 => TRUE))
+  variable_set('backdrop_upgrade_status_todo', array(1 => TRUE));
   // Set default lifetime to one day.
   variable_set('backdrop_upgrade_status_lifetime', 86400);
 
@@ -25,6 +25,7 @@ function backdrop_upgrade_status_uninstall() {
   // Clean up our variables.
   variable_del('backdrop_upgrade_status_last_check');
   variable_del('backdrop_upgrade_status_lifetime');
+  variable_del('backdrop_upgrade_status_todo');
 }
 
 /**
