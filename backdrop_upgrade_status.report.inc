@@ -423,14 +423,18 @@ function backdrop_upgrade_status_report() {
   $default = variable_get('backdrop_upgrade_status_todo', array(1 => TRUE));
   $renderable['intro']['backdrop_upgrade_status_todo'] = array(
     '#type' => 'checkboxes',
-    '#title' => t('Database prep for upgrading to Backdrop CMS:'),
+    '#title' => t('Prepare for upgrading to Backdrop CMS:'),
     '#options' => array(
-      1 => t('Modules that have been integrated into Backdrop core should be <em>enabled</em>.'),
-      2 => t('Disable and uninstall any modules that are not wanted anymore.'),
-      3 => t('Disable (but do not uninstall) any modules that are not ready for Backdrop yet, but you plan to port after the upgrade.'),
-      4 => t('Remove content and configuration that is not wanted anymore.'),
-      5 => t('Store all views in the database to have them converted automatically.'),
-      6 => t('(If you have not yet ported your Drupal 7 theme to Backdrop) Swicth to Bartik for the upgrade.'),
+      1 => t('Review <a href="#edit-core-modules">core modules</a>: disable and uninstall anthing not in use.'),
+      2 => t('Review <a href="#edit-contrib-modules">contrib modules</a>: disable and uninstall anthing not in use.'),
+      3 => t('Review <a href="#edit-custom-modules">custom modules</a>: disable and uninstall anthing not in use.'),
+      4 => t('Review <a href="#edit-views">views</a>: Configuration must be in the database to convert automatically durung upgrade.'),
+      5 => t('(optional) Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop)'),
+      6 => t('(optional) Review <a href="#edit-nodes">content types</a>: remove any content types that are not wanted anymore.'),
+      7 => t('(optional) Review <a href="#edit-fields">fields</a>: remove fields that are not wanted anymore.'),
+      8 => t('(optional) Review <a href="#edit-terms">taxonomy</a>: remove terms or vocabularies that are not wanted anymore.'),
+      9 => t('(optional) Review <a href="#edit-paragraphs">paragraphs</a>: remove paragraphs that are not wanted anymore.'),
+      10 => t('(optional) Review <a href="#edit-users">user accounts</a>: remove old or blocked accounts not in use.'),
     ),
     '#default_value' => $default,
   );
@@ -569,17 +573,29 @@ function backdrop_upgrade_status_report() {
           if ($available && array_key_exists($project->name, $backdrop_data)) {
             switch ($backdrop_data[$project->name]['status']) {
               case BACKDROP_UPGRADE_STATUS_CORE:
-                $backdrop_version = $backdrop_data[$project->name]['in_core_note'] . '<br>' . $backdrop_data[$project->name]['in_core_warning'];
-                $status = $backdrop_data[$project->name]['in_core_upgrade_status'];
-                $rec_translated = $backdrop_data[$project->name]['in_core_upgrade'];
+                $backdrop_version = '';
+                if (isset($backdrop_data[$project->name]['in_core_note'])) {
+                  $backdrop_version .= $backdrop_data[$project->name]['in_core_note'] . '<br>';
+                }
+                if (isset($backdrop_data[$project->name]['in_core_warning'])) {
+                  $backdrop_version .= $backdrop_data[$project->name]['in_core_warning'];
+                }
+                $status = '';
+                if (isset($backdrop_data[$project->name]['in_core_upgrade_status'])) {
+                  $status = $backdrop_data[$project->name]['in_core_upgrade_status'];
+                }
+                $rec_translated = '';
+                if (isset($backdrop_data[$project->name]['in_core_upgrade'])) {
+                  $rec_translated = $backdrop_data[$project->name]['in_core_upgrade'];
+                }
                 break;
               case BACKDROP_UPGRADE_STATUS_STABLE;
-                $backdrop_version = t('Version :bversion', array(':bversion' => $backdrop_data[$project->name]['latest_version']));
+                $backdrop_version = t('Stable :bversion', array(':bversion' => $backdrop_data[$project->name]['latest_version']));
                 $status = t('Leave enabled.');
                 $recommendation = 'Before upgrade: Add the stable contrib version of :module to Backdrop.';
                 break;
               case BACKDROP_UPGRADE_STATUS_DEVELOPMENT:
-                $backdrop_version = t('Version :bversion', array(':bversion' => $backdrop_data[$project->name]['latest_version']));
+                $backdrop_version = t('In Development :bversion', array(':bversion' => $backdrop_data[$project->name]['latest_version']));
                 $recommendation = 'Before upgrade: Add the development contrib version of :module to Backdrop.';
                 $class = 'warning';
                 break;
