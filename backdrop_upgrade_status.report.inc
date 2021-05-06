@@ -569,26 +569,40 @@ function backdrop_upgrade_status_report() {
           if ($available && array_key_exists($project->name, $backdrop_data)) {
             switch ($backdrop_data[$project->name]['status']) {
               case BACKDROP_UPGRADE_STATUS_CORE:
-                $backdrop_version = t('Integrated into Backdrop core.');
-                $recommendation = $backdrop_data[$project->name]['in_core_note'];
+                $backdrop_version = $backdrop_data[$project->name]['in_core_note'] . '<br>' . $backdrop_data[$project->name]['in_core_warning'];
+                $status = $backdrop_data[$project->name]['in_core_upgrade_status'];
+                $rec_translated = $backdrop_data[$project->name]['in_core_upgrade'];
                 break;
               case BACKDROP_UPGRADE_STATUS_STABLE;
                 $backdrop_version = t('Version :bversion', array(':bversion' => $backdrop_data[$project->name]['latest_version']));
-                $recommendation = 'Add the stable contrib version of :module to Backdrop.';
+                $status = t('Leave enabled.');
+                $recommendation = 'Before upgrade: Add the stable contrib version of :module to Backdrop.';
                 break;
               case BACKDROP_UPGRADE_STATUS_DEVELOPMENT:
                 $backdrop_version = t('Version :bversion', array(':bversion' => $backdrop_data[$project->name]['latest_version']));
-                $recommendation = 'Add the development contrib version of :module to Backdrop.';
+                $recommendation = 'Before upgrade: Add the development contrib version of :module to Backdrop.';
                 $class = 'warning';
                 break;
               case UPDATE_UNKNOWN:
                 // fall-through intentional.
               default:
                 $backdrop_version = t('Unknown');
+                $status = t('Leave enabled.');
                 $recommendation = 'Port :module to Backdrop.';
                 $class = 'error';
                 break;
             }
+          }
+
+          $note = '';
+          if (isset($status)) {
+            $note .= '<strong>' . $status . '</strong><br>';
+          }
+          if (isset($recommendation)) {
+            $note .=  t($recommendation, array(':module' => $project->info['name']));
+          }
+          elseif (isset($rec_translated))  {
+            $node .= $rec_translated;
           }
 
           $row = array(
@@ -596,7 +610,7 @@ function backdrop_upgrade_status_report() {
               'name' => $project->info['name'],
               'drupal' => $drupal_version,
               'backdrop' => $backdrop_version,
-              'note' => t($recommendation, array(':module' => $project->info['name'])),
+              'note' => $note,
             ),
             'class' => isset($class) ? array($class) : array(),
           );
