@@ -447,7 +447,7 @@ function backdrop_upgrade_status_report() {
   $removed_modules = array(
     'aggregator' => array(
       'class' => 'warning',
-      'rec' => t('Add the contrib version of Aggregtor module to Backdrop.'),
+      'rec' => t('Add the contrib version of Aggregtor to Backdrop.'),
     ),
     'blog' => array(
       'class' => 'error',
@@ -459,19 +459,19 @@ function backdrop_upgrade_status_report() {
     ),
     'forum' => array(
       'class' => 'warning',
-      'rec' => t('Add the contrib version of Forum module to Backdrop.'),
+      'rec' => t('Add the contrib version of Forum to Backdrop.'),
     ),
     'help' => array(
       'class' => 'warning', // Warning, because help is rarely necessary.
-      'rec' => t('Disable and Uninstall Help module, or port to Backdrop.)'),
+      'rec' => t('Disable and Uninstall :module, or port to Backdrop.)'),
     ),
     'openid' => array(
       'class' => 'error',
-      'rec' => t('Port the OpenID modile to Backdrop, or Disable and Uninstall.'),
+      'rec' => t('Port :module to Backdrop, or Disable and Uninstall.'),
     ),
     'overlay' => array(
       'class' => 'warning', // Warning, because overlay is rarely necessary.
-      'rec' => t('Disable and Uninstall Overlay module, or port to Backdrop.'),
+      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
     ),
     'php' => array(
       'class' => 'error',
@@ -479,23 +479,23 @@ function backdrop_upgrade_status_report() {
     ),
     'poll' => array(
       'class' => 'error',
-      'rec' => t('Port the Poll modile to Backdrop, or Disable and Uninstall.'),
+      'rec' => t('Port Poll modile to Backdrop, or Disable and Uninstall.'),
     ),
     'profile' => array(
       'class' => 'warning',
-      'rec' => t('Add the contrib version of Profile module to Backdrop.'),
+      'rec' => t('Add the contrib version of :module to Backdrop.'),
     ),
     'rdf' => array(
       'class' => 'warning', // Warning, because rdf is rarely necessary.
-      'rec' => t('Disable and Uninstall RDF module, or port to Backdrop.'),
+      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
     ),
     'shortcut' => array(
       'class' => 'warning', // Warning, because shortcut is rarely necessary.
-      'rec' => t('Disable and Uninstall Shortcut module, or port to Backdrop.'),
+      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
     ),
     'statistics' => array(
       'class' => 'warning', // Warning, because statistics is rarely necessary.
-      'rec' => t('Disable and Uninstall Statistics module, or port to Backdrop.'),
+      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
     ),
     'toolbar' => array(
       'class' => '',
@@ -503,11 +503,11 @@ function backdrop_upgrade_status_report() {
     ),
     'tracker' => array(
       'class' => 'warning', // Warning, because tracker is rarely necessary.
-      'rec' => t('Disable and Uninstall Tracker module, or port to Backdrop.'),
+      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
     ),
     'trigger' => array(
       'class' => 'warning',
-      'rec' => t('Add the contrib version of Trigger module to Backdrop.'),
+      'rec' => t('Add the contrib version of :module to Backdrop.'),
     )
   );
 
@@ -552,7 +552,7 @@ function backdrop_upgrade_status_report() {
             'name' => $project->info['name'],
             'drupal' => t('In core'),
             'backdrop' => $backdrop_status,
-            'rec' => $recommendation,
+            'rec' => t($recommendation, array(':module' => $project->info['name'])),
           ),
           'class' => isset($class) ? array($class) : array(),
         );
@@ -562,22 +562,15 @@ function backdrop_upgrade_status_report() {
       // Contrib modules.
       elseif (isset($project->info['version'])) {
         if (isset($project->info['project']) && $project->info['project'] != $last_project) {
-          $drupal_version = '';
+          $drupal_version = t('Version :version', array(':version' => $project->info['version']));
           $backdrop_version = '';
           $recommendation = '';
           $class = '';
-          if (array_key_exists($project->name, $backdrop_data)) {
-
-            $drupal_version = '';
-            $version = $backdrop_data[$project->name]['info']['version'];
-            if (!empty($version)) {
-              $drupal_version = t('Version :version', array(':version' => $version));
-            }
-
+          if ($available && array_key_exists($project->name, $backdrop_data)) {
             switch ($backdrop_data[$project->name]['status']) {
               case BACKDROP_UPGRADE_STATUS_CORE:
                 $backdrop_version = t('Integrated into Backdrop core.');
-                $recommendation = 'No action required.';
+                $recommendation = $backdrop_data[$project->name]['in_core_note'];
                 break;
               case BACKDROP_UPGRADE_STATUS_STABLE;
                 $backdrop_version = t('Version :bversion', array(':bversion' => $backdrop_data[$project->name]['latest_version']));
@@ -592,7 +585,7 @@ function backdrop_upgrade_status_report() {
                 // fall-through intentional.
               default:
                 $backdrop_version = t('Unknown');
-                $recommendation = 'Port the :module to Backdrop.';
+                $recommendation = 'Port :module to Backdrop.';
                 $class = 'error';
                 break;
             }
@@ -619,7 +612,7 @@ function backdrop_upgrade_status_report() {
             'name' => $project->info['name'],
             'drupal' => t('Custom?'),
             'backdrop' => t('Unknown'),
-            'rec' => t('Port to Backdrop'),
+            'rec' => t('Port :module to Backdrop.', array(':module' => $project->info['name'])),
           ),
           'class' => array('error'),
         );
