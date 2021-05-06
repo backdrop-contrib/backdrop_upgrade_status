@@ -562,7 +562,7 @@ function backdrop_upgrade_status_report() {
       // Contrib modules.
       elseif (isset($project->info['version'])) {
         if (isset($project->info['project']) && $project->info['project'] != $last_project) {
-          $drupal_version = t('Version :version', array(':version' => $project->info['version']));
+          $drupal_version = $project->info['version'];
           $backdrop_version = '';
           $recommendation = '';
           $class = '';
@@ -657,7 +657,7 @@ function backdrop_upgrade_status_report() {
     $contrib_module_data = array(
       'title' => t('Enabled Contrib Modules'),
       'info' => t('This is a summary of the enabled contributed modules.'),
-      'header' => array(t('Module name'), t('Drupal status'), t('Backdrop status'), t('Recommendation')),
+      'header' => array(t('Module name'), t('Drupal version'), t('Backdrop status'), t('Recommendation')),
       'rows' => $contrib_module_rows,
       'collapsed' => $collapsed,
     );
