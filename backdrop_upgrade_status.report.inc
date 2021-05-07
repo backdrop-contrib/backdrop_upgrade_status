@@ -902,20 +902,16 @@ function paragraphs_backdrop_upgrade_status_report_alter(&$renderable) {
 function views_backdrop_upgrade_status_report_alter(&$renderable) {
   // Get all the taxonomy terms in the system.
   $rows = array();
+  $collapsed = TRUE;
   $views = views_get_all_views();
   foreach ($views as $view) {
     switch ($view->type) {
-      case t('Default'):
-      default:
-        $type = t('In code');
-        break;
-
       case t('Normal'):
+      case t('Overridden'):
         $type = t('In database');
         break;
-
-      case t('Overridden'):
-        $type = t('Database overriding code');
+      default:
+        $type = t('In code');
         break;
     }
     $row = array(
@@ -924,19 +920,100 @@ function views_backdrop_upgrade_status_report_alter(&$renderable) {
         'machine' => $view->name,
         'state' => $type,
         'description' => $view->description,
+        'recommendation' => t('No action required.'),
       ),
     );
+
     if ($type == t('In code')) {
+      $collapsed = FALSE;
       $row['class'] = array('error');
+      $text = t('Edit and save this view.');
+      $row['data']['recommendation'] = $text;
+      if (user_access('administer views')) {
+        $href = 'admin/structure/views/view/' . $view->name . '/edit';
+        $options = array('query' => array('destination' => current_path()));
+        $link = l($text, $href, $options);
+        $row['data']['recommendation'] = $link;
+      }
     }
     $rows[] = $row;
   }
   $view_data = array(
     'title' => t('Views data'),
-    'info' => t('All views should show as "In database" or "Databse overriding code" in order to be properly upgraded into Backdrop CMS.'),
-    'header' => array(t('View name'), t('Machine name'), t('Storage state'), t('Description')),
+    'info' => t('All views should show STORAGE STATE as <strong>In database</strong> in order to be properly upgraded into Backdrop CMS. Note: You will first need to make the <em>Save</em> button appear on the Edit View form. Click on any setting to open a modal, then click <em>Cancel</em> to close the modal. The <em>Save</em> button will be at the top right.'),
+    'header' => array(t('View name'), t('Machine name'), t('Storage state'), t('Description'), t('Recommendation')),
+    'rows' => $rows,
+    'collapsed' => $collapsed,
+  );
+  $renderable['views'] = backdrop_upgrade_status_report_data($view_data);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ *   @todo  none of this works ?!?
+ */
+function backdrop_upgrade_status_form_views_ui_edit_form_alter(&$form, &$form_state, $view, $display_id) {
+  // Don't hide the Save button, so that people can save views into the DB.
+  $key = array_search('js-hide', $form['actions']['#attributes']['class']);
+  if ($key !== FALSE) {
+    unset($form['actions']['#attributes']['class'][$key]);
+  }
+
+  // Add CSS to force the Save button to display.
+  //$path = drupal_get_path('module', 'backdrop_upgrade_status');
+  //$form['#attached']['css'][$path . '/css/views-fix.css'] = array();
+
+  // Add JS to remove the js-hide class.
+  //$form['#attached']['js'][] = $path . '/js/views-fix.js';
+  //dpm($form['#attached']['js']);
+
+  // Mark the view as changed, and invalidate the cache.
+  $form_state['view']->changed = TRUE;
+  views_invalidate_cache();
+}
+
+/**
+ * Implements hook_backdrop_upgrade_status_report_alter() on behalf of
+ * features module.
+ */
+function features_backdrop_upgrade_status_report_alter(&$renderable) {
+  //user_access('administer features')
+  $rows = array();
+  module_load_include('inc', 'features', 'features.admin');
+  $default_text = array(
+    FEATURES_OVERRIDDEN => t('Overridden'),
+    FEATURES_DEFAULT => t('Default'),
+    FEATURES_NEEDS_REVIEW => t('Needs review'),
+    FEATURES_REBUILDING => t('Rebuilding'),
+    FEATURES_REBUILDABLE => t('Rebuilding'),
+    FEATURES_CONFLICT => t('Conflict'),
+    FEATURES_DISABLED => t('Disabled'),
+    FEATURES_CHECKING => t('Checking...'),
+  );
+
+  $features = _features_get_features_list();
+  foreach ($features as $machine => $feature) {
+    $row = array(
+      'data' => array(
+        'name' => $feature->info['name'],
+        'machine' => $machine,
+        'state' => $default_text[$feature->status],
+        'components' => implode(', ', $feature->components),
+        'description' => $feature->info['description'],
+        'recommendation' => t('No action required.'),
+      ),
+    );
+
+    $rows[] = $row;
+  }
+
+  $feature_data = array(
+    'title' => t('Features data'),
+    'info' => t('All features should show STORAGE STATE as <strong>Overridden</strong> or <strong>Disabled</strong> in order to be properly upgraded into Backdrop CMS.'),
+    'header' => array(t('Name'), t('Machine name'), t('Storage state'), t('Components'), t('Description'), t('Recommendation')),
     'rows' => $rows,
     'collapsed' => FALSE,
   );
-  $renderable['views'] = backdrop_upgrade_status_report_data($view_data);
+  $renderable['features'] = backdrop_upgrade_status_report_data($feature_data);
 }
