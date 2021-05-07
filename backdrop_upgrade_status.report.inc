@@ -980,6 +980,7 @@ function backdrop_upgrade_status_form_views_ui_edit_form_alter(&$form, &$form_st
 function features_backdrop_upgrade_status_report_alter(&$renderable) {
   //user_access('administer features')
   $rows = array();
+  $collapsed = TRUE;
   module_load_include('inc', 'features', 'features.admin');
   $default_text = array(
     FEATURES_OVERRIDDEN => t('Overridden'),
@@ -994,26 +995,42 @@ function features_backdrop_upgrade_status_report_alter(&$renderable) {
 
   $features = _features_get_features_list();
   foreach ($features as $machine => $feature) {
-    $row = array(
-      'data' => array(
-        'name' => $feature->info['name'],
-        'machine' => $machine,
-        'state' => $default_text[$feature->status],
-        'components' => implode(', ', $feature->components),
-        'description' => $feature->info['description'],
-        'recommendation' => t('No action required.'),
-      ),
-    );
-
-    $rows[] = $row;
+    // Only include enabled features.
+    if ($feature->status == 1) {
+      $row = array(
+        'data' => array(
+          'name' => $feature->info['name'],
+          'machine' => $machine,
+          'state' => $default_text[$feature->status],
+          'components' => implode(', ', $feature->components),
+          'description' => $feature->info['description'],
+          'recommendation' => t('No action required.'),
+        ),
+      );
+      if (in_array('views_view', $feature->components)) {
+        $row['class'] = array('warning');
+        $row['data']['recommendation'] = t('Move these views back into the database.');
+      }
+      if (in_array('node', $feature->components)) {
+        $collapsed = FALSE;
+        $row['class'] = array('error');
+        $row['data']['recommendation'] = t('Unfeaturize these content types.');
+        if (module_exists('unfeatureize') && user_access('administer content types')) {
+          $href = 'admin/config/development/unfeaturize';
+          $row['data']['recommendation'] = l(t('Unfeaturize these content types.'), $href);
+        }
+      }
+      $rows[] = $row;
+    }
   }
 
+  $replacements = array('!unfeatureized' => l(t('unfeatureized'), 'https://www.drupal.org/project/unfeaturize'));
   $feature_data = array(
     'title' => t('Features data'),
-    'info' => t('All features should show STORAGE STATE as <strong>Overridden</strong> or <strong>Disabled</strong> in order to be properly upgraded into Backdrop CMS.'),
+    'info' => t('All configuration in Features will also need to be in the database in order to be properly upgraded into Backdrop CMS. Features using the <strong>node</strong> component may need to be !unfeatureized.', $replacements),
     'header' => array(t('Name'), t('Machine name'), t('Storage state'), t('Components'), t('Description'), t('Recommendation')),
     'rows' => $rows,
-    'collapsed' => FALSE,
+    'collapsed' => $collapsed,
   );
   $renderable['features'] = backdrop_upgrade_status_report_data($feature_data);
 }
