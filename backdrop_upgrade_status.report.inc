@@ -429,12 +429,13 @@ function backdrop_upgrade_status_report() {
       2 => t('Review <a href="#edit-contrib-modules">contrib modules</a>: disable and uninstall anthing not in use.'),
       3 => t('Review <a href="#edit-custom-modules">custom modules</a>: disable and uninstall anthing not in use.'),
       4 => t('Review <a href="#edit-views">views</a>: Configuration must be in the database to convert automatically durung upgrade.'),
-      5 => t('(optional) Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop)'),
-      6 => t('(optional) Review <a href="#edit-nodes">content types</a>: remove any content types that are not wanted anymore.'),
-      7 => t('(optional) Review <a href="#edit-fields">fields</a>: remove fields that are not wanted anymore.'),
-      8 => t('(optional) Review <a href="#edit-terms">taxonomy</a>: remove terms or vocabularies that are not wanted anymore.'),
-      9 => t('(optional) Review <a href="#edit-paragraphs">paragraphs</a>: remove paragraphs that are not wanted anymore.'),
-      10 => t('(optional) Review <a href="#edit-users">user accounts</a>: remove old or blocked accounts not in use.'),
+      5 => t('Review <a href="#edit-features">features</a>: Configuration must be in the database to convert automatically durung upgrade.'),
+      6 => t('(optional) Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop)'),
+      7 => t('(optional) Review <a href="#edit-nodes">content types</a>: remove any content types that are not wanted anymore.'),
+      8 => t('(optional) Review <a href="#edit-fields">fields</a>: remove fields that are not wanted anymore.'),
+      9 => t('(optional) Review <a href="#edit-terms">taxonomy</a>: remove terms or vocabularies that are not wanted anymore.'),
+      10 => t('(optional) Review <a href="#edit-paragraphs">paragraphs</a>: remove paragraphs that are not wanted anymore.'),
+      11 => t('(optional) Review <a href="#edit-users">user accounts</a>: remove old or blocked accounts not in use.'),
     ),
     '#default_value' => $default,
   );
@@ -459,7 +460,7 @@ function backdrop_upgrade_status_report() {
     ),
     'dashboard' => array(
       'class' => '',
-      'rec' => t('Alternaive core module provided. No action necessary.'),
+      'rec' => t('Alternaive core module provided. No action required.'),
     ),
     'forum' => array(
       'class' => 'warning',
@@ -503,7 +504,7 @@ function backdrop_upgrade_status_report() {
     ),
     'toolbar' => array(
       'class' => '',
-      'rec' => t('Alternaive core module provided. No action necessary.'),
+      'rec' => t('Alternaive core module provided. No action required.'),
     ),
     'tracker' => array(
       'class' => 'warning', // Warning, because tracker is rarely necessary.
@@ -548,7 +549,7 @@ function backdrop_upgrade_status_report() {
         }
         else {
           $backdrop_status = t('In core');
-          $recommendation = t('No action necessary');
+          $recommendation = '';
           $class = '';
         }
         $row = array(
@@ -724,17 +725,19 @@ function backdrop_upgrade_status_report() {
         'type' => $node_type,
         'machine' => $machine,
         'count' => $count,
+        'recommendation' => '',
       ),
     );
     if ($count == 0) {
       $row['class'] = array('warning');
+      $row['data']['recommendation'] = t('Delete this content type?');
     }
     $rows[] = $row;
   }
   $node_data = array(
     'title' => t('Content type data'),
     'info' => t('Any conent types with zero itesm could be deleted.'),
-    'header' => array(t('Conent type'), t('Machine name'), t('Number of items')),
+    'header' => array(t('Conent type'), t('Machine name'), t('Number of items'), t('Recommendation')),
     'rows' => $rows,
   );
   $renderable['nodes'] = backdrop_upgrade_status_report_data($node_data);
@@ -747,8 +750,8 @@ function backdrop_upgrade_status_report() {
     $row = array(
       'data' => array(
         'type' => $vocab->name,
-        'machine' => $vocab->machine_name,
         'vid' => $vid,
+        'machine' => $vocab->machine_name,
         'count' => $count,
       ),
     );
@@ -760,7 +763,7 @@ function backdrop_upgrade_status_report() {
   $term_data = array(
     'title' => t('Vocabulary & Term data'),
     'info' => t('Any vocabularies with zero terms could be deleted.'),
-    'header' => array(t('Vocabulary'), t('Machine name'), t('Vocabulary ID'), t('Number of terms')),
+    'header' => array(t('Vocabulary'), t('Vocabulary ID'), t('Machine name'), t('Number of terms')),
     'rows' => $rows,
   );
   $renderable['terms'] = backdrop_upgrade_status_report_data($term_data);
@@ -780,28 +783,30 @@ function backdrop_upgrade_status_report() {
         // Initialize the row if we encounter the field for the first time.
         if (!isset($rows[$field_name])) {
           $rows[$field_name]['class'] = $field['locked'] ? array('menu-disabled') : array('');
-          $rows[$field_name]['data'][0] = $field['locked'] ? t('@field_name (Locked)', array('@field_name' => $field_name)) : $field_name;
-          $rows[$field_name]['data'][1] = $field_types[$field['type']]['label'];
+          $rows[$field_name]['data']['name'] = $field['locked'] ? t('@field_name (Locked)', array('@field_name' => $field_name)) : $field_name;
+          $rows[$field_name]['data']['label'] = $field_types[$field['type']]['label'];
           $module_name = $field_types[$field['type']]['module'];
-          $rows[$field_name]['data'][2] = $modules[$module_name]->info['name'];
+          $rows[$field_name]['data']['module'] = $modules[$module_name]->info['name'];
         }
 
         // Add the current instance.
         $admin_path = _field_ui_bundle_admin_path($entity_type, $bundle);
-        $rows[$field_name]['data'][3][] = $admin_path ? l($bundles[$entity_type][$bundle]['label'], $admin_path . '/fields') : $bundles[$entity_type][$bundle]['label'];
+        $rows[$field_name]['data']['bundles'][] = $admin_path ? l($bundles[$entity_type][$bundle]['label'], $admin_path . '/fields') : $bundles[$entity_type][$bundle]['label'];
 
         // Add the item count.
         $table = 'field_data_' . $field_name;
         $count = db_query("SELECT count(entity_id) FROM {$table}")->fetchField();
-        $rows[$field_name]['data'][4] = $count;
+        $rows[$field_name]['data']['count'] = $count;
+        $rows[$field_name]['data']['recommendation'] = '';
         if ($count == 0) {
           $rows[$field_name]['class'] = array('warning');
+          $rows[$field_name]['data']['recommendation'] = t('Delete this field?');
         }
       }
     }
   }
   foreach ($rows as $field_name => $cell) {
-    $rows[$field_name]['data'][3] = implode(', ', $cell['data'][3]);
+    $rows[$field_name]['data']['bundles'] = implode(', ', $cell['data']['bundles']);
   }
   if (empty($rows)) {
     $output = t('No fields have been defined yet.');
@@ -810,7 +815,7 @@ function backdrop_upgrade_status_report() {
   $field_data = array(
     'title' => t('Field data'),
     'info' => t('Any fields with zero values could be removed.'),
-    'header' => array(t('Field name'), t('Field type'), t('Module'), t('Used in'), t('Number of values')),
+    'header' => array(t('Field name'), t('Field type'), t('Module'), t('Used in'), t('Number of values'), t('Recommendation')),
     'rows' => $rows,
   );
   $renderable['fields'] = backdrop_upgrade_status_report_data($field_data);
@@ -920,7 +925,7 @@ function views_backdrop_upgrade_status_report_alter(&$renderable) {
         'machine' => $view->name,
         'state' => $type,
         'description' => $view->description,
-        'recommendation' => t('No action required.'),
+        'recommendation' => '',
       ),
     );
 
@@ -1004,7 +1009,7 @@ function features_backdrop_upgrade_status_report_alter(&$renderable) {
           'state' => $default_text[$feature->status],
           'components' => implode(', ', $feature->components),
           'description' => $feature->info['description'],
-          'recommendation' => t('No action required.'),
+          'recommendation' => '',
         ),
       );
       if (in_array('views_view', $feature->components)) {
