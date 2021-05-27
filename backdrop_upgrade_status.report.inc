@@ -420,24 +420,27 @@ function backdrop_upgrade_status_report() {
     '#description' => t('When you are ready to perform the upgrade, this list should walk you through the steps necessary to prepare your Drupal 7 database.'),
     '#collapsible' => TRUE,
   );
-  $default = variable_get('backdrop_upgrade_status_todo', array(1 => TRUE));
+  // Set the starting default value based on whats in the DataBase.
+  $todo_default = variable_get('backdrop_upgrade_status_todo', array());
   $renderable['intro']['backdrop_upgrade_status_todo'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Prepare for upgrading to Backdrop CMS:'),
     '#options' => array(
-      1 => t('Review <a href="#edit-core-modules">core modules</a>: disable and uninstall anthing not in use.'),
-      2 => t('Review <a href="#edit-contrib-modules">contrib modules</a>: disable and uninstall anthing not in use.'),
-      3 => t('Review <a href="#edit-custom-modules">custom modules</a>: disable and uninstall anthing not in use.'),
-      4 => t('Review <a href="#edit-views">views</a>: Configuration must be in the database to convert automatically durung upgrade.'),
-      5 => t('Review <a href="#edit-features">features</a>: Configuration must be in the database to convert automatically durung upgrade.'),
-      6 => t('(optional) Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop)'),
-      7 => t('(optional) Review <a href="#edit-nodes">content types</a>: remove any content types that are not wanted anymore.'),
-      8 => t('(optional) Review <a href="#edit-fields">fields</a>: remove fields that are not wanted anymore.'),
-      9 => t('(optional) Review <a href="#edit-terms">taxonomy</a>: remove terms or vocabularies that are not wanted anymore.'),
-      10 => t('(optional) Review <a href="#edit-paragraphs">paragraphs</a>: remove paragraphs that are not wanted anymore.'),
-      11 => t('(optional) Review <a href="#edit-users">user accounts</a>: remove old or blocked accounts not in use.'),
+      'profile' => t('Review <a href="#edit-profile">system profile</a>: check that Backdrop version is available.'),
+      'core' => t('Review <a href="#edit-core-modules">core modules</a>: disable and uninstall anthing not in use.'),
+      'contrib' => t('Review <a href="#edit-contrib-modules">contrib modules</a>: disable and uninstall anthing not in use.'),
+      'custom' => t('Review <a href="#edit-custom-modules">custom modules</a>: disable and uninstall anthing not in use.'),
+      'views' => t('Review <a href="#edit-views">views</a>: Configuration must be in the database to convert automatically durung upgrade.'),
+      'features' => t('Review <a href="#edit-features">features</a>: Configuration must be in the database to convert automatically durung upgrade.'),
+      'theme' => t('(optional) Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop)'),
+      'node' => t('(optional) Review <a href="#edit-nodes">content types</a>: remove any content types that are not wanted anymore.'),
+      'field' => t('(optional) Review <a href="#edit-fields">fields</a>: remove fields that are not wanted anymore.'),
+      'taxonomy' => t('(optional) Review <a href="#edit-terms">taxonomy</a>: remove terms or vocabularies that are not wanted anymore.'),
+      'paragraph' => t('(optional) Review <a href="#edit-paragraphs">paragraphs</a>: remove paragraphs that are not wanted anymore.'),
+      'user' => t('(optional) Review <a href="#edit-users">user accounts</a>: remove old or blocked accounts not in use.'),
     ),
-    '#default_value' => $default,
+    // Defaults will be adjusted again, before the end of the function.
+    '#default_value' => $todo_default,
   );
   $renderable['intro']['save'] = array(
     '#type' => 'button',
@@ -445,76 +448,55 @@ function backdrop_upgrade_status_report() {
     '#disabled' => TRUE,
   );
 
+  $profile = drupal_get_profile();
+  $info = system_get_info('module', $profile);
+  $collapsed = TRUE;
+  $recommendation = '';
+  $backdrop_status = t('Supported');
+  $drupal_status = db_query("SELECT status FROM {system} WHERE name = :profile", array(':profile' => $profile))->fetchField();
+  if ($drupal_status) {
+    $enabled = t('Enabled');
+  }
+  else {
+    $enabled = t('Disabled');
+    $class = 'warning';
+  }
+
+  if ($info['distribution_name'] == 'Drupal') {
+    $todo_default['profile'] = 'profile';
+  }
+  else {
+    $collapsed = FALSE;
+    $recommendation = t('Check if the distribution is available for Backdrop, or use the <a href="!url">profile switcher</a> module to change to the Standard profile.', array('!url' => 'https://www.drupal.org/project/profile_switcher'));
+    $backdrop_status = t('Unknown');
+    $class = 'warning';
+  }
+  $profile_rows = array(
+    array(
+      'data' => array(
+        'name' => $info['name'],
+        'status' => $enabled,
+        'distro' => $info['distribution_name'],
+        'backdrop' => $backdrop_status,
+        'rec' => $recommendation,
+      ),
+      'class' => isset($class) ? array($class) : array(),
+    ),
+  );
+  $profile_data = array(
+    'title' => t('Profile / Distribution'),
+    'info' => t('This is the profile that was used when the site was first installed.'),
+    'header' => array(t('Profile name'), t('Enabled'), t('Distribution'), t('Backdrop status'), t('Recommendation')),
+    'rows' => $profile_rows,
+    'collapsed' => $collapsed,
+  );
+  $renderable['profile'] = backdrop_upgrade_status_report_data($profile_data);
+
 
   // Get all module data.
   $projects = system_rebuild_module_data();
-  // List of core modules removed from Backdrop, and what to do about it.
-  $removed_modules = array(
-    'aggregator' => array(
-      'class' => 'warning',
-      'rec' => t('Add the contrib version of Aggregtor to Backdrop.'),
-    ),
-    'blog' => array(
-      'class' => 'error',
-      'rec' => t('Delete content, Convert to custom content type, or port to Backdrop.'),
-    ),
-    'dashboard' => array(
-      'class' => '',
-      'rec' => t('Alternaive core module provided. No action required.'),
-    ),
-    'forum' => array(
-      'class' => 'warning',
-      'rec' => t('Add the contrib version of Forum to Backdrop.'),
-    ),
-    'help' => array(
-      'class' => 'warning', // Warning, because help is rarely necessary.
-      'rec' => t('Disable and Uninstall :module, or port to Backdrop.)'),
-    ),
-    'openid' => array(
-      'class' => 'error',
-      'rec' => t('Port :module to Backdrop, or Disable and Uninstall.'),
-    ),
-    'overlay' => array(
-      'class' => 'warning', // Warning, because overlay is rarely necessary.
-      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
-    ),
-    'php' => array(
-      'class' => 'error',
-      'rec' => t('Review all PHP code: delete or change format. Disable and Uninstall PHP Filter module.'),
-    ),
-    'poll' => array(
-      'class' => 'error',
-      'rec' => t('Port Poll modile to Backdrop, or Disable and Uninstall.'),
-    ),
-    'profile' => array(
-      'class' => 'warning',
-      'rec' => t('Add the contrib version of :module to Backdrop.'),
-    ),
-    'rdf' => array(
-      'class' => 'warning', // Warning, because rdf is rarely necessary.
-      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
-    ),
-    'shortcut' => array(
-      'class' => 'warning', // Warning, because shortcut is rarely necessary.
-      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
-    ),
-    'statistics' => array(
-      'class' => 'warning', // Warning, because statistics is rarely necessary.
-      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
-    ),
-    'toolbar' => array(
-      'class' => '',
-      'rec' => t('Alternaive core module provided. No action required.'),
-    ),
-    'tracker' => array(
-      'class' => 'warning', // Warning, because tracker is rarely necessary.
-      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
-    ),
-    'trigger' => array(
-      'class' => 'warning',
-      'rec' => t('Add the contrib version of :module to Backdrop.'),
-    )
-  );
+  // Get list of core modules removed from Backdrop.
+  $removed_modules = _backdrop_upgrade_status_removed_core_modules();
 
   // Get backdrop project data.
   if ($available = backdrop_upgrade_status_get_available()) {
@@ -660,6 +642,9 @@ function backdrop_upgrade_status_report() {
     }
   }
 
+  if ($collapsed) {
+    $todo_default['core'] = 'core';
+  }
   $core_module_data = array(
     'title' => t('Enabled Core Modules'),
     'info' => t('This is a summary of the enabled core modules.'),
@@ -735,7 +720,7 @@ function backdrop_upgrade_status_report() {
     $rows[] = $row;
   }
   $node_data = array(
-    'title' => t('Content type data'),
+    'title' => t('Content types'),
     'info' => t('Any conent types with zero itesm could be deleted.'),
     'header' => array(t('Conent type'), t('Machine name'), t('Number of items'), t('Recommendation')),
     'rows' => $rows,
@@ -820,6 +805,8 @@ function backdrop_upgrade_status_report() {
   );
   $renderable['fields'] = backdrop_upgrade_status_report_data($field_data);
 
+  // Updtates defaults based on changed info from above.
+  $renderable['intro']['backdrop_upgrade_status_todo']['#default_value'] = $todo_default;
 
   // Allow other modules to add things to the reports page.
   drupal_alter('backdrop_upgrade_status_report', $renderable);
@@ -892,7 +879,7 @@ function paragraphs_backdrop_upgrade_status_report_alter(&$renderable) {
     $rows[] = $row;
   }
   $paragraph_data = array(
-    'title' => t('Paragraph type data'),
+    'title' => t('Paragraph content'),
     'info' => t('Any paragraph types with zero items could be deleted.'),
     'header' => array(t('Paragraph type'), t('Machine name'), t('Number of paragraphs')),
     'rows' => $rows,
@@ -954,31 +941,6 @@ function views_backdrop_upgrade_status_report_alter(&$renderable) {
 }
 
 /**
- * Implements hook_form_FORM_ID_alter().
- *
- *   @todo  none of this works ?!?
- */
-function backdrop_upgrade_status_form_views_ui_edit_form_alter(&$form, &$form_state, $view, $display_id) {
-  // Don't hide the Save button, so that people can save views into the DB.
-  $key = array_search('js-hide', $form['actions']['#attributes']['class']);
-  if ($key !== FALSE) {
-    unset($form['actions']['#attributes']['class'][$key]);
-  }
-
-  // Add CSS to force the Save button to display.
-  //$path = drupal_get_path('module', 'backdrop_upgrade_status');
-  //$form['#attached']['css'][$path . '/css/views-fix.css'] = array();
-
-  // Add JS to remove the js-hide class.
-  //$form['#attached']['js'][] = $path . '/js/views-fix.js';
-  //dpm($form['#attached']['js']);
-
-  // Mark the view as changed, and invalidate the cache.
-  $form_state['view']->changed = TRUE;
-  views_invalidate_cache();
-}
-
-/**
  * Implements hook_backdrop_upgrade_status_report_alter() on behalf of
  * features module.
  */
@@ -1032,10 +994,112 @@ function features_backdrop_upgrade_status_report_alter(&$renderable) {
   $replacements = array('!unfeatureized' => l(t('unfeatureized'), 'https://www.drupal.org/project/unfeaturize'));
   $feature_data = array(
     'title' => t('Features data'),
-    'info' => t('All configuration in Features will also need to be in the database in order to be properly upgraded into Backdrop CMS. Features using the <strong>node</strong> component may need to be !unfeatureized.', $replacements),
+    'info' => t('All configuration in Features will also need to be in the database in order to be properly upgraded into Backdrop CMS. Features may need to be !unfeatureized.', $replacements),
     'header' => array(t('Name'), t('Machine name'), t('Storage state'), t('Components'), t('Description'), t('Recommendation')),
     'rows' => $rows,
     'collapsed' => $collapsed,
   );
   $renderable['features'] = backdrop_upgrade_status_report_data($feature_data);
+}
+
+/**
+ * Get list of core modules removed from Backdrop, and what to do about each.
+ *
+ * @return array
+ *   List of modules removed from core as an array with the follwing keys:
+ *   - class: Class to color-code the row of the modules table.
+ *   - rec: Recommendation for how to proceed.
+ */
+function _backdrop_upgrade_status_removed_core_modules() {
+  return array(
+    'aggregator' => array(
+      'class' => 'warning',
+      'rec' => t('Add the contrib version of Aggregtor to Backdrop.'),
+    ),
+    'blog' => array(
+      'class' => 'error',
+      'rec' => t('Delete content, Convert to custom content type, or port to Backdrop.'),
+    ),
+    'dashboard' => array(
+      'class' => '',
+      'rec' => t('Alternaive core module provided. No action required.'),
+    ),
+    'forum' => array(
+      'class' => 'warning',
+      'rec' => t('Add the contrib version of Forum to Backdrop.'),
+    ),
+    'help' => array(
+      'class' => 'warning', // Warning, because help is rarely necessary.
+      'rec' => t('Disable and Uninstall :module, or port to Backdrop.)'),
+    ),
+    'openid' => array(
+      'class' => 'error',
+      'rec' => t('Port :module to Backdrop, or Disable and Uninstall.'),
+    ),
+    'overlay' => array(
+      'class' => 'warning', // Warning, because overlay is rarely necessary.
+      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
+    ),
+    'php' => array(
+      'class' => 'error',
+      'rec' => t('Review all PHP code: delete or change format. Disable and Uninstall PHP Filter module.'),
+    ),
+    'poll' => array(
+      'class' => 'error',
+      'rec' => t('Port Poll modile to Backdrop, or Disable and Uninstall.'),
+    ),
+    'profile' => array(
+      'class' => 'warning',
+      'rec' => t('Add the contrib version of :module to Backdrop.'),
+    ),
+    'rdf' => array(
+      'class' => 'warning', // Warning, because rdf is rarely necessary.
+      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
+    ),
+    'shortcut' => array(
+      'class' => 'warning', // Warning, because shortcut is rarely necessary.
+      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
+    ),
+    'statistics' => array(
+      'class' => 'warning', // Warning, because statistics is rarely necessary.
+      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
+    ),
+    'toolbar' => array(
+      'class' => '',
+      'rec' => t('Alternaive core module provided. No action required.'),
+    ),
+    'tracker' => array(
+      'class' => 'warning', // Warning, because tracker is rarely necessary.
+      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
+    ),
+    'trigger' => array(
+      'class' => 'warning',
+      'rec' => t('Add the contrib version of :module to Backdrop.'),
+    )
+  );
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ *   @todo  none of this works ?!?
+ */
+function backdrop_upgrade_status_form_views_ui_edit_form_alter(&$form, &$form_state, $view, $display_id) {
+  // Don't hide the Save button, so that people can save views into the DB.
+  $key = array_search('js-hide', $form['actions']['#attributes']['class']);
+  if ($key !== FALSE) {
+    unset($form['actions']['#attributes']['class'][$key]);
+  }
+
+  // Add CSS to force the Save button to display.
+  //$path = drupal_get_path('module', 'backdrop_upgrade_status');
+  //$form['#attached']['css'][$path . '/css/views-fix.css'] = array();
+
+  // Add JS to remove the js-hide class.
+  //$form['#attached']['js'][] = $path . '/js/views-fix.js';
+  //dpm($form['#attached']['js']);
+
+  // Mark the view as changed, and invalidate the cache.
+  $form_state['view']->changed = TRUE;
+  views_invalidate_cache();
 }
