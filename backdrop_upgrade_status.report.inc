@@ -444,7 +444,7 @@ function backdrop_upgrade_status_report() {
   );
   $renderable['intro']['save'] = array(
     '#type' => 'button',
-    '#value' => t('Confirm status'),
+    '#value' => t('Save Progress'),
     '#disabled' => TRUE,
   );
 
@@ -523,6 +523,7 @@ function backdrop_upgrade_status_report() {
         $core_modules[$project->name] = $project;
         if (array_key_exists($project->name, $removed_modules)) {
           $backdrop_status = t('Removed from core');
+
           $recommendation = $removed_modules[$project->name]['rec'];
           if (!empty($removed_modules[$project->name]['class'])) {
             $class = $removed_modules[$project->name]['class'];
@@ -888,8 +889,8 @@ function paragraphs_backdrop_upgrade_status_report_alter(&$renderable) {
 }
 
 /**
- * Implements hook_backdrop_upgrade_status_report_alter() on behalf of
- * views module.
+ * Implements hook_backdrop_upgrade_status_report_alter() on behalf of views
+ * module.
  */
 function views_backdrop_upgrade_status_report_alter(&$renderable) {
   // Get all the taxonomy terms in the system.
@@ -938,6 +939,11 @@ function views_backdrop_upgrade_status_report_alter(&$renderable) {
     'collapsed' => $collapsed,
   );
   $renderable['views'] = backdrop_upgrade_status_report_data($view_data);
+
+  // Mark all views as reviewed when all are in the database.
+  if ($collapsed && !isset($renderable['intro']['backdrop_upgrade_status_todo']['#default_value']['views'])) {
+    $renderable['intro']['backdrop_upgrade_status_todo']['#default_value']['views'] = 'views';
+  }
 }
 
 /**
@@ -945,7 +951,10 @@ function views_backdrop_upgrade_status_report_alter(&$renderable) {
  * features module.
  */
 function features_backdrop_upgrade_status_report_alter(&$renderable) {
-  //user_access('administer features')
+
+  // Add a checkbox to the todo list.
+
+  // Add a fieldset to the report.
   $rows = array();
   $collapsed = TRUE;
   module_load_include('inc', 'features', 'features.admin');
@@ -974,27 +983,56 @@ function features_backdrop_upgrade_status_report_alter(&$renderable) {
           'recommendation' => '',
         ),
       );
-      if (in_array('views_view', $feature->components)) {
-        $row['class'] = array('warning');
-        $row['data']['recommendation'] = t('Move these views back into the database.');
+
+      if (module_exists('unfeaturize')) {
+        $href = 'admin/config/development/unfeaturize';
+        $row['data']['recommendation'] = l(t('Use unfeaturize to restore this configuration to the database.'), $href);
       }
-      if (in_array('node', $feature->components)) {
-        $collapsed = FALSE;
-        $row['class'] = array('error');
-        $row['data']['recommendation'] = t('Unfeaturize these content types.');
-        if (module_exists('unfeatureize') && user_access('administer content types')) {
-          $href = 'admin/config/development/unfeaturize';
-          $row['data']['recommendation'] = l(t('Unfeaturize these content types.'), $href);
+      else {
+        $href = 'https://drupal.org/project/unfeaturize';
+        $row['data']['recommendation'] = t('Install the <a href="!url">Unfeaturize</a> module.', array('!url' => $href));
+      }
+
+      $problem = FALSE;
+      $problem_components = array();
+      if (module_exists('unfeaturize')) {
+        unfeaturize_include();
+        foreach ($feature->components as $component) {
+          if (!features_hook($component, 'unfeaturize_restore')) {
+            $problem_components[] = $component;
+          }
         }
       }
+
+      // Remove the components that won't be a problem.
+      $not_problem = array('ctools', 'features_api', 'dependencies');
+      foreach ($not_problem as $component) {
+        $key = array_search($component, $problem_components);
+        if ($key !== FALSE) {
+          unset($problem_components[$key]);
+        }
+      }
+
+      // If any problem remains, note it here.
+      if (!empty($problem_components)) {
+        $problem = TRUE;
+      }
+
+      if ($problem) {
+        $row['class'] = array('error');
+        $list = implode(', ', $problem_components);
+        $row['data']['recommendation'] = t('The following components are not yet supported by unfeaturize: !list. You will need to determine how to move these items into the database.', array('!list' => $list));
+      }
+
       $rows[] = $row;
     }
   }
 
+  $collapsed = FALSE;
   $replacements = array('!unfeatureized' => l(t('unfeatureized'), 'https://www.drupal.org/project/unfeaturize'));
   $feature_data = array(
     'title' => t('Features data'),
-    'info' => t('All configuration in Features will also need to be in the database in order to be properly upgraded into Backdrop CMS. Features may need to be !unfeatureized.', $replacements),
+    'info' => t('All configuration from Features will need to be in the database in order to be properly upgraded to Backdrop CMS. Features may need to be !unfeatureized.', $replacements),
     'header' => array(t('Name'), t('Machine name'), t('Storage state'), t('Components'), t('Description'), t('Recommendation')),
     'rows' => $rows,
     'collapsed' => $collapsed,
@@ -1011,8 +1049,11 @@ function features_backdrop_upgrade_status_report_alter(&$renderable) {
  *   - rec: Recommendation for how to proceed.
  */
 function _backdrop_upgrade_status_removed_core_modules() {
+  $drupal_url = 'https://drupal.org/pr';
+  // @todo - remove t() here and add instead at render point.
   return array(
     'aggregator' => array(
+      'name' => '',
       'class' => 'warning',
       'rec' => t('Add the contrib version of Aggregtor to Backdrop.'),
     ),
