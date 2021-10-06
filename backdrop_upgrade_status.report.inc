@@ -430,6 +430,7 @@ function backdrop_upgrade_status_report() {
       'core' => t('Review <a href="#edit-core-modules">core modules</a>: disable and uninstall anthing not in use.'),
       'contrib' => t('Review <a href="#edit-contrib-modules">contrib modules</a>: disable and uninstall anthing not in use.'),
       'custom' => t('Review <a href="#edit-custom-modules">custom modules</a>: disable and uninstall anthing not in use.'),
+      'image_styles' => t('Review <a href="#edit-image-styles">image styles</a>: Configuration must be in the database to convert automatically durung upgrade.'),
       'views' => t('Review <a href="#edit-views">views</a>: Configuration must be in the database to convert automatically durung upgrade.'),
       'features' => t('Review <a href="#edit-features">features</a>: Configuration must be in the database to convert automatically durung upgrade.'),
       'theme' => t('(optional) Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop)'),
@@ -886,6 +887,58 @@ function paragraphs_backdrop_upgrade_status_report_alter(&$renderable) {
     'rows' => $rows,
   );
   $renderable['paragraphs'] = backdrop_upgrade_status_report_data($paragraph_data);
+}
+
+/**
+ * Implements hook_backdrop_upgrade_status_report_alter() on behalf of image
+ * module.
+ */
+function image_backdrop_upgrade_status_report_alter(&$renderable) {
+  // Get all the taxonomy terms in the system.
+  $rows = array();
+  $collapsed = TRUE;
+  $styles = image_styles();
+  foreach ($styles as $style) {
+    $storage = t('In database');
+    $editable = (bool) ($style['storage'] & IMAGE_STORAGE_EDITABLE);
+    if (!$editable) {
+      $storage = t('In code');
+    }
+    $row = array(
+      'data' => array(
+        'label' => $style['label'],
+        'machine' => $style['name'],
+        'storage' => $storage,
+        'recommendation' => '',
+      ),
+    );
+    if (!$editable) {
+      $collapsed = FALSE;
+      $row['class'] = array('warning');
+      $text = t('Overide defaults for this image style');
+      $row['data']['recommendation'] = $text;
+      if (user_access('administer image styles')) {
+        $href = 'admin/config/media/image-styles/edit/' . $style['name'];
+        $options = array('query' => array('destination' => current_path()));
+        $link = l($text, $href, $options);
+        $row['data']['recommendation'] = $link;
+      }
+    }
+    $rows[] = $row;
+  }
+  $image_style_data = array(
+    'title' => t('Image Styles'),
+    'info' => t('Image styles need to be stored in the databse for a smooth upgrade.'),
+    'header' => array(t('Style Name'), t('Machine name'), t('Storage state'), t('Recommendation')),
+    'rows' => $rows,
+    'collapsed' => $collapsed,
+  );
+  $renderable['image_styles'] = backdrop_upgrade_status_report_data($image_style_data);
+
+  // Mark all image_styles as reviewed when all are in the database.
+  if ($collapsed && !isset($renderable['intro']['backdrop_upgrade_status_todo']['#default_value']['image_styles'])) {
+    $renderable['intro']['backdrop_upgrade_status_todo']['#default_value']['image_styles'] = 'image_styles';
+  }
 }
 
 /**
