@@ -84,15 +84,15 @@ function backdrop_upgrade_status_menu() {
     'file' => 'backdrop_upgrade_status.fetch.inc'
   );
 
-  // Add reports.
+  // Add overview report.
   $items['admin/reports/backdrop-upgrade'] = array(
-    'title' => 'Backdrop upgrade report',
+    'title' => 'Backdrop upgrade overview',
     'description' => 'Report of site informaton useful in preparing for upgrade to Backdrop CMS.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('backdrop_upgrade_status_report'),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'backdrop_upgrade_status.report.inc'
+    'file' => 'backdrop_upgrade_status.overview.inc'
   );
 
   return $items;
