@@ -12,51 +12,16 @@
  *   Renderable tables with all the info!
  */
 function backdrop_upgrade_status_report() {
-  $renderable = array();
-
   $welcome = array(
     t('This information should prove useful as you are evaluating an upgrade to Backdrop CMS for this site. This report should contain an overview for most of the content on this site.'),
   );
-
   $renderable['welcome'] = array(
     '#type' => 'markup',
     '#markup' => '<p>' . implode('</p><p>', $welcome) . '</p>',
   );
 
-  $renderable['intro'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Backdrop Upgrade to-do list'),
-    '#description' => t('When you are ready to perform the upgrade, this list should walk you through the steps necessary to prepare your Drupal 7 database.'),
-    '#collapsible' => TRUE,
-  );
-  // Set the starting default value based on whats in the DataBase.
-  $todo_default = variable_get('backdrop_upgrade_status_todo', array());
-  $renderable['intro']['backdrop_upgrade_status_todo'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Prepare for upgrading to Backdrop CMS:'),
-    '#options' => array(
-      'profile' => t('Review <a href="#edit-profile">system profile</a>: check that Backdrop version is available.'),
-      'core' => t('Review <a href="#edit-core-modules">core modules</a>: disable and uninstall anthing not in use.'),
-      'contrib' => t('Review <a href="#edit-contrib-modules">contrib modules</a>: disable and uninstall anthing not in use.'),
-      'custom' => t('Review <a href="#edit-custom-modules">custom modules</a>: disable and uninstall anthing not in use.'),
-      'image_styles' => t('Review <a href="#edit-image-styles">image styles</a>: Configuration must be in the database to convert automatically durring upgrade.'),
-      'views' => t('Review <a href="#edit-views">views</a>: Configuration must be in the database to convert automatically durring upgrade.'),
-      'features' => t('Review <a href="#edit-features">features</a>: Configuration must be in the database to convert automatically durring upgrade.'),
-      'theme' => t('(optional) Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop)'),
-      'node' => t('(optional) Review <a href="#edit-nodes">content types</a>: remove any content types that are not wanted anymore.'),
-      'field' => t('(optional) Review <a href="#edit-fields">fields</a>: remove fields that are not wanted anymore.'),
-      'taxonomy' => t('(optional) Review <a href="#edit-terms">taxonomy</a>: remove terms or vocabularies that are not wanted anymore.'),
-      'paragraph' => t('(optional) Review <a href="#edit-paragraphs">paragraphs</a>: remove paragraphs that are not wanted anymore.'),
-      'user' => t('(optional) Review <a href="#edit-users">user accounts</a>: remove old or blocked accounts not in use.'),
-    ),
-    // Defaults will be adjusted again, before the end of the function.
-    '#default_value' => $todo_default,
-  );
-  $renderable['intro']['save'] = array(
-    '#type' => 'button',
-    '#value' => t('Save Progress'),
-    '#disabled' => TRUE,
-  );
+  // Add the checklist as a separate form.
+  $renderable = backdrop_upgrade_status_report_checklist_form($renderable);
 
   $profile = drupal_get_profile();
   $info = system_get_info('module', $profile);
@@ -807,4 +772,64 @@ function backdrop_upgrade_status_form_views_ui_edit_form_alter(&$form, &$form_st
   // Mark the view as changed, and invalidate the cache.
   $form_state['view']->changed = TRUE;
   views_invalidate_cache();
+}
+
+/**
+ * Generates an informational report showing everything you'll need to upgrade
+ * your site from Drupal to Backdrop CMS.
+ *
+ * @see backdrop_upgrade_status_report_checklist_form_submit().
+ *
+ * @return array
+ *   Renderable tables with all the info!
+ */
+function backdrop_upgrade_status_report_checklist_form($form = array()) {
+
+  $form['intro'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Backdrop Upgrade to-do list'),
+    '#description' => t('When you are ready to perform the upgrade, this list should walk you through the steps necessary to prepare your Drupal 7 database.'),
+    '#collapsible' => TRUE,
+  );
+
+  // Set the starting default value based on whats in the DataBase.
+  $todo_default = variable_get('backdrop_upgrade_status_todo', array());
+  $form['intro']['backdrop_upgrade_status_todo'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Prepare for upgrading to Backdrop CMS:'),
+    '#options' => array(
+      'profile' => t('Review <a href="#edit-profile">system profile</a>: check that Backdrop version is available.'),
+      'core' => t('Review <a href="#edit-core-modules">core modules</a>: disable and uninstall anthing not in use.'),
+      'contrib' => t('Review <a href="#edit-contrib-modules">contrib modules</a>: disable and uninstall anthing not in use.'),
+      'custom' => t('Review <a href="#edit-custom-modules">custom modules</a>: disable and uninstall anthing not in use.'),
+      'image_styles' => t('Review <a href="#edit-image-styles">image styles</a>: Configuration must be in the database to convert automatically durring upgrade.'),
+      'views' => t('Review <a href="#edit-views">views</a>: Configuration must be in the database to convert automatically durring upgrade.'),
+      'features' => t('Review <a href="#edit-features">features</a>: Configuration must be in the database to convert automatically durring upgrade.'),
+      'theme' => t('(optional) Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop)'),
+      'node' => t('(optional) Review <a href="#edit-nodes">content types</a>: remove any content types that are not wanted anymore.'),
+      'field' => t('(optional) Review <a href="#edit-fields">fields</a>: remove fields that are not wanted anymore.'),
+      'taxonomy' => t('(optional) Review <a href="#edit-terms">taxonomy</a>: remove terms or vocabularies that are not wanted anymore.'),
+      'paragraph' => t('(optional) Review <a href="#edit-paragraphs">paragraphs</a>: remove paragraphs that are not wanted anymore.'),
+      'user' => t('(optional) Review <a href="#edit-users">user accounts</a>: remove old or blocked accounts not in use.'),
+    ),
+    // Defaults will be adjusted again, before the end of the function.
+    '#default_value' => $todo_default,
+  );
+  $form['intro']['save'] = array(
+    '#type' => 'button',
+    '#value' => t('Save Progress'),
+    '#submit' => array('backdrop_upgrade_status_report_checklist_form_submit'),
+  );
+
+  return $form;
+}
+
+/**
+ * Submit handler for backdrop_upgrade_status_report_checklist_form().
+ */
+function backdrop_upgrade_status_report_checklist_form_submit($form, &$form_state) {
+  if (isset($form_state['values']['backdrop_upgrade_status_todo'])) {
+    $todo = $form_state['values']['backdrop_upgrade_status_todo'];
+    variable_set('backdrop_upgrade_status_todo', $todo);
+  }
 }
