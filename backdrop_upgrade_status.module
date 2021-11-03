@@ -68,6 +68,7 @@ function backdrop_upgrade_status_cron() {
  * Implementation of hook_menu().
  */
 function backdrop_upgrade_status_menu() {
+  // Add update status page for Backdrop modules.
   $items['admin/reports/updates/backdrop-upgrade'] = array(
     'title' => 'Backdrop upgrade status',
     'page callback' => 'backdrop_upgrade_status_status',
@@ -81,6 +82,17 @@ function backdrop_upgrade_status_menu() {
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
     'file' => 'backdrop_upgrade_status.fetch.inc'
+  );
+
+  // Add reports.
+  $items['admin/reports/backdrop-upgrade'] = array(
+    'title' => 'Backdrop upgrade report',
+    'description' => 'Report of site informaton useful in preparing for upgrade to Backdrop CMS.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('backdrop_upgrade_status_report'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'backdrop_upgrade_status.report.inc'
   );
 
   return $items;
