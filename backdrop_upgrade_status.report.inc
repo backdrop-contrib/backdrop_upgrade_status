@@ -836,24 +836,26 @@ function backdrop_upgrade_status_report_data($variables) {
   $rows = $variables['rows'];
   $collapsed = isset($variables['collapsed'])? $variables['collapsed']: TRUE;
 
-  $fieldset = array(
-    '#type' => 'fieldset',
-    '#title' => $title,
-    '#collapsible' => TRUE,
-    '#collapsed' => $collapsed,
-  );
-  $fieldset['info'] = array(
-    '#type' => 'markup',
-    '#markup' => $info,
-  );
-  $fieldset['table'] = array(
-    '#type' => 'markup',
-    '#markup' => theme('table', array(
-      'header' => $header,
-      'rows' => $rows,
-      'attributes' => array('class' => array('backdrop-upgrade-table')),
-    )),
-  );
+  if (!empty($rows)) {
+    $fieldset = array(
+      '#type' => 'fieldset',
+      '#title' => $title,
+      '#collapsible' => TRUE,
+      '#collapsed' => $collapsed,
+    );
+    $fieldset['info'] = array(
+      '#type' => 'markup',
+      '#markup' => $info,
+    );
+    $fieldset['table'] = array(
+      '#type' => 'markup',
+      '#markup' => theme('table', array(
+        'header' => $header,
+        'rows' => $rows,
+        'attributes' => array('class' => array('backdrop-upgrade-table')),
+      )),
+    );
+  }
 
   return $fieldset;
 }
