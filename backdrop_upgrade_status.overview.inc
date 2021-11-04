@@ -23,6 +23,7 @@ function backdrop_upgrade_status_report() {
   // Add the checklist as a separate form.
   $renderable = backdrop_upgrade_status_report_checklist_form($renderable);
 
+  // Add the profile data.
   $profile = drupal_get_profile();
   $info = system_get_info('module', $profile);
   $collapsed = TRUE;
@@ -251,135 +252,8 @@ function backdrop_upgrade_status_report() {
   );
   $renderable['custom_modules'] = backdrop_upgrade_status_report_data($custom_module_data);
 
-  // Get all the users in the system.
-  $rows = array();
-  $statuses = array(1 => t('Active'), 0 => t('Blocked'));
-  foreach ($statuses as $status => $label) {
-    $count = db_query("SELECT count(uid) FROM {users} WHERE status = :status", array(':status' => $status))->fetchField();
-    $row = array(
-      'data' => array(
-        'type' => $label,
-        'machine' => $status,
-        'count' => $count,
-      ),
-    );
-    if ($count == 0) {
-      $row['class'] = array('warning');
-    }
-    $rows[] = $row;
-  }
-  $user_data = array(
-    'title' => t('User account data'),
-    'info' => t('This is a summary of the user accounts on the site.'),
-    'header' => array(t('User accounts'), t('Status'), t('Number of users')),
-    'rows' => $rows,
-  );
-  $renderable['users'] = backdrop_upgrade_status_report_data($user_data);
 
-  // Get all the node types in the system.
-  $rows = array();
-  $node_types = node_type_get_names();
-  foreach ($node_types as $machine => $node_type) {
-    $count = db_query("SELECT count(nid) FROM {node} WHERE type = :machine", array(':machine' => $machine))->fetchField();
-    $row = array(
-      'data' => array(
-        'type' => $node_type,
-        'machine' => $machine,
-        'count' => $count,
-        'recommendation' => '',
-      ),
-    );
-    if ($count == 0) {
-      $row['class'] = array('warning');
-      $row['data']['recommendation'] = t('Delete this content type?');
-    }
-    $rows[] = $row;
-  }
-  $node_data = array(
-    'title' => t('Content types'),
-    'info' => t('Any conent types with zero itesm could be deleted.'),
-    'header' => array(t('Conent type'), t('Machine name'), t('Number of items'), t('Recommendation')),
-    'rows' => $rows,
-  );
-  $renderable['nodes'] = backdrop_upgrade_status_report_data($node_data);
 
-  // Get all the taxonomy terms in the system.
-  $rows = array();
-  $term_types = taxonomy_get_vocabularies();
-  foreach ($term_types as $vid => $vocab) {
-    $count = db_query("SELECT count(tid) FROM {taxonomy_term_data} WHERE vid = :machine", array(':machine' => $vid))->fetchField();
-    $row = array(
-      'data' => array(
-        'type' => $vocab->name,
-        'vid' => $vid,
-        'machine' => $vocab->machine_name,
-        'count' => $count,
-      ),
-    );
-    if ($count == 0) {
-      $row['class'] = array('warning');
-    }
-    $rows[] = $row;
-  }
-  $term_data = array(
-    'title' => t('Vocabulary & Term data'),
-    'info' => t('Any vocabularies with zero terms could be deleted.'),
-    'header' => array(t('Vocabulary'), t('Vocabulary ID'), t('Machine name'), t('Number of terms')),
-    'rows' => $rows,
-  );
-  $renderable['terms'] = backdrop_upgrade_status_report_data($term_data);
-
-  // Get all fields in the system.
-  $instances = field_info_instances();
-  $field_types = field_info_field_types();
-  $bundles = field_info_bundles();
-
-  $modules = system_rebuild_module_data();
-  $rows = array();
-  foreach ($instances as $entity_type => $type_bundles) {
-    foreach ($type_bundles as $bundle => $bundle_instances) {
-      foreach ($bundle_instances as $field_name => $instance) {
-        $field = field_info_field($field_name);
-
-        // Initialize the row if we encounter the field for the first time.
-        if (!isset($rows[$field_name])) {
-          $rows[$field_name]['class'] = $field['locked'] ? array('menu-disabled') : array('');
-          $rows[$field_name]['data']['name'] = $field['locked'] ? t('@field_name (Locked)', array('@field_name' => $field_name)) : $field_name;
-          $rows[$field_name]['data']['label'] = $field_types[$field['type']]['label'];
-          $module_name = $field_types[$field['type']]['module'];
-          $rows[$field_name]['data']['module'] = $modules[$module_name]->info['name'];
-        }
-
-        // Add the current instance.
-        $admin_path = _field_ui_bundle_admin_path($entity_type, $bundle);
-        $rows[$field_name]['data']['bundles'][] = $admin_path ? l($bundles[$entity_type][$bundle]['label'], $admin_path . '/fields') : $bundles[$entity_type][$bundle]['label'];
-
-        // Add the item count.
-        $table = 'field_data_' . $field_name;
-        $count = db_query("SELECT count(entity_id) FROM {$table}")->fetchField();
-        $rows[$field_name]['data']['count'] = $count;
-        $rows[$field_name]['data']['recommendation'] = '';
-        if ($count == 0) {
-          $rows[$field_name]['class'] = array('warning');
-          $rows[$field_name]['data']['recommendation'] = t('Delete this field?');
-        }
-      }
-    }
-  }
-  foreach ($rows as $field_name => $cell) {
-    $rows[$field_name]['data']['bundles'] = implode(', ', $cell['data']['bundles']);
-  }
-  if (empty($rows)) {
-    $output = t('No fields have been defined yet.');
-  }
-
-  $field_data = array(
-    'title' => t('Field data'),
-    'info' => t('Any fields with zero values could be removed.'),
-    'header' => array(t('Field name'), t('Field type'), t('Module'), t('Used in'), t('Number of values'), t('Recommendation')),
-    'rows' => $rows,
-  );
-  $renderable['fields'] = backdrop_upgrade_status_report_data($field_data);
 
   // Updtates defaults based on changed info from above.
   $renderable['intro']['backdrop_upgrade_status_todo']['#default_value'] = $todo_default;
@@ -389,6 +263,18 @@ function backdrop_upgrade_status_report() {
 
   return system_settings_form($renderable);
 }
+
+// Include all the
+$path = drupal_get_path('module', 'backdrop_upgrade_status') . '/includes/';
+include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.node.inc');
+include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.field.inc');
+include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.image.inc');
+include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.taxonomy.inc');
+include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.user.inc');
+include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.paragraphs.inc');
+include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.views.inc');
+include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.features.inc');
+
 
 /**
  * Creates a fieldset with tabular data for the reports page.
@@ -435,241 +321,6 @@ function backdrop_upgrade_status_report_data($variables) {
 }
 
 /**
- * Implements hook_backdrop_upgrade_status_report_alter() on behalf of
- * paragraphs module.
- */
-function paragraphs_backdrop_upgrade_status_report_alter(&$renderable) {
-  // Get all the taxonomy terms in the system.
-  $rows = array();
-  $bundles = paragraphs_bundle_load();
-  foreach ($bundles as $bundle) {
-    $count = db_query("SELECT count(item_id) FROM {paragraphs_item} WHERE bundle = :machine", array(':machine' => $bundle->bundle))->fetchField();
-    $row = array(
-      'data' => array(
-        'type' => $bundle->name,
-        'machine' => $bundle->bundle,
-        'count' => $count,
-      ),
-    );
-    if ($count == 0) {
-      $row['class'] = array('warning');
-    }
-    $rows[] = $row;
-  }
-  $paragraph_data = array(
-    'title' => t('Paragraph content'),
-    'info' => t('Any paragraph types with zero items could be deleted.'),
-    'header' => array(t('Paragraph type'), t('Machine name'), t('Number of paragraphs')),
-    'rows' => $rows,
-  );
-  $renderable['paragraphs'] = backdrop_upgrade_status_report_data($paragraph_data);
-}
-
-/**
- * Implements hook_backdrop_upgrade_status_report_alter() on behalf of image
- * module.
- */
-function image_backdrop_upgrade_status_report_alter(&$renderable) {
-  // Get all the taxonomy terms in the system.
-  $rows = array();
-  $collapsed = TRUE;
-  $styles = image_styles();
-  foreach ($styles as $style) {
-    $storage = t('In database');
-    $editable = (bool) ($style['storage'] & IMAGE_STORAGE_EDITABLE);
-    if (!$editable) {
-      $storage = t('In code');
-    }
-    $row = array(
-      'data' => array(
-        'label' => $style['label'],
-        'machine' => $style['name'],
-        'storage' => $storage,
-        'recommendation' => '',
-      ),
-    );
-    if (!$editable) {
-      $collapsed = FALSE;
-      $row['class'] = array('warning');
-      $text = t('Overide defaults for this image style');
-      $row['data']['recommendation'] = $text;
-      if (user_access('administer image styles')) {
-        $href = 'admin/config/media/image-styles/edit/' . $style['name'];
-        $options = array('query' => array('destination' => current_path()));
-        $link = l($text, $href, $options);
-        $row['data']['recommendation'] = $link;
-      }
-    }
-    $rows[] = $row;
-  }
-  $image_style_data = array(
-    'title' => t('Image Styles'),
-    'info' => t('Image styles need to be stored in the databse for a smooth upgrade.'),
-    'header' => array(t('Style Name'), t('Machine name'), t('Storage state'), t('Recommendation')),
-    'rows' => $rows,
-    'collapsed' => $collapsed,
-  );
-  $renderable['image_styles'] = backdrop_upgrade_status_report_data($image_style_data);
-
-  // Mark all image_styles as reviewed when all are in the database.
-  if ($collapsed && !isset($renderable['intro']['backdrop_upgrade_status_todo']['#default_value']['image_styles'])) {
-    $renderable['intro']['backdrop_upgrade_status_todo']['#default_value']['image_styles'] = 'image_styles';
-  }
-}
-
-/**
- * Implements hook_backdrop_upgrade_status_report_alter() on behalf of views
- * module.
- */
-function views_backdrop_upgrade_status_report_alter(&$renderable) {
-  // Get all the taxonomy terms in the system.
-  $rows = array();
-  $collapsed = TRUE;
-  $views = views_get_all_views();
-  foreach ($views as $view) {
-    switch ($view->type) {
-      case t('Normal'):
-      case t('Overridden'):
-        $type = t('In database');
-        break;
-      default:
-        $type = t('In code');
-        break;
-    }
-    $row = array(
-      'data' => array(
-        'name' => $view->human_name,
-        'machine' => $view->name,
-        'state' => $type,
-        'description' => $view->description,
-        'recommendation' => '',
-      ),
-    );
-
-    if ($type == t('In code')) {
-      $collapsed = FALSE;
-      $row['class'] = array('error');
-      $text = t('Edit and save this view.');
-      $row['data']['recommendation'] = $text;
-      if (user_access('administer views')) {
-        $href = 'admin/structure/views/view/' . $view->name . '/edit';
-        $options = array('query' => array('destination' => current_path()));
-        $link = l($text, $href, $options);
-        $row['data']['recommendation'] = $link;
-      }
-    }
-    $rows[] = $row;
-  }
-  $view_data = array(
-    'title' => t('Views data'),
-    'info' => t('All views should show STORAGE STATE as <strong>In database</strong> in order to be properly upgraded into Backdrop CMS. Note: You will first need to make the <em>Save</em> button appear on the Edit View form. Click on any setting to open a modal, then click <em>Cancel</em> to close the modal. The <em>Save</em> button will be at the top right.'),
-    'header' => array(t('View name'), t('Machine name'), t('Storage state'), t('Description'), t('Recommendation')),
-    'rows' => $rows,
-    'collapsed' => $collapsed,
-  );
-  $renderable['views'] = backdrop_upgrade_status_report_data($view_data);
-
-  // Mark all views as reviewed when all are in the database.
-  if ($collapsed && !isset($renderable['intro']['backdrop_upgrade_status_todo']['#default_value']['views'])) {
-    $renderable['intro']['backdrop_upgrade_status_todo']['#default_value']['views'] = 'views';
-  }
-}
-
-/**
- * Implements hook_backdrop_upgrade_status_report_alter() on behalf of
- * features module.
- */
-function features_backdrop_upgrade_status_report_alter(&$renderable) {
-
-  // Add a checkbox to the todo list.
-
-  // Add a fieldset to the report.
-  $rows = array();
-  $collapsed = TRUE;
-  module_load_include('inc', 'features', 'features.admin');
-  $default_text = array(
-    FEATURES_OVERRIDDEN => t('Overridden'),
-    FEATURES_DEFAULT => t('Default'),
-    FEATURES_NEEDS_REVIEW => t('Needs review'),
-    FEATURES_REBUILDING => t('Rebuilding'),
-    FEATURES_REBUILDABLE => t('Rebuilding'),
-    FEATURES_CONFLICT => t('Conflict'),
-    FEATURES_DISABLED => t('Disabled'),
-    FEATURES_CHECKING => t('Checking...'),
-  );
-
-  $features = _features_get_features_list();
-  foreach ($features as $machine => $feature) {
-    // Only include enabled features.
-    if ($feature->status == 1) {
-      $row = array(
-        'data' => array(
-          'name' => $feature->info['name'],
-          'machine' => $machine,
-          'state' => $default_text[$feature->status],
-          'components' => implode(', ', $feature->components),
-          'description' => $feature->info['description'],
-          'recommendation' => '',
-        ),
-      );
-
-      if (module_exists('unfeaturize')) {
-        $href = 'admin/config/development/unfeaturize';
-        $row['data']['recommendation'] = l(t('Use unfeaturize to restore this configuration to the database.'), $href);
-      }
-      else {
-        $href = 'https://drupal.org/project/unfeaturize';
-        $row['data']['recommendation'] = t('Install the <a href="!url">Unfeaturize</a> module.', array('!url' => $href));
-      }
-
-      $problem = FALSE;
-      $problem_components = array();
-      if (module_exists('unfeaturize')) {
-        unfeaturize_include();
-        foreach ($feature->components as $component) {
-          if (!features_hook($component, 'unfeaturize_restore')) {
-            $problem_components[] = $component;
-          }
-        }
-      }
-
-      // Remove the components that won't be a problem.
-      $not_problem = array('ctools', 'features_api', 'dependencies');
-      foreach ($not_problem as $component) {
-        $key = array_search($component, $problem_components);
-        if ($key !== FALSE) {
-          unset($problem_components[$key]);
-        }
-      }
-
-      // If any problem remains, note it here.
-      if (!empty($problem_components)) {
-        $problem = TRUE;
-      }
-
-      if ($problem) {
-        $row['class'] = array('error');
-        $list = implode(', ', $problem_components);
-        $row['data']['recommendation'] = t('The following components are not yet supported by unfeaturize: !list. You will need to determine how to move these items into the database.', array('!list' => $list));
-      }
-
-      $rows[] = $row;
-    }
-  }
-
-  $collapsed = FALSE;
-  $replacements = array('!unfeatureized' => l(t('unfeatureized'), 'https://www.drupal.org/project/unfeaturize'));
-  $feature_data = array(
-    'title' => t('Features data'),
-    'info' => t('All configuration from Features will need to be in the database in order to be properly upgraded to Backdrop CMS. Features may need to be !unfeatureized.', $replacements),
-    'header' => array(t('Name'), t('Machine name'), t('Storage state'), t('Components'), t('Description'), t('Recommendation')),
-    'rows' => $rows,
-    'collapsed' => $collapsed,
-  );
-  $renderable['features'] = backdrop_upgrade_status_report_data($feature_data);
-}
-
-/**
  * Get list of core modules removed from Backdrop, and what to do about each.
  *
  * @return array
@@ -678,7 +329,7 @@ function features_backdrop_upgrade_status_report_alter(&$renderable) {
  *   - rec: Recommendation for how to proceed.
  */
 function _backdrop_upgrade_status_removed_core_modules() {
-  $drupal_url = 'https://drupal.org/pr';
+  $drupal_url = 'https://drupal.org/project/';
   // @todo - remove t() here and add instead at render point.
   return array(
     'aggregator' => array(
@@ -750,31 +401,6 @@ function _backdrop_upgrade_status_removed_core_modules() {
 }
 
 /**
- * Implements hook_form_FORM_ID_alter().
- *
- *   @todo  none of this works ?!?
- */
-function backdrop_upgrade_status_form_views_ui_edit_form_alter(&$form, &$form_state, $view, $display_id) {
-  // Don't hide the Save button, so that people can save views into the DB.
-  $key = array_search('js-hide', $form['actions']['#attributes']['class']);
-  if ($key !== FALSE) {
-    unset($form['actions']['#attributes']['class'][$key]);
-  }
-
-  // Add CSS to force the Save button to display.
-  //$path = drupal_get_path('module', 'backdrop_upgrade_status');
-  //$form['#attached']['css'][$path . '/css/views-fix.css'] = array();
-
-  // Add JS to remove the js-hide class.
-  //$form['#attached']['js'][] = $path . '/js/views-fix.js';
-  //dpm($form['#attached']['js']);
-
-  // Mark the view as changed, and invalidate the cache.
-  $form_state['view']->changed = TRUE;
-  views_invalidate_cache();
-}
-
-/**
  * Generates an informational report showing everything you'll need to upgrade
  * your site from Drupal to Backdrop CMS.
  *
@@ -794,31 +420,79 @@ function backdrop_upgrade_status_report_checklist_form($form = array()) {
 
   // Set the starting default value based on whats in the DataBase.
   $todo_default = variable_get('backdrop_upgrade_status_todo', array());
+
+  // Here's the list of possible overvoew options. Let's make this pluggable?
+  $todo_items = array(
+    'profile' => array(
+      'review' => 'system profile',
+      'description' => 'Check that a Backdrop version is available.',
+      'weight' => -10,
+    ),
+    'core_modules' => array(
+      'review' => 'core modules',
+      'description' => 'Disable and uninstall anthing not in use.',
+      'weight' => -10,
+    ),
+    'contrib_modules' => array(
+      'review' => 'contrib modules',
+      'description' => 'Disable and uninstall anthing not in use, or nolonger necessary.',
+      'weight' => -10,
+    ),
+    'custom_modules' => array(
+      'review' => 'custom modules',
+      'description' => 'Disable and uninstall anthing not in use, or nolonger necessary.',
+      'weight' => -10,
+    ),
+    'theme' => array(
+      'description' => 'Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop).',
+      'optional' => TRUE,
+      'weight' => 0,
+    ),
+  );
+
+  foreach (module_implements('backdrop_upgrade_status_todo') as $module) {
+    $module_todos = module_invoke($module, 'backdrop_upgrade_status_todo');
+    foreach ($module_todos as $machine => $item) {
+      $todo_items[$machine] = $item;
+    }
+  }
+  drupal_alter('backdrop_upgrade_status_todo', $todo_items);
+  uasort($todo_items, 'drupal_sort_weight');
+
+
+  $todo_options = array();
+  foreach ($todo_items as $machine => $item) {
+    $output = '';
+    if (isset($item['optional']) && $item['optional']) {
+      $output .= t('(optional)') . ' ';
+    }
+    if (isset($item['review'])) {
+      $id = drupal_clean_css_identifier('#edit-' . $machine);
+      $output .= t('Review <a href="' . $id . '">' . $item['review'] . '</a>:')  . ' ';
+    }
+    if (isset($item['description'])) {
+      $output .= t($item['description']);
+    }
+    $todo_options[$machine] = $output;
+  }
+
   $form['intro']['backdrop_upgrade_status_todo'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Prepare for upgrading to Backdrop CMS:'),
-    '#options' => array(
-      'profile' => t('Review <a href="#edit-profile">system profile</a>: check that Backdrop version is available.'),
-      'core' => t('Review <a href="#edit-core-modules">core modules</a>: disable and uninstall anthing not in use.'),
-      'contrib' => t('Review <a href="#edit-contrib-modules">contrib modules</a>: disable and uninstall anthing not in use.'),
-      'custom' => t('Review <a href="#edit-custom-modules">custom modules</a>: disable and uninstall anthing not in use.'),
-      'image_styles' => t('Review <a href="#edit-image-styles">image styles</a>: Configuration must be in the database to convert automatically durring upgrade.'),
-      'views' => t('Review <a href="#edit-views">views</a>: Configuration must be in the database to convert automatically durring upgrade.'),
-      'features' => t('Review <a href="#edit-features">features</a>: Configuration must be in the database to convert automatically durring upgrade.'),
-      'theme' => t('(optional) Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop)'),
-      'node' => t('(optional) Review <a href="#edit-nodes">content types</a>: remove any content types that are not wanted anymore.'),
-      'field' => t('(optional) Review <a href="#edit-fields">fields</a>: remove fields that are not wanted anymore.'),
-      'taxonomy' => t('(optional) Review <a href="#edit-terms">taxonomy</a>: remove terms or vocabularies that are not wanted anymore.'),
-      'paragraph' => t('(optional) Review <a href="#edit-paragraphs">paragraphs</a>: remove paragraphs that are not wanted anymore.'),
-      'user' => t('(optional) Review <a href="#edit-users">user accounts</a>: remove old or blocked accounts not in use.'),
-    ),
-    // Defaults will be adjusted again, before the end of the function.
+    '#options' => $todo_options,
     '#default_value' => $todo_default,
   );
+
   $form['intro']['save'] = array(
     '#type' => 'button',
     '#value' => t('Save Progress'),
     '#submit' => array('backdrop_upgrade_status_report_checklist_form_submit'),
+  );
+  $form['intro']['scan'] = array(
+    '#type' => 'button',
+    '#value' => t('Scan this site'),
+    '#submit' => array('backdrop_upgrade_status_report_checklist_form_scan'),
+    '#disabled' => TRUE,
   );
 
   return $form;
@@ -832,4 +506,11 @@ function backdrop_upgrade_status_report_checklist_form_submit($form, &$form_stat
     $todo = $form_state['values']['backdrop_upgrade_status_todo'];
     variable_set('backdrop_upgrade_status_todo', $todo);
   }
+}
+
+/**
+ * Submit handler for backdrop_upgrade_status_report_checklist_form().
+ */
+function backdrop_upgrade_status_report_checklist_form_scan() {
+  drupal_set_message('Not working just yet.');
 }

@@ -43,5 +43,22 @@ function backdrop_upgrade_status_update_7000() {
 }
 
 /**
+ * Create a queue to store tasks for requests to fetch available update data.
+ */
+function backdrop_upgrade_status_update_7001() {
+  $todo_status = variable_get('backdrop_upgrade_status_todo');
+
+  // Update machine names of todo items.
+  $todo_status['core_modules'] = $todo_status['core'];
+  unset($todo_status['core']);
+  $todo_status['contrib_modules'] = $todo_status['contrib'];
+  unset($todo_status['contrib']);
+  $todo_status['custom_modules'] = $todo_status['custom'];
+  unset($todo_status['custom']);
+
+  variable_set('backdrop_upgrade_status_todo', $todo_status);
+}
+
+/**
  * @} End of "addtogroup updates-7.x".
  */
