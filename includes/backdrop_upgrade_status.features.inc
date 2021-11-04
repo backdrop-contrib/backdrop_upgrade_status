@@ -18,8 +18,7 @@ function features_backdrop_upgrade_status_todo() {
 /**
  * Implements hook_backdrop_upgrade_status_report_alter().
  */
-function features_backdrop_upgrade_status_report_alter(&$renderable) {
-
+function features_backdrop_upgrade_status_report($todo_status = FALSE) {
   // Add a checkbox to the todo list.
 
   // Add a fieldset to the report.
@@ -96,14 +95,23 @@ function features_backdrop_upgrade_status_report_alter(&$renderable) {
     }
   }
 
+  // @todo add $todo_status
+  $todo_status = FALSE;
+
   $collapsed = FALSE;
   $replacements = array('!unfeatureized' => l(t('unfeatureized'), 'https://www.drupal.org/project/unfeaturize'));
-  $feature_data = array(
+  $info = t('All configuration from Features will need to be in the database in order to be properly upgraded to Backdrop CMS. Features may need to be !unfeatureized.', $replacements);
+
+  $return = array(
     'title' => t('Features data'),
-    'info' => t('All configuration from Features will need to be in the database in order to be properly upgraded to Backdrop CMS. Features may need to be !unfeatureized.', $replacements),
+    'info' => $info,
     'header' => array(t('Name'), t('Machine name'), t('Storage state'), t('Components'), t('Description'), t('Recommendation')),
     'rows' => $rows,
     'collapsed' => $collapsed,
+    'todo_status' => $todo_status,
+    'machine' => 'features',
   );
-  $renderable['features'] = backdrop_upgrade_status_report_data($feature_data);
+
+  return $return;
 }
+

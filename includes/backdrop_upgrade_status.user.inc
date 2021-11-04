@@ -20,7 +20,7 @@ function user_backdrop_upgrade_status_todo() {
 /**
  * Implements hook_backdrop_upgrade_status_report_alter().
  */
-function user_backdrop_upgrade_status_report_alter(&$renderable) {
+function user_backdrop_upgrade_status_report($todo_status = FALSE) {
   // Get all the users in the system.
   $rows = array();
   $statuses = array(1 => t('Active'), 0 => t('Blocked'));
@@ -38,11 +38,23 @@ function user_backdrop_upgrade_status_report_alter(&$renderable) {
     }
     $rows[] = $row;
   }
-  $user_data = array(
+
+  // @todo add $collapsed
+  $collapsed = FALSE;
+
+  // @todo add $todo_status
+  $todo_status = FALSE;
+
+  $return = array(
+    'machine' => 'user',
     'title' => t('User account data'),
     'info' => t('This is a summary of the user accounts on the site.'),
     'header' => array(t('User accounts'), t('Status'), t('Number of users')),
     'rows' => $rows,
+    'empty' => '',
+    'collapsed' => $collapsed,
+    'todo_status' => $todo_status,
   );
-  $renderable['users'] = backdrop_upgrade_status_report_data($user_data);
+
+  return $return;
 }

@@ -8,7 +8,7 @@
  */
 function image_backdrop_upgrade_status_todo() {
   return array(
-    'image_styles' => array(
+    'image' => array(
       'review' => 'image styles',
       'description' => 'Configuration must be in the database to convert automatically durring upgrade.',
       'optional' => TRUE,
@@ -18,9 +18,9 @@ function image_backdrop_upgrade_status_todo() {
 }
 
 /**
- * Implements hook_backdrop_upgrade_status_report_alter().
+ * Implements hook_backdrop_upgrade_status_report().
  */
-function image_backdrop_upgrade_status_report_alter(&$renderable) {
+function image_backdrop_upgrade_status_report($todo_status = FALSE) {
   // Get all the taxonomy terms in the system.
   $rows = array();
   $collapsed = TRUE;
@@ -53,17 +53,22 @@ function image_backdrop_upgrade_status_report_alter(&$renderable) {
     }
     $rows[] = $row;
   }
-  $image_style_data = array(
+
+  // Mark all image_styles as reviewed when all are in the database.
+  $todo_status = FALSE;
+  if ($collapsed && !isset($renderable['intro']['backdrop_upgrade_status_todo']['#default_value']['image_styles'])) {
+    $todo_status = TRUE;
+  }
+
+  $return = array(
     'title' => t('Image Styles'),
     'info' => t('Image styles need to be stored in the databse for a smooth upgrade.'),
     'header' => array(t('Style Name'), t('Machine name'), t('Storage state'), t('Recommendation')),
     'rows' => $rows,
     'collapsed' => $collapsed,
+    'todo_status' => $todo_status,
+    'machine' => 'image',
   );
-  $renderable['image_styles'] = backdrop_upgrade_status_report_data($image_style_data);
 
-  // Mark all image_styles as reviewed when all are in the database.
-  if ($collapsed && !isset($renderable['intro']['backdrop_upgrade_status_todo']['#default_value']['image_styles'])) {
-    $renderable['intro']['backdrop_upgrade_status_todo']['#default_value']['image_styles'] = 'image_styles';
-  }
+  return $return;
 }

@@ -20,7 +20,7 @@ function taxonomy_backdrop_upgrade_status_todo() {
 /**
  * Implements hook_backdrop_upgrade_status_report_alter().
  */
-function taxonomy_backdrop_upgrade_status_report_alter(&$renderable) {
+function taxonomy_backdrop_upgrade_status_report($todo_status = FALSE) {
   // Get all the taxonomy terms in the system.
   $rows = array();
   $term_types = taxonomy_get_vocabularies();
@@ -39,11 +39,23 @@ function taxonomy_backdrop_upgrade_status_report_alter(&$renderable) {
     }
     $rows[] = $row;
   }
-  $term_data = array(
+
+  // @todo add $collapsed
+  $collapsed = FALSE;
+
+  // @todo add $todo_status
+  $todo_status = FALSE;
+
+  $return = array(
+    'machine' => 'taxonomy',
     'title' => t('Vocabulary & Term data'),
     'info' => t('Any vocabularies with zero terms could be deleted.'),
     'header' => array(t('Vocabulary'), t('Vocabulary ID'), t('Machine name'), t('Number of terms')),
     'rows' => $rows,
+    'empty' => '',
+    'collapsed' => $collapsed,
+    'todo_status' => $todo_status,
   );
-  $renderable['terms'] = backdrop_upgrade_status_report_data($term_data);
+
+  return $return;
 }

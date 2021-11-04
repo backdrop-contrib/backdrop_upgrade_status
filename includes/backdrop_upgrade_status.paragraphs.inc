@@ -17,9 +17,9 @@ function paragraphs_backdrop_upgrade_status_todo() {
 }
 
 /**
- * Implements hook_backdrop_upgrade_status_report_alter().
+ * Implements hook_backdrop_upgrade_status_report().
  */
-function paragraphs_backdrop_upgrade_status_report_alter(&$renderable) {
+function paragraphs_backdrop_upgrade_status_report($todo_status = FALSE) {
   // Get all the taxonomy terms in the system.
   $rows = array();
   $bundles = paragraphs_bundle_load();
@@ -37,11 +37,23 @@ function paragraphs_backdrop_upgrade_status_report_alter(&$renderable) {
     }
     $rows[] = $row;
   }
-  $paragraph_data = array(
+
+  // @todo add $collapsed
+  $collapsed = FALSE;
+
+  // @todo add $todo_status
+  $todo_status = FALSE;
+
+  $return = array(
+    'machine' => 'paragraphs',
     'title' => t('Paragraph content'),
     'info' => t('Any paragraph types with zero items could be deleted.'),
     'header' => array(t('Paragraph type'), t('Machine name'), t('Number of paragraphs')),
     'rows' => $rows,
+    'empty' => '',
+    'collapsed' => $collapsed,
+    'todo_status' => $todo_status,
   );
-  $renderable['paragraphs'] = backdrop_upgrade_status_report_data($paragraph_data);
+
+  return $return;
 }

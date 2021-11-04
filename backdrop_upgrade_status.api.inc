@@ -15,21 +15,25 @@
  * @return array
  *   An array containing all the data needed to build a table on the report,
  *   containing the following keys:
+ *   - machine:
  *   - title:
  *   - info:
  *   - header:
  *   - rows:
+ *   - empty:
  *   - collapsed:
  *   - todo_status:
  */
-function hook_backdrop_upgrade_status_report(&$renderable, $todo_status = FALSE) {
+function hook_backdrop_upgrade_status_report($todo_status = FALSE) {
   $return = array(
+    'machine' => '',
     'title' => t('Profile / Distribution'),
     'info' => t('This is the profile that was used when the site was first installed.'),
     'header' => array(t('Profile name'), t('Enabled'), t('Distribution'), t('Backdrop status'), t('Recommendation')),
     'rows' => $profile_rows,
+    'empty' => '',
     'collapsed' => $collapsed,
-    'todo_status' => FALSE,
+    'todo_status' => $todo_status,
   );
 
   return $return;

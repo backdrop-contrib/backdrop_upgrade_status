@@ -254,9 +254,25 @@ function backdrop_upgrade_status_report() {
 
 
 
-
   // Updtates defaults based on changed info from above.
   $renderable['intro']['backdrop_upgrade_status_todo']['#default_value'] = $todo_default;
+
+
+  // Add fieldsets for all modules that provide one.
+  foreach (module_implements('backdrop_upgrade_status_report') as $module) {
+    $module_data = module_invoke($module, 'backdrop_upgrade_status_report');
+
+    $machine = $module_data['machine'];
+    unset($module_data['machine']);
+
+    $todo_status = $module_data['todo_status'];
+    unset($module_data['todo_status']);
+
+    // Set default value for checkbox.
+    $renderable['intro']['backdrop_upgrade_status_todo']['#default_value'][$machine] = $todo_status;
+    // Add fieldset for module data.
+    $renderable[$machine] = backdrop_upgrade_status_report_data($module_data);
+  }
 
   // Allow other modules to add things to the reports page.
   drupal_alter('backdrop_upgrade_status_report', $renderable);
@@ -319,6 +335,123 @@ function backdrop_upgrade_status_report_data($variables) {
 
   return $fieldset;
 }
+
+/**
+ * Generates an informational report showing everything you'll need to upgrade
+ * your site from Drupal to Backdrop CMS.
+ *
+ * @see backdrop_upgrade_status_report_checklist_form_submit().
+ *
+ * @return array
+ *   Renderable tables with all the info!
+ */
+function backdrop_upgrade_status_report_checklist_form($form = array()) {
+
+  $form['intro'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Backdrop Upgrade to-do list'),
+    '#description' => t('When you are ready to perform the upgrade, this list should walk you through the steps necessary to prepare your Drupal 7 database.'),
+    '#collapsible' => TRUE,
+  );
+
+  // Set the starting default value based on whats in the DataBase.
+  $todo_default = variable_get('backdrop_upgrade_status_todo', array());
+
+  // Here's the list of possible overvoew options. Let's make this pluggable?
+  $todo_items = array(
+    'profile' => array(
+      'review' => 'system profile',
+      'description' => 'Check that a Backdrop version is available.',
+      'weight' => -10,
+    ),
+    'core_modules' => array(
+      'review' => 'core modules',
+      'description' => 'Disable and uninstall anthing not in use.',
+      'weight' => -10,
+    ),
+    'contrib_modules' => array(
+      'review' => 'contrib modules',
+      'description' => 'Disable and uninstall anthing not in use, or nolonger necessary.',
+      'weight' => -10,
+    ),
+    'custom_modules' => array(
+      'review' => 'custom modules',
+      'description' => 'Disable and uninstall anthing not in use, or nolonger necessary.',
+      'weight' => -10,
+    ),
+    'theme' => array(
+      'description' => 'Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop).',
+      'optional' => TRUE,
+      'weight' => 0,
+    ),
+  );
+
+  // Add checkboxes for all modules that provide one.
+  foreach (module_implements('backdrop_upgrade_status_todo') as $module) {
+    $module_todos = module_invoke($module, 'backdrop_upgrade_status_todo');
+    foreach ($module_todos as $machine => $item) {
+      $todo_items[$machine] = $item;
+    }
+  }
+  drupal_alter('backdrop_upgrade_status_todo', $todo_items);
+  uasort($todo_items, 'drupal_sort_weight');
+
+
+  $todo_options = array();
+  foreach ($todo_items as $machine => $item) {
+    $output = '';
+    if (isset($item['optional']) && $item['optional']) {
+      $output .= t('(optional)') . ' ';
+    }
+    if (isset($item['review'])) {
+      $id = drupal_clean_css_identifier('#edit-' . $machine);
+      $output .= t('Review <a href="#' . $id . '">' . $item['review'] . '</a>:')  . ' ';
+    }
+    if (isset($item['description'])) {
+      $output .= t($item['description']);
+    }
+    $todo_options[$machine] = $output;
+  }
+
+  $form['intro']['backdrop_upgrade_status_todo'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Prepare for upgrading to Backdrop CMS:'),
+    '#options' => $todo_options,
+    '#default_value' => $todo_default,
+  );
+
+  $form['intro']['save'] = array(
+    '#type' => 'button',
+    '#value' => t('Save Progress'),
+    '#submit' => array('backdrop_upgrade_status_report_checklist_form_submit'),
+  );
+  $form['intro']['scan'] = array(
+    '#type' => 'button',
+    '#value' => t('Scan this site'),
+    '#submit' => array('backdrop_upgrade_status_report_checklist_form_scan'),
+    '#disabled' => TRUE,
+  );
+
+  return $form;
+}
+
+/**
+ * Submit handler for backdrop_upgrade_status_report_checklist_form().
+ */
+function backdrop_upgrade_status_report_checklist_form_submit($form, &$form_state) {
+  if (isset($form_state['values']['backdrop_upgrade_status_todo'])) {
+    $todo = $form_state['values']['backdrop_upgrade_status_todo'];
+    variable_set('backdrop_upgrade_status_todo', $todo);
+  }
+}
+
+/**
+ * Submit handler for backdrop_upgrade_status_report_checklist_form().
+ */
+function backdrop_upgrade_status_report_checklist_form_scan() {
+  drupal_set_message('Not working just yet.');
+}
+
 
 /**
  * Get list of core modules removed from Backdrop, and what to do about each.
@@ -398,119 +531,4 @@ function _backdrop_upgrade_status_removed_core_modules() {
       'rec' => t('Add the contrib version of :module to Backdrop.'),
     )
   );
-}
-
-/**
- * Generates an informational report showing everything you'll need to upgrade
- * your site from Drupal to Backdrop CMS.
- *
- * @see backdrop_upgrade_status_report_checklist_form_submit().
- *
- * @return array
- *   Renderable tables with all the info!
- */
-function backdrop_upgrade_status_report_checklist_form($form = array()) {
-
-  $form['intro'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Backdrop Upgrade to-do list'),
-    '#description' => t('When you are ready to perform the upgrade, this list should walk you through the steps necessary to prepare your Drupal 7 database.'),
-    '#collapsible' => TRUE,
-  );
-
-  // Set the starting default value based on whats in the DataBase.
-  $todo_default = variable_get('backdrop_upgrade_status_todo', array());
-
-  // Here's the list of possible overvoew options. Let's make this pluggable?
-  $todo_items = array(
-    'profile' => array(
-      'review' => 'system profile',
-      'description' => 'Check that a Backdrop version is available.',
-      'weight' => -10,
-    ),
-    'core_modules' => array(
-      'review' => 'core modules',
-      'description' => 'Disable and uninstall anthing not in use.',
-      'weight' => -10,
-    ),
-    'contrib_modules' => array(
-      'review' => 'contrib modules',
-      'description' => 'Disable and uninstall anthing not in use, or nolonger necessary.',
-      'weight' => -10,
-    ),
-    'custom_modules' => array(
-      'review' => 'custom modules',
-      'description' => 'Disable and uninstall anthing not in use, or nolonger necessary.',
-      'weight' => -10,
-    ),
-    'theme' => array(
-      'description' => 'Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop).',
-      'optional' => TRUE,
-      'weight' => 0,
-    ),
-  );
-
-  foreach (module_implements('backdrop_upgrade_status_todo') as $module) {
-    $module_todos = module_invoke($module, 'backdrop_upgrade_status_todo');
-    foreach ($module_todos as $machine => $item) {
-      $todo_items[$machine] = $item;
-    }
-  }
-  drupal_alter('backdrop_upgrade_status_todo', $todo_items);
-  uasort($todo_items, 'drupal_sort_weight');
-
-
-  $todo_options = array();
-  foreach ($todo_items as $machine => $item) {
-    $output = '';
-    if (isset($item['optional']) && $item['optional']) {
-      $output .= t('(optional)') . ' ';
-    }
-    if (isset($item['review'])) {
-      $id = drupal_clean_css_identifier('#edit-' . $machine);
-      $output .= t('Review <a href="' . $id . '">' . $item['review'] . '</a>:')  . ' ';
-    }
-    if (isset($item['description'])) {
-      $output .= t($item['description']);
-    }
-    $todo_options[$machine] = $output;
-  }
-
-  $form['intro']['backdrop_upgrade_status_todo'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Prepare for upgrading to Backdrop CMS:'),
-    '#options' => $todo_options,
-    '#default_value' => $todo_default,
-  );
-
-  $form['intro']['save'] = array(
-    '#type' => 'button',
-    '#value' => t('Save Progress'),
-    '#submit' => array('backdrop_upgrade_status_report_checklist_form_submit'),
-  );
-  $form['intro']['scan'] = array(
-    '#type' => 'button',
-    '#value' => t('Scan this site'),
-    '#submit' => array('backdrop_upgrade_status_report_checklist_form_scan'),
-    '#disabled' => TRUE,
-  );
-
-  return $form;
-}
-
-/**
- * Submit handler for backdrop_upgrade_status_report_checklist_form().
- */
-function backdrop_upgrade_status_report_checklist_form_submit($form, &$form_state) {
-  if (isset($form_state['values']['backdrop_upgrade_status_todo'])) {
-    $todo = $form_state['values']['backdrop_upgrade_status_todo'];
-    variable_set('backdrop_upgrade_status_todo', $todo);
-  }
-}
-
-/**
- * Submit handler for backdrop_upgrade_status_report_checklist_form().
- */
-function backdrop_upgrade_status_report_checklist_form_scan() {
-  drupal_set_message('Not working just yet.');
 }

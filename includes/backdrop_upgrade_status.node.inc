@@ -18,9 +18,9 @@ function node_backdrop_upgrade_status_todo() {
 }
 
 /**
- * Implements hook_backdrop_upgrade_status_report_alter().
+ * Implements hook_backdrop_upgrade_status_report().
  */
-function node_backdrop_upgrade_status_report_alter(&$renderable) {
+function node_backdrop_upgrade_status_report($todo_status = FALSE) {
   // Get all the node types in the system.
   $rows = array();
   $node_types = node_type_get_names();
@@ -40,11 +40,23 @@ function node_backdrop_upgrade_status_report_alter(&$renderable) {
     }
     $rows[] = $row;
   }
-  $node_data = array(
+
+  // @todo add $collapsed
+  $collapsed = FALSE;
+
+  // @todo add $todo_status
+  $todo_status = FALSE;
+
+  $return = array(
+    'machine' => 'node',
     'title' => t('Content types'),
     'info' => t('Any conent types with zero itesm could be deleted.'),
     'header' => array(t('Conent type'), t('Machine name'), t('Number of items'), t('Recommendation')),
     'rows' => $rows,
+    'empty' => '',
+    'collapsed' => $collapsed,
+    'todo_status' => $todo_status,
   );
-  $renderable['nodes'] = backdrop_upgrade_status_report_data($node_data);
+
+  return $return;
 }

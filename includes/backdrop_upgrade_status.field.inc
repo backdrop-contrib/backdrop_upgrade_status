@@ -18,9 +18,24 @@ function field_backdrop_upgrade_status_todo() {
 }
 
 /**
- * Implements hook_backdrop_upgrade_status_report_alter().
+ * Returns all content needed for the Backdrop Upgrade Status report.
+ *
+ * @param array $$renderable
+ *   The rest of the form.
+ * @param boolean $todo_status
+ *   Value of the todo checkbox based on the current state of the site.
+ *
+ * @return array
+ *   An array containing all the data needed to build a table on the report,
+ *   containing the following keys:
+ *   - title:
+ *   - info:
+ *   - header:
+ *   - rows:
+ *   - collapsed:
+ *   - todo_status:
  */
-function field_backdrop_upgrade_status_report_alter(&$renderable) {
+function field_backdrop_upgrade_status_report($todo_status = FALSE) {
   // Get all fields in the system.
   $instances = field_info_instances();
   $field_types = field_info_field_types();
@@ -61,15 +76,23 @@ function field_backdrop_upgrade_status_report_alter(&$renderable) {
   foreach ($rows as $field_name => $cell) {
     $rows[$field_name]['data']['bundles'] = implode(', ', $cell['data']['bundles']);
   }
-  if (empty($rows)) {
-    $output = t('No fields have been defined yet.');
-  }
 
-  $field_data = array(
+  // @todo add $collapsed
+  $collapsed = FALSE;
+
+  // @todo add $todo_status
+  $todo_status = FALSE;
+
+  $return = array(
+    'machine' => 'field',
     'title' => t('Field data'),
     'info' => t('Any fields with zero values could be removed.'),
     'header' => array(t('Field name'), t('Field type'), t('Module'), t('Used in'), t('Number of values'), t('Recommendation')),
     'rows' => $rows,
+    'collapsed' => $collapsed,
+    'empty' => t('No fields have been defined yet.'),
+    'todo_status' => $todo_status,
   );
-  $renderable['fields'] = backdrop_upgrade_status_report_data($field_data);
+
+  return $return;
 }
