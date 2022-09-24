@@ -63,7 +63,7 @@ function field_backdrop_upgrade_status_report($todo_status = FALSE) {
 
         // Add the item count.
         $table = 'field_data_' . $field_name;
-        $count = db_query("SELECT count(entity_id) FROM {$table}")->fetchField();
+        $count = db_query("SELECT count(entity_id) FROM {" . $table . "}")->fetchField();
         $rows[$field_name]['data']['count'] = $count;
         $rows[$field_name]['data']['recommendation'] = '';
         if ($count == 0) {
