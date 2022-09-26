@@ -242,7 +242,13 @@ function backdrop_upgrade_status_report() {
     );
     $renderable['contrib_modules'] = backdrop_upgrade_status_report_data($contrib_module_data);
   }
-
+  else {
+    $renderable['contrib_modules'] = [
+      '#type' => 'markup',
+      '#markup' => '<p><strong>No contrib data retrieved yet.</strong> Here\'s what to do about it.</p>',
+    ];
+  }
+  
   $custom_module_data = array(
     'title' => t('Enabled Custom Modules'),
     'info' => t('This is a summary of the enabled custom modules.'),
