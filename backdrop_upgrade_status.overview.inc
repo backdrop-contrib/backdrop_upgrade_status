@@ -224,7 +224,7 @@ function backdrop_upgrade_status_report() {
   }
   $core_module_data = array(
     'title' => t('Enabled Core Modules'),
-    'info' => t('This is a summary of the enabled core modules.'),
+    'info' => t('This is a summary of enabled core modules.'),
     'header' => array(t('Module name'), t('Drupal status'), t('Backdrop status'), t('Recommendation')),
     'rows' => $core_module_rows,
     'collapsed' => $collapsed,
@@ -232,26 +232,35 @@ function backdrop_upgrade_status_report() {
   $renderable['core_modules'] = backdrop_upgrade_status_report_data($core_module_data);
 
 
+  $contrib_module_data = array(
+    'title' => t('Enabled Contrib Modules'),
+    'info' => t('This is a summary of enabled contributed modules.'),
+    'header' => array(t('Module name'), t('Drupal version'), t('Backdrop status'), t('Recommendation')),
+    'collapsed' => FALSE,
+  );
+  
   if ($available) {
-    $contrib_module_data = array(
-      'title' => t('Enabled Contrib Modules'),
-      'info' => t('This is a summary of the enabled contributed modules.'),
-      'header' => array(t('Module name'), t('Drupal version'), t('Backdrop status'), t('Recommendation')),
-      'rows' => $contrib_module_rows,
-      'collapsed' => $collapsed,
-    );
-    $renderable['contrib_modules'] = backdrop_upgrade_status_report_data($contrib_module_data);
+    $contrib_module_data['rows'] = $contrib_module_rows;
+    $contrib_module_data['collapsed'] = $collapsed;
   }
   else {
-    $renderable['contrib_modules'] = [
-      '#type' => 'markup',
-      '#markup' => '<p><strong>No contrib data retrieved yet.</strong> Here\'s what to do about it.</p>',
-    ];
+    $run_cron = t('Run cron');
+    if (user_access('administer site configuration')) {
+      $cron_url = url('admin/reports/status/run-cron');
+      $run_cron = '<a href="' . $cron_url . '">' . $run_cron . '</a>';
+    }
+    
+    $replacements = array('!cron' => $run_cron);
+    $run_cron = t('!cron to retrieve contributed module status.', $replacements);
+    $replacements = array('!run_cron' => $run_cron);
+    $help = '<p>' . t('<strong>No contrib data available yet.</strong> !run_cron', $replacements) . '</p>';
+    $contrib_module_data['rows'] = array(array(array('data' => $help, 'colspan' => 4)));
   }
+  $renderable['contrib_modules'] = backdrop_upgrade_status_report_data($contrib_module_data);
   
   $custom_module_data = array(
     'title' => t('Enabled Custom Modules'),
-    'info' => t('This is a summary of the enabled custom modules.'),
+    'info' => t('This is a summary of enabled custom modules.'),
     'header' => array(t('Module name'), t('Drupal status'), t('Backdrop status'), t('Recommendation')),
     'rows' => $custom_module_rows,
     'collapsed' => FALSE,
@@ -303,17 +312,18 @@ include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.features.inc')
  *
  * @param array $variables
  *   Contains the following keys:
- *   - title
- *   - info
- *   - header
- *   - data
+ *   - title: The content for fieldset label, as passed through t().
+ *   - info: The content for the introductary paragraph, passed through t().
+ *   - header: Array of columnn headers for data, each passed through t().
+ *   - rows: Table of data (must match column headers), sanitized.
+ *   - collapsed: Whether or not the fieldset should be collapsed.
  *
  * @return array
  *   Renderable fieldset.
  */
 function backdrop_upgrade_status_report_data($variables) {
-  $title = $variables['title']; // has t().
-  $info = $variables['info']; // has t().
+  $title = $variables['title'];
+  $info = $variables['info'];
   $header = $variables['header'];
   $rows = $variables['rows'];
   $collapsed = isset($variables['collapsed'])? $variables['collapsed']: TRUE;
