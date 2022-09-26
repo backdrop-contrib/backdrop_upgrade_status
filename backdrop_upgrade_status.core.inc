@@ -74,6 +74,7 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
     case 'block_class':
       $data[$project]['in_core_since'] = '1.x';
       $data[$project]['in_core_note'] = t('Integrated into core Block module in v1.0.');
+      $data[$project]['in_core_warning'] = t('Classes will need to be re-entered manually until https://github.com/backdrop/backdrop-issues/issues/5801 is resolved.');
       $data[$project]['in_core_complete'] = TRUE;
       break;
 
