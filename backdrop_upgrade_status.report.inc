@@ -22,10 +22,7 @@ function backdrop_upgrade_status_status() {
     // US: Inlined _update_no_data().
     // @todo: File an upstream patch for that.
     $destination = drupal_get_destination();
-    $data = t('No upgrade information available. <a href="@run_cron">Run cron</a> or <a href="@check_manually">check manually</a>.', array(
-      '@run_cron' => url('admin/reports/status/run-cron', array('query' => $destination)),
-      '@check_manually' => url('admin/reports/updates/backdrop-upgrade/check', array('query' => $destination)),
-    ));
+    $data = _backdrop_upgrade_status_help();
     return theme('backdrop_upgrade_status_report', array('data' => $data));
   }
 }

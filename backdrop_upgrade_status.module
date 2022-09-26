@@ -328,4 +328,13 @@ function backdrop_upgrade_status_moved_into_core(&$projects, $project) {
   return $core;
 }
 
-
+/**
+ * Helper function to provide links for generating upgrade status data.
+ */
+function _backdrop_upgrade_status_help() {
+  $help = t('No Backdrop upgrade information available. <a href="@run_cron">Run cron</a> or <a href="@check_manually">check manually</a>.', array(
+    '@run_cron' => url('admin/reports/status/run-cron', array('query' => $destination)),
+    '@check_manually' => url('admin/reports/updates/backdrop-upgrade/check', array('query' => $destination)),
+  ));
+  return $help;
+}

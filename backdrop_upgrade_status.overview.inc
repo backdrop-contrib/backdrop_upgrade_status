@@ -244,16 +244,7 @@ function backdrop_upgrade_status_report() {
     $contrib_module_data['collapsed'] = $collapsed;
   }
   else {
-    $run_cron = t('Run cron');
-    if (user_access('administer site configuration')) {
-      $cron_url = url('admin/reports/status/run-cron');
-      $run_cron = '<a href="' . $cron_url . '">' . $run_cron . '</a>';
-    }
-    
-    $replacements = array('!cron' => $run_cron);
-    $run_cron = t('!cron to retrieve contributed module status.', $replacements);
-    $replacements = array('!run_cron' => $run_cron);
-    $help = '<p>' . t('<strong>No contrib data available yet.</strong> !run_cron', $replacements) . '</p>';
+    $help = _backdrop_upgrade_status_help();
     $contrib_module_data['rows'] = array(array(array('data' => $help, 'colspan' => 4)));
   }
   $renderable['contrib_modules'] = backdrop_upgrade_status_report_data($contrib_module_data);
