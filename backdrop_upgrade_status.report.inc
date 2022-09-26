@@ -207,32 +207,34 @@ function theme_backdrop_upgrade_status_report($variables) {
           ) {
             $version_class[] = 'version-recommended-strong';
           }
-          $versions_inner .= theme('update_version', array('version' => $project['releases'][$project['recommended']], 'tag' => t('Recommended version:'), 'class' => $version_class));
+
+          $versions_inner .= theme('backdrop_upgrade_status_update_version', array('version' => $project['releases'][$project['recommended']], 'tag' => t('Recommended version:'), 'class' => $version_class));
         }
 
         // Now, print any security updates.
         if (!empty($project['security updates'])) {
           $security_class[] = 'version-security';
           foreach ($project['security updates'] as $security_update) {
-            $versions_inner .= theme('update_version', array('version' => $security_update, 'tag' => t('Security update:'), 'class' => $security_class));
+            $versions_inner .= theme('backdrop_upgrade_status_update_version', array('version' => $security_update, 'tag' => t('Security update:'), 'class' => $security_class));
           }
         }
       }
 
       if ($project['recommended'] !== $project['latest_version']) {
-        $versions_inner .= theme('update_version', array('version' => $project['releases'][$project['latest_version']], 'tag' => t('Latest version:'), 'class' => array('version-latest')));
+        $versions_inner .= theme('backdrop_upgrade_status_update_version', array('version' => $project['releases'][$project['latest_version']], 'tag' => t('Latest version:'), 'class' => array('version-latest')));
       }
       if ($project['install_type'] == 'dev'
           && $project['status'] != UPDATE_CURRENT
           && isset($project['dev_version'])
           && $project['recommended'] !== $project['dev_version']) {
-        $versions_inner .= theme('update_version', array('version' => $project['releases'][$project['dev_version']], 'tag' => t('Development version:'), 'class' => array('version-latest')));
+        // Switch to our own theme function for better hadling of date.
+        $versions_inner .= theme('backdrop_upgrade_status_update_version', array('version' => $project['releases'][$project['dev_version']], 'tag' => t('Development version:'), 'class' => array('version-latest')));
       }
     }
 
     if (isset($project['also'])) {
       foreach ($project['also'] as $also) {
-        $versions_inner .= theme('update_version', array('version' => $project['releases'][$also], 'tag' => t('Also available:'), 'class' => array('version-also-available')));
+        $versions_inner .= theme('backdrop_upgrade_status_update_version', array('version' => $project['releases'][$also], 'tag' => t('Also available:'), 'class' => array('version-also-available')));
       }
     }
 
@@ -332,6 +334,46 @@ function theme_backdrop_upgrade_status_report($variables) {
     }
   }
   drupal_add_css(drupal_get_path('module', 'update') . '/update.css');
+  return $output;
+}
+
+/**
+ * Creates markup for the version display of a project.
+ * 
+ * Checks if the date exists before running format_date() on it.
+ * 
+ * Replaces theme_update_version().
+ */
+function theme_backdrop_upgrade_status_update_version($variables) {
+  $version = $variables['version'];
+  $tag = $variables['tag'];
+  $class = implode(' ', $variables['class']);
+  $output = '';
+  $output .= '<table class="version ' . $class . '">';
+  $output .= '<tr>';
+  $output .= '<td class="version-title">' . $tag . "</td>\n";
+  $output .= '<td class="version-details">';
+  $output .= l($version['version'], $version['release_link']);
+  if (!empty($version['date'])) {
+    $output .= ' <span class="version-date">(' . format_date($version['date'], 'custom', 'Y-M-d') . ')</span>';
+  }
+  $output .= "</td>\n";
+  $output .= '<td class="version-links">';
+  $links = array();
+  $links['update-download'] = array(
+    'title' => t('Download'),
+    'href' => $version['download_link'],
+  );
+  $links['update-release-notes'] = array(
+    'title' => t('Release notes'),
+    'href' => $version['release_link'],
+  );
+  $output .= theme('links__update_version', array(
+    'links' => $links,
+  ));
+  $output .= '</td>';
+  $output .= '</tr>';
+  $output .= "</table>\n";
   return $output;
 }
 

@@ -113,6 +113,10 @@ function backdrop_upgrade_status_theme() {
     'backdrop_upgrade_status_status_label' => array(
       'variables' => array('status' => NULL, 'project' => NULL),
     ),
+    'backdrop_upgrade_status_update_version' => array(
+      'variables' => array('version' => NULL, 'tag' => '', 'class' => ''),
+      'file' => 'backdrop_upgrade_status.report.inc',
+    ),
   );
 }
 
