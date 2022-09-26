@@ -498,7 +498,7 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
 
     case 'transliteration':
       $data[$project]['in_core_since'] = '1.x';
-      $data[$project]['in_core_note'] = t('Integrated into core APIs.');
+      $data[$project]['in_core_note'] = t('Integrated into core APIs in v1.3.');
       $data[$project]['in_core_warning'] = t('No direct support for transliterating path aliases or file names.');
       $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
       break;
