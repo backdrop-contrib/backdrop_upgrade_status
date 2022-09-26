@@ -24,52 +24,49 @@ function views_backdrop_upgrade_status_report($todo_status = FALSE) {
   $collapsed = TRUE;
   $views = views_get_all_views();
   foreach ($views as $view) {
+
+    $row = array(
+      'data' => array(
+        'name' => $view->human_name,
+        'machine' => $view->name,
+        'state' => '',
+        'description' => $view->description,
+        'recommendation' => '',
+      ),
+    );
+
     // Mark disabled views with a warning
     if ( $view->disabled ) {
-      $type = t('Disabled');
-      $row = array(
-        'data' => array(
-          'name' => $view->human_name,
-          'machine' => $view->name,
-          'state' => $type,
-          'description' => $view->description,
-          'recommendation' => '',
-        ),
-      );
-      if ($type == t('Disabled')) {
-        $collapsed = FALSE;
-        $row['class'] = array('warning');
-        $text = t('If required, enable this view.');
-        $row['data']['recommendation'] = $text;
-        if (user_access('administer views')) {
-          $href = 'admin/structure/views';
-          $options = array('query' => array('destination' => current_path()));
-          $link = l($text, $href, $options);
-          $row['data']['recommendation'] = $link;
-        }
-        $rows[] = $row;
+      $row['class'] = array('warning');
+      $row['data']['state'] = t('Disabled');
+      $text = t('If required, enable this view.');
+      $row['data']['recommendation'] = $text;
+      if (user_access('administer views')) {
+        $href = 'admin/structure/views/view/' . $view->name . '/edit';
+        $options = array('query' => array('destination' => current_path()));
+        $link = l($text, $href, $options);
+        $row['data']['recommendation'] = $link;
       }
-    } else {
+    } 
+
+    else {
+
+      $in_code = FALSE;
       // Show views that need to be added to DB.
       switch ($view->type) {
         case t('Normal'):
         case t('Overridden'):
-        $type = t('In database');
+          $type = t('In database');
         break;
         default:
-        $type = t('In code');
+          $type = t('In code');
+          $in_code = TRUE;
         break;
       }
-      $row = array(
-        'data' => array(
-          'name' => $view->human_name,
-          'machine' => $view->name,
-          'state' => $type,
-          'description' => $view->description,
-          'recommendation' => '',
-        ),
-      );
-      if ($type == t('In code')) {
+
+      $row['data']['state'] = $type;
+
+      if ($in_code) {
         $collapsed = FALSE;
         $row['class'] = array('error');
         $text = t('Edit and save this view.');
@@ -81,8 +78,9 @@ function views_backdrop_upgrade_status_report($todo_status = FALSE) {
           $row['data']['recommendation'] = $link;
         }
       }
-      $rows[] = $row;
     }
+
+    $rows[] = $row;
   }
 
   // Mark all views as reviewed when all are in the database.
