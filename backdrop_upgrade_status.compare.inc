@@ -405,6 +405,11 @@ function backdrop_upgrade_status_obsolete(&$projects, $project) {
   $obsolete = TRUE;
 
   switch ($project) {
+    case 'font_awesome':
+      $projects[$project]['obsolete_since'] = '1.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'fontawesome';
+      break;
+
     case 'gmagick':
       $projects[$project]['obsolete_since'] = '1.x';
       $projects[$project]['replaced_by'][0]['name'] = 'graphicsmagick';
