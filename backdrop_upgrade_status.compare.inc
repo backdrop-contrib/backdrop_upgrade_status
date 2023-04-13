@@ -405,9 +405,9 @@ function backdrop_upgrade_status_obsolete(&$projects, $project) {
   $obsolete = TRUE;
 
   switch ($project) {
-    case 'profile2':
+    case 'gmagick':
       $projects[$project]['obsolete_since'] = '1.x';
-      $projects[$project]['replaced_by'][0]['name'] = 'profile';
+      $projects[$project]['replaced_by'][0]['name'] = 'graphicsmagick';
       break;
 
     case 'google_analytics':
@@ -418,6 +418,11 @@ function backdrop_upgrade_status_obsolete(&$projects, $project) {
     case 'imagecache_actions':
       $projects[$project]['obsolete_since'] = '1.x';
       $projects[$project]['replaced_by'][0]['name'] = 'image_effects';
+      break;
+
+    case 'profile2':
+      $projects[$project]['obsolete_since'] = '1.x';
+      $projects[$project]['replaced_by'][0]['name'] = 'profile';
       break;
 
     // case 'taxonomy_csv':
