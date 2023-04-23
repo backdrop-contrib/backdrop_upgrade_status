@@ -237,6 +237,15 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
       $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
       break;
 
+    case 'entitycache':
+      $data[$project]['in_core_since'] = '1.x';
+      $data[$project]['in_core_note'] = t('Integrated into core Entity module in v1.16.');
+      $data[$project]['in_core_warning'] = t('See <a href="@entitycache">the documentation</a> for more information.', array(
+        '@entitycache' => 'https://docs.backdropcms.org/change-records/entity-caching-added-to-core',
+      ));
+      $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
+      break;
+
     case 'entity_view_mode':
       $data[$project]['in_core_since'] = '1.x';
       $data[$project]['in_core_note'] = t('Integrated into core Field UI module in v1.6.');
@@ -355,8 +364,15 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
 
     case 'media':
       $data[$project]['in_core_since'] = '1.x';
-      $data[$project]['in_core_note'] = t('Partially replaced by core System module in v1.0, CKEditor module in v.1.2, and File module in v1.10.');
-      $data[$project]['in_core_warning'] = t('Media entites are not included (File entites should be sufficient).');
+      $data[$project]['in_core_note'] = t('Partially replaced by file handling in System module in v1.0, CKEditor module in v.1.2, and File module in v1.10.');
+      $data[$project]['in_core_warning'] = t('Media entites are not supported (file entites are sufficient.).');
+      $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
+      break;
+
+    case 'media_ckeditor':
+      $data[$project]['in_core_since'] = '1.x';
+      $data[$project]['in_core_note'] = t('Imanges can be embededd in textfields since 1.11.');
+      $data[$project]['in_core_warning'] = t('Other media types are not yet supported.');
       $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
       break;
 
@@ -483,10 +499,18 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
       $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
       break;
 
-    case 'superfish':
+    case 'systeminfo':
       $data[$project]['in_core_since'] = '1.x';
-      $data[$project]['in_core_note'] = t('Replaced by core System drop-down menus in v1.5 + v1.6.');
+      $data[$project]['in_core_note'] = t('Replaced by core Dashboard blocks since v1.13.');
       $data[$project]['in_core_complete'] = TRUE;
+      $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
+      break;
+
+    case 'taxonomy_display':
+      $data[$project]['in_core_since'] = '1.x';
+      $data[$project]['in_core_note'] = t('Replaced by core Layout module in v1.0.');
+      $data[$project]['in_core_complete'] = TRUE;
+      $data[$project]['in_core_warning'] = t('Taxonomy pages will need to be rebuilt as Layouts.');
       $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
       break;
 
