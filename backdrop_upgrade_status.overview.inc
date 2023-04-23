@@ -479,10 +479,10 @@ function _backdrop_upgrade_status_removed_core_modules() {
     ),
     'blog' => array(
       'class' => 'error',
-      'rec' => t('Delete content, Convert to custom content type, or port to Backdrop.'),
+      'rec' => t('Convert to custom content type, delete content, port module to Backdrop.'),
     ),
     'dashboard' => array(
-      'class' => '',
+      'class' => 'warning',
       'rec' => t('Alternaive core module provided. No action required.'),
     ),
     'forum' => array(
