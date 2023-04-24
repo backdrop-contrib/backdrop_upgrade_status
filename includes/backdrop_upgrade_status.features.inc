@@ -11,6 +11,7 @@ function features_backdrop_upgrade_status_todo() {
     'features' => array(
       'review' => 'features',
       'description' => 'Configuration must be in the database to convert automatically durring upgrade.',
+      'weight' => 9,
     ),
   );
 }

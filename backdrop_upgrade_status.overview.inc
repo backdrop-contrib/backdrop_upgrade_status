@@ -13,7 +13,7 @@
  */
 function backdrop_upgrade_status_report() {
   $welcome = array(
-    t('This information should prove useful as you are evaluating an upgrade to Backdrop CMS for this site. This report should contain an overview for most of the content on this site.'),
+    t('This information should prove useful as you are evaluating an upgrade to Backdrop CMS for this site.'),
   );
   $renderable['welcome'] = array(
     '#type' => 'markup',
@@ -258,12 +258,6 @@ function backdrop_upgrade_status_report() {
   );
   $renderable['custom_modules'] = backdrop_upgrade_status_report_data($custom_module_data);
 
-
-
-  // Updtates defaults based on changed info from above.
-  $renderable['intro']['backdrop_upgrade_status_todo']['#default_value'] = $todo_default;
-
-
   // Add fieldsets for all modules that provide one.
   foreach (module_implements('backdrop_upgrade_status_report') as $module) {
     $module_data = module_invoke($module, 'backdrop_upgrade_status_report');
@@ -271,11 +265,6 @@ function backdrop_upgrade_status_report() {
     $machine = $module_data['machine'];
     unset($module_data['machine']);
 
-    $todo_status = $module_data['todo_status'];
-    unset($module_data['todo_status']);
-
-    // Set default value for checkbox.
-    $renderable['intro']['backdrop_upgrade_status_todo']['#default_value'][$machine] = $todo_status;
     // Add fieldset for module data.
     $renderable[$machine] = backdrop_upgrade_status_report_data($module_data);
   }
@@ -361,9 +350,6 @@ function backdrop_upgrade_status_report_checklist_form($form = array()) {
     '#collapsible' => TRUE,
   );
 
-  // Set the starting default value based on whats in the DataBase.
-  $todo_default = variable_get('backdrop_upgrade_status_todo', array());
-
   // Here's the list of possible overvoew options. Let's make this pluggable?
   $todo_items = array(
     'profile' => array(
@@ -386,10 +372,10 @@ function backdrop_upgrade_status_report_checklist_form($form = array()) {
       'description' => 'Disable and uninstall anthing not in use, or nolonger necessary.',
       'weight' => -10,
     ),
-    'theme' => array(
+    'bartik' => array(
       'description' => 'Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop).',
       'optional' => TRUE,
-      'weight' => 0,
+      'weight' => 100, // Ensure this comes last.
     ),
   );
 
@@ -397,12 +383,15 @@ function backdrop_upgrade_status_report_checklist_form($form = array()) {
   foreach (module_implements('backdrop_upgrade_status_todo') as $module) {
     $module_todos = module_invoke($module, 'backdrop_upgrade_status_todo');
     foreach ($module_todos as $machine => $item) {
+      // Move optional items to the bottom of the list.
+      if ($item['optional'] === TRUE) {
+        $item['weight'] = $item['weight'] + 10;
+      }
       $todo_items[$machine] = $item;
     }
   }
   drupal_alter('backdrop_upgrade_status_todo', $todo_items);
   uasort($todo_items, 'drupal_sort_weight');
-
 
   $todo_options = array();
   foreach ($todo_items as $machine => $item) {
@@ -420,6 +409,9 @@ function backdrop_upgrade_status_report_checklist_form($form = array()) {
     $todo_options[$machine] = $output;
   }
 
+  // Set the starting default value based on whats in the database.
+  $todo_default = variable_get('backdrop_upgrade_status_todo', $starting_todo);
+
   $form['intro']['backdrop_upgrade_status_todo'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Prepare for upgrading to Backdrop CMS:'),
@@ -428,13 +420,13 @@ function backdrop_upgrade_status_report_checklist_form($form = array()) {
   );
 
   $form['intro']['save'] = array(
-    '#type' => 'button',
+    '#type' => 'submit',
     '#value' => t('Save Progress'),
     '#submit' => array('backdrop_upgrade_status_report_checklist_form_submit'),
   );
   $form['intro']['scan'] = array(
     '#type' => 'button',
-    '#value' => t('Scan this site'),
+    '#value' => t('Scan this site - coming soon'),
     '#submit' => array('backdrop_upgrade_status_report_checklist_form_scan'),
     '#disabled' => TRUE,
   );
@@ -447,16 +439,23 @@ function backdrop_upgrade_status_report_checklist_form($form = array()) {
  */
 function backdrop_upgrade_status_report_checklist_form_submit($form, &$form_state) {
   if (isset($form_state['values']['backdrop_upgrade_status_todo'])) {
-    $todo = $form_state['values']['backdrop_upgrade_status_todo'];
-    variable_set('backdrop_upgrade_status_todo', $todo);
+    $save_me = array();
+    foreach ($form_state['values']['backdrop_upgrade_status_todo'] as $key => $value) {
+      if ($value !== 0) {
+        $save_me[] = $key;
+      }
+    }
+    variable_set('backdrop_upgrade_status_todo', $save_me);
   }
+
+  drupal_set_message(t('The checklist has been saved.'));
 }
 
 /**
  * Submit handler for backdrop_upgrade_status_report_checklist_form().
  */
 function backdrop_upgrade_status_report_checklist_form_scan() {
-  drupal_set_message('Not working just yet.');
+  drupal_set_message(t('Not working just yet.'));
 }
 
 
@@ -479,7 +478,7 @@ function _backdrop_upgrade_status_removed_core_modules() {
     ),
     'blog' => array(
       'class' => 'error',
-      'rec' => t('Convert to custom content type, delete content, port module to Backdrop.'),
+      'rec' => t('Convert to custom content type, delete content, ot port the Blog module to Backdrop.'),
     ),
     'dashboard' => array(
       'class' => 'warning',
