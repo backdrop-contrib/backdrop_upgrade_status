@@ -410,13 +410,13 @@ function backdrop_upgrade_status_report_checklist_form($form = array()) {
   }
 
   // Set the starting default value based on whats in the database.
-  $todo_default = variable_get('backdrop_upgrade_status_todo', $starting_todo);
+  $todo_status = variable_get('backdrop_upgrade_status_todo', array());
 
   $form['intro']['backdrop_upgrade_status_todo'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Prepare for upgrading to Backdrop CMS:'),
     '#options' => $todo_options,
-    '#default_value' => $todo_default,
+    '#default_value' => $todo_status,
   );
 
   $form['intro']['save'] = array(
@@ -461,14 +461,23 @@ function backdrop_upgrade_status_report_checklist_form_submit($form, &$form_stat
  * Submit handler for backdrop_upgrade_status_report_checklist_form().
  */
 function backdrop_upgrade_status_report_checklist_form_scan($form, &$form_state) {
+  $todo_status = variable_get('backdrop_upgrade_status_todo', array());
+
   $checklist_data = array();
   foreach (module_implements('backdrop_upgrade_status_scan') as $module) {
-    $checklist_data[] = module_invoke($module, 'backdrop_upgrade_status_scan');
+    $checklist_data += module_invoke($module, 'backdrop_upgrade_status_scan');
   }
 
-  // Check additional boxes, but do not un-check.
+  // Add additional checks, but do not remove.
+  foreach ($checklist_data as $key => $value) {
+    if ($value) {
+      $todo_status[] = $key;
+    }
+  }
 
-  drupal_set_message(t('Not working just yet.'));
+  variable_set('backdrop_upgrade_status_todo', $todo_status);
+
+  drupal_set_message(t('This site has been scanned. Additional items may have been cheked off if we believe they are ready for upgrade.'));
 }
 
 /**

@@ -7,10 +7,7 @@
 /**
  * Returns all content needed for the Backdrop Upgrade Status report.
  *
- * @param array $$renderable
- *   The rest of the form.
- * @param boolean $todo_status
- *   Value of the todo checkbox based on the current state of the site.
+ * @param array $renderable
  *
  * @return array
  *   An array containing all the data needed to build a table on the report,
@@ -24,16 +21,15 @@
  *   - collapsed:
  *   - todo_status:
  */
-function hook_backdrop_upgrade_status_report($todo_status = FALSE) {
+function hook_backdrop_upgrade_status_report() {
   $return = array(
-    'machine' => '',
+    'machine' => 'profile',
     'title' => t('Profile / Distribution'),
     'info' => t('This is the profile that was used when the site was first installed.'),
     'header' => array(t('Profile name'), t('Enabled'), t('Distribution'), t('Backdrop status'), t('Recommendation')),
     'rows' => $profile_rows,
     'empty' => '',
     'collapsed' => $collapsed,
-    'todo_status' => $todo_status,
   );
 
   return $return;
@@ -47,6 +43,26 @@ function hook_backdrop_upgrade_status_report($todo_status = FALSE) {
  */
 function hook_backdrop_upgrade_status_report_alter(&$renderable) {
   // @todo
+}
+
+/**
+ * Implements hook_backdrop_upgrade_status_scan().
+ *
+ * @return array
+ *   For each key in hook_backdrop_upgrade_status_todo, return TRUE or FALSE.
+ *
+ * @see hook_backdrop_upgrade_status_todo().
+ */
+function hook_backdrop_upgrade_status_scan() {
+  $styles = image_styles();
+  foreach ($styles as $style) {
+    $editable = (bool) ($style['storage'] && IMAGE_STORAGE_EDITABLE);
+    if (!$editable) {
+      return array('image' => FALSE);
+    }
+  }
+
+  return array('image' => TRUE);
 }
 
 /**
