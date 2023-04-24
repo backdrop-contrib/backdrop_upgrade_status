@@ -422,13 +422,19 @@ function backdrop_upgrade_status_report_checklist_form($form = array()) {
   $form['intro']['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save Progress'),
+    '#attributes' => array('class' => array('button-primary')),
     '#submit' => array('backdrop_upgrade_status_report_checklist_form_submit'),
   );
   $form['intro']['scan'] = array(
-    '#type' => 'button',
+    '#type' => 'submit',
     '#value' => t('Scan this site - coming soon'),
     '#submit' => array('backdrop_upgrade_status_report_checklist_form_scan'),
     '#disabled' => TRUE,
+  );
+  $form['intro']['clear'] = array(
+    '#type' => 'submit',
+    '#value' => t('Clear progress'),
+    '#submit' => array('backdrop_upgrade_status_report_checklist_form_clear'),
   );
 
   return $form;
@@ -454,10 +460,25 @@ function backdrop_upgrade_status_report_checklist_form_submit($form, &$form_stat
 /**
  * Submit handler for backdrop_upgrade_status_report_checklist_form().
  */
-function backdrop_upgrade_status_report_checklist_form_scan() {
+function backdrop_upgrade_status_report_checklist_form_scan($form, &$form_state) {
+  $checklist_data = array();
+  foreach (module_implements('backdrop_upgrade_status_scan') as $module) {
+    $checklist_data[] = module_invoke($module, 'backdrop_upgrade_status_scan');
+  }
+
+  // Check additional boxes, but do not un-check.
+
   drupal_set_message(t('Not working just yet.'));
 }
 
+/**
+ * Submit handler for backdrop_upgrade_status_report_checklist_form().
+ */
+function backdrop_upgrade_status_report_checklist_form_clear($form, &$form_state) {
+  variable_set('backdrop_upgrade_status_todo', array());
+
+  drupal_set_message(t('The checklist has been cleared.'));
+}
 
 /**
  * Get list of core modules removed from Backdrop, and what to do about each.
