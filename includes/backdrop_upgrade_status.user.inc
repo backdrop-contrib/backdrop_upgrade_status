@@ -10,7 +10,7 @@ function user_backdrop_upgrade_status_todo() {
   return array(
     'user' => array(
       'review' => 'user accounts',
-      'description' => 'Remove old or blocked accounts that are not in use, or wanted in Backdrop.',
+      'description' => 'Remove old or blocked accounts that are not in use, or not wanted in Backdrop.',
       'optional' => TRUE,
       'weight' => 0,
     ),

@@ -10,7 +10,7 @@ function node_backdrop_upgrade_status_todo() {
   return array(
     'node' => array(
       'review' => 'content types',
-      'description' => 'Remove any content types that are not in use, or wanted in Backdrop.',
+      'description' => 'Remove any content types that are not in use, or not wanted in Backdrop.',
       'optional' => TRUE,
       'weight' => 0,
     ),
@@ -50,8 +50,8 @@ function node_backdrop_upgrade_status_report($todo_status = FALSE) {
   $return = array(
     'machine' => 'node',
     'title' => t('Content types'),
-    'info' => t('Any conent types with zero itesm could be deleted.'),
-    'header' => array(t('Conent type'), t('Machine name'), t('Number of items'), t('Recommendation')),
+    'info' => t('Any content types with zero items could be deleted.'),
+    'header' => array(t('Content type'), t('Machine name'), t('Number of items'), t('Recommendation')),
     'rows' => $rows,
     'empty' => '',
     'collapsed' => $collapsed,

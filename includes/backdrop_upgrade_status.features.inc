@@ -10,7 +10,7 @@ function features_backdrop_upgrade_status_todo() {
   return array(
     'features' => array(
       'review' => 'features',
-      'description' => 'Configuration must be in the database to convert automatically durring upgrade.',
+      'description' => 'Configuration must be in the database to convert automatically during upgrade.',
       'weight' => 9,
     ),
   );
@@ -100,8 +100,8 @@ function features_backdrop_upgrade_status_report($todo_status = FALSE) {
   $todo_status = FALSE;
 
   $collapsed = FALSE;
-  $replacements = array('!unfeatureized' => l(t('unfeatureized'), 'https://www.drupal.org/project/unfeaturize'));
-  $info = t('All configuration from Features will need to be in the database in order to be properly upgraded to Backdrop CMS. Features may need to be !unfeatureized.', $replacements);
+  $replacements = array('!unfeaturized' => l(t('unfeaturized'), 'https://www.drupal.org/project/unfeaturize'));
+  $info = t('All configuration from Features will need to be in the database in order to be properly upgraded to Backdrop CMS. Features may need to be !unfeaturized.', $replacements);
 
   $return = array(
     'title' => t('Features data'),

@@ -10,7 +10,7 @@ function image_backdrop_upgrade_status_todo() {
   return array(
     'image' => array(
       'review' => 'image styles',
-      'description' => 'Configuration must be in the database to convert automatically durring upgrade.',
+      'description' => 'Configuration must be in the database to convert automatically during upgrade.',
       'optional' => TRUE,
       'weight' => 0,
     ),
@@ -62,7 +62,7 @@ function image_backdrop_upgrade_status_report($todo_status = FALSE) {
 
   $return = array(
     'title' => t('Image Styles'),
-    'info' => t('Image styles need to be stored in the databse for a smooth upgrade.'),
+    'info' => t('Image styles need to be stored in the database for a smooth upgrade.'),
     'header' => array(t('Style Name'), t('Machine name'), t('Storage state'), t('Recommendation')),
     'rows' => $rows,
     'collapsed' => $collapsed,

@@ -10,7 +10,7 @@ function views_backdrop_upgrade_status_todo() {
   return array(
     'views' => array(
       'review' => 'views',
-      'description' => 'Configuration must be in the database to convert automatically durring upgrade.',
+      'description' => 'Configuration must be in the database to convert automatically during upgrade.',
     ),
   );
 }
@@ -47,7 +47,7 @@ function views_backdrop_upgrade_status_report($todo_status = FALSE) {
         $link = l($text, $href, $options);
         $row['data']['recommendation'] = $link;
       }
-    } 
+    }
 
     else {
 

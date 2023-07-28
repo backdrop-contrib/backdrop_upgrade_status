@@ -10,7 +10,7 @@ function taxonomy_backdrop_upgrade_status_todo() {
   return array(
     'taxonomy' => array(
       'review' => 'taxonomy',
-      'description' => 'Remove terms or vocabularies that are not in use, or wanted in Backdrop.',
+      'description' => 'Remove terms or vocabularies that are not in use, or not wanted in Backdrop.',
       'optional' => TRUE,
       'weight' => 0,
     ),

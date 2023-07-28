@@ -238,7 +238,7 @@ function backdrop_upgrade_status_report() {
     'header' => array(t('Module name'), t('Drupal version'), t('Backdrop status'), t('Recommendation')),
     'collapsed' => FALSE,
   );
-  
+
   if ($available) {
     $contrib_module_data['rows'] = $contrib_module_rows;
     $contrib_module_data['collapsed'] = $collapsed;
@@ -248,7 +248,7 @@ function backdrop_upgrade_status_report() {
     $contrib_module_data['rows'] = array(array(array('data' => $help, 'colspan' => 4)));
   }
   $renderable['contrib_modules'] = backdrop_upgrade_status_report_data($contrib_module_data);
-  
+
   $custom_module_data = array(
     'title' => t('Enabled Custom Modules'),
     'info' => t('This is a summary of enabled custom modules.'),
@@ -359,21 +359,21 @@ function backdrop_upgrade_status_report_checklist_form($form = array()) {
     ),
     'core_modules' => array(
       'review' => 'core modules',
-      'description' => 'Disable and uninstall anthing not in use.',
+      'description' => 'Disable and uninstall anything not in use.',
       'weight' => -10,
     ),
     'contrib_modules' => array(
       'review' => 'contrib modules',
-      'description' => 'Disable and uninstall anthing not in use, or nolonger necessary.',
+      'description' => 'Disable and uninstall anything not in use, or no longer necessary.',
       'weight' => -10,
     ),
     'custom_modules' => array(
       'review' => 'custom modules',
-      'description' => 'Disable and uninstall anthing not in use, or nolonger necessary.',
+      'description' => 'Disable and uninstall anything not in use, or no longer necessary.',
       'weight' => -10,
     ),
     'bartik' => array(
-      'description' => 'Swicth to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop).',
+      'description' => 'Switch to the Bartik theme for the upgrade (Useful if you have not yet ported your Drupal 7 theme to Backdrop).',
       'optional' => TRUE,
       'weight' => 100, // Ensure this comes last.
     ),
@@ -495,11 +495,11 @@ function _backdrop_upgrade_status_removed_core_modules() {
     'aggregator' => array(
       'name' => '',
       'class' => 'warning',
-      'rec' => t('Add the contrib version of Aggregtor to Backdrop.'),
+      'rec' => t('Add the contrib version of Aggregator to Backdrop.'),
     ),
     'blog' => array(
       'class' => 'error',
-      'rec' => t('Convert to custom content type, delete content, ot port the Blog module to Backdrop.'),
+      'rec' => t('Convert to custom content type, delete content, or port the Blog module to Backdrop.'),
     ),
     'dashboard' => array(
       'class' => 'warning',

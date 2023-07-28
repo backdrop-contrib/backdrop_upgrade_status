@@ -10,7 +10,7 @@ function field_backdrop_upgrade_status_todo() {
   return array(
     'field' => array(
       'review' => 'fields',
-      'description' => 'Remove any fields that are not in use, or wanted in Backdrop.',
+      'description' => 'Remove any fields that are not in use, or not wanted in Backdrop.',
       'optional' => TRUE,
       'weight' => 0,
     ),
