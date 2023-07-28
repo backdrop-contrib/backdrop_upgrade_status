@@ -168,13 +168,13 @@ function theme_backdrop_upgrade_status_report($variables) {
     // US: Special handling for projects moved into core.
     if (!empty($project['in_core_note'])) {
       $row .= "<div class=\"core-notice\">\n";
-      $row .=   '<p>';
-      $row .=     '<strong>'. t('In Backdrop core since @version', array('@version' => $project['in_core_since'])) . '</strong><br>';
-      $row .=      $project['in_core_note'];
+      $row .= '<p>';
+      $row .= '<strong>'. t('In Backdrop core since @version', array('@version' => $project['in_core_since'])) . '</strong><br>';
+      $row .= $project['in_core_note'];
       if (isset($project['in_core_warning'])) {
-        $row .=   ' <em>' . $project['in_core_warning'] . '</em>';
+        $row .= ' <em>' . $project['in_core_warning'] . '</em>';
       }
-      $row .=   '</p>';
+      $row .= '</p>';
       $row .= '</div>';
     }
 
@@ -250,7 +250,7 @@ function theme_backdrop_upgrade_status_report($variables) {
         $row .= drupal_placeholder($value['data']);
         $row .= "</div>\n";
       }
-      $row .= "</div>\n";  // extra div.
+      $row .= "</div>\n";  // Extra div.
     }
 
     if (isset($project['replaced_by'])) {
@@ -273,7 +273,7 @@ function theme_backdrop_upgrade_status_report($variables) {
       $includes_items[] = t('Disabled: %disabled', array('%disabled' => implode(', ', $project['disabled'])));
       $row .= theme('item_list', array('items' => $includes_items));
     }
-    else {
+    elseif (!empty($project['includes'])) {
       $row .= '<div class="includes">';
       sort($project['includes']);
       $row .= t('Includes: %includes', array('%includes' => implode(', ', $project['includes'])));
@@ -307,7 +307,7 @@ function theme_backdrop_upgrade_status_report($variables) {
       $row .= "</div>\n";
     }
 
-    $row .= "</div>\n"; // info div.
+    $row .= "</div>\n"; // Info div.
 
     if (!isset($rows[$project['project_type']])) {
       $rows[$project['project_type']] = array();
@@ -339,9 +339,9 @@ function theme_backdrop_upgrade_status_report($variables) {
 
 /**
  * Creates markup for the version display of a project.
- * 
+ *
  * Checks if the date exists before running format_date() on it.
- * 
+ *
  * Replaces theme_update_version().
  */
 function theme_backdrop_upgrade_status_update_version($variables) {
@@ -432,4 +432,3 @@ function theme_backdrop_upgrade_status_status_label($variables) {
       return '<span class="current">'. t('In core') .'</span>';
   }
 }
-
