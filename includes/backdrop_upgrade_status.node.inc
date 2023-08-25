@@ -41,11 +41,9 @@ function node_backdrop_upgrade_status_report($todo_status = FALSE) {
     $rows[] = $row;
   }
 
-  // @todo add $collapsed
-  $collapsed = FALSE;
-
-  // @todo add $todo_status
-  $todo_status = FALSE;
+  // Get current state.
+  $todo_status = backdrop_upgrade_status_get_state('node');
+  $collapsed = $todo_status;
 
   $return = array(
     'machine' => 'node',
@@ -53,7 +51,7 @@ function node_backdrop_upgrade_status_report($todo_status = FALSE) {
     'info' => t('Any content types with zero items could be deleted.'),
     'header' => array(t('Content type'), t('Machine name'), t('Number of items'), t('Recommendation')),
     'rows' => $rows,
-    'empty' => '',
+    'empty' => t('No custom node types have been detected.'),
     'collapsed' => $collapsed,
     'todo_status' => $todo_status,
   );

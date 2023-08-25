@@ -24,7 +24,11 @@ function features_backdrop_upgrade_status_report($todo_status = FALSE) {
 
   // Add a fieldset to the report.
   $rows = array();
-  $collapsed = TRUE;
+
+  // Get current state.
+  $todo_status = backdrop_upgrade_status_get_state('features');
+  $collapsed = $todo_status;
+
   module_load_include('inc', 'features', 'features.admin');
   $default_text = array(
     FEATURES_OVERRIDDEN => t('Overridden'),
@@ -96,21 +100,18 @@ function features_backdrop_upgrade_status_report($todo_status = FALSE) {
     }
   }
 
-  // @todo add $todo_status
-  $todo_status = FALSE;
-
-  $collapsed = FALSE;
   $replacements = array('!unfeaturized' => l(t('unfeaturized'), 'https://www.drupal.org/project/unfeaturize'));
   $info = t('All configuration from Features will need to be in the database in order to be properly upgraded to Backdrop CMS. Features may need to be !unfeaturized.', $replacements);
 
   $return = array(
+    'machine' => 'features',
     'title' => t('Features data'),
     'info' => $info,
     'header' => array(t('Name'), t('Machine name'), t('Storage state'), t('Components'), t('Description'), t('Recommendation')),
     'rows' => $rows,
+    'empty' => t('No feature modules have been detected.'),
     'collapsed' => $collapsed,
     'todo_status' => $todo_status,
-    'machine' => 'features',
   );
 
   return $return;

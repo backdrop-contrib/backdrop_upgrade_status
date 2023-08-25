@@ -61,7 +61,7 @@ function backdrop_upgrade_status_report() {
   );
   $profile_data = array(
     'title' => t('Profile / Distribution'),
-    'info' => t('This is the profile that was used when the site was first installed.'),
+    'info' => t('This is the Install Profile or Distribution that was used when the site was first installed.'),
     'header' => array(t('Profile name'), t('Enabled'), t('Distribution'), t('Backdrop status'), t('Recommendation')),
     'rows' => $profile_rows,
     'collapsed' => $collapsed,
@@ -200,7 +200,7 @@ function backdrop_upgrade_status_report() {
         $row = array(
           'data' => array(
             'name' => $project->info['name'],
-            'drupal' => t('Custom?'),
+            'drupal' => t('Custom'),
             'backdrop' => t('Unknown'),
             'rec' => t('Port :module to Backdrop.', array(':module' => $project->info['name'])),
           ),
@@ -231,12 +231,16 @@ function backdrop_upgrade_status_report() {
   );
   $renderable['core_modules'] = backdrop_upgrade_status_report_data($core_module_data);
 
+  // Get current state.
+  $collapsed = backdrop_upgrade_status_get_state('contrib_modules');
 
   $contrib_module_data = array(
+    'machine' => 'contrib_modules',
     'title' => t('Enabled Contrib Modules'),
     'info' => t('This is a summary of enabled contributed modules.'),
     'header' => array(t('Module name'), t('Drupal version'), t('Backdrop status'), t('Recommendation')),
-    'collapsed' => FALSE,
+    'empty' => t('No enabled contributed modules have been detected.'),
+    'collapsed' => $collapsed,
   );
 
   if ($available) {
@@ -249,12 +253,17 @@ function backdrop_upgrade_status_report() {
   }
   $renderable['contrib_modules'] = backdrop_upgrade_status_report_data($contrib_module_data);
 
+  // Get current state.
+  $collapsed = backdrop_upgrade_status_get_state('custom_modules');
+
   $custom_module_data = array(
+    'machine' => 'custom_modules',
     'title' => t('Enabled Custom Modules'),
     'info' => t('This is a summary of enabled custom modules.'),
     'header' => array(t('Module name'), t('Drupal status'), t('Backdrop status'), t('Recommendation')),
     'rows' => $custom_module_rows,
-    'collapsed' => FALSE,
+    'empty' => t('No enabled custom modules have been detected.'),
+    'collapsed' => $collapsed,
   );
   $renderable['custom_modules'] = backdrop_upgrade_status_report_data($custom_module_data);
 

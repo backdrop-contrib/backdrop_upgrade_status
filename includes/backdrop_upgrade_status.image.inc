@@ -23,7 +23,11 @@ function image_backdrop_upgrade_status_todo() {
 function image_backdrop_upgrade_status_report($todo_status = FALSE) {
   // Get all the taxonomy terms in the system.
   $rows = array();
-  $collapsed = TRUE;
+
+  // Get current state.
+  $todo_status = backdrop_upgrade_status_get_state('image');
+  $collapsed = $todo_status;
+
   $styles = image_styles();
   foreach ($styles as $style) {
     $storage = t('In database');
@@ -55,19 +59,19 @@ function image_backdrop_upgrade_status_report($todo_status = FALSE) {
   }
 
   // Mark all image_styles as reviewed when all are in the database.
-  $todo_status = FALSE;
   if ($collapsed && !isset($renderable['intro']['backdrop_upgrade_status_todo']['#default_value']['image_styles'])) {
     $todo_status = TRUE;
   }
 
   $return = array(
+    'machine' => 'image',
     'title' => t('Image Styles'),
     'info' => t('Image styles need to be stored in the database for a smooth upgrade.'),
     'header' => array(t('Style Name'), t('Machine name'), t('Storage state'), t('Recommendation')),
     'rows' => $rows,
+    'empty' => t('No image styles have been detected.'),
     'collapsed' => $collapsed,
     'todo_status' => $todo_status,
-    'machine' => 'image',
   );
 
   return $return;

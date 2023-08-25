@@ -39,11 +39,8 @@ function user_backdrop_upgrade_status_report($todo_status = FALSE) {
     $rows[] = $row;
   }
 
-  // @todo add $collapsed
-  $collapsed = FALSE;
-
-  // @todo add $todo_status
-  $todo_status = FALSE;
+  $todo_status = backdrop_upgrade_status_get_state('user');
+  $collapsed = $todo_status;
 
   $return = array(
     'machine' => 'user',

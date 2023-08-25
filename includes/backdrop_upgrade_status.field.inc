@@ -77,11 +77,9 @@ function field_backdrop_upgrade_status_report($todo_status = FALSE) {
     $rows[$field_name]['data']['bundles'] = implode(', ', $cell['data']['bundles']);
   }
 
-  // @todo add $collapsed
-  $collapsed = FALSE;
-
-  // @todo add $todo_status
-  $todo_status = FALSE;
+  // Get current state.
+  $todo_status = backdrop_upgrade_status_get_state('field');
+  $collapsed = $todo_status;
 
   $return = array(
     'machine' => 'field',
@@ -89,8 +87,8 @@ function field_backdrop_upgrade_status_report($todo_status = FALSE) {
     'info' => t('Any fields with zero values could be removed.'),
     'header' => array(t('Field name'), t('Field type'), t('Module'), t('Used in'), t('Number of values'), t('Recommendation')),
     'rows' => $rows,
+    'empty' => t('No custom fields have been detected.'),
     'collapsed' => $collapsed,
-    'empty' => t('No fields have been defined yet.'),
     'todo_status' => $todo_status,
   );
 

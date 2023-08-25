@@ -40,8 +40,9 @@ function taxonomy_backdrop_upgrade_status_report($todo_status = FALSE) {
     $rows[] = $row;
   }
 
-  // @todo add $collapsed
-  $collapsed = FALSE;
+  // Get current state.
+  $todo_status = backdrop_upgrade_status_get_state('taxonomy');
+  $collapsed = $todo_status;
 
   // @todo add $todo_status
   $todo_status = FALSE;
@@ -52,7 +53,7 @@ function taxonomy_backdrop_upgrade_status_report($todo_status = FALSE) {
     'info' => t('Any vocabularies with zero terms could be deleted.'),
     'header' => array(t('Vocabulary'), t('Vocabulary ID'), t('Machine name'), t('Number of terms')),
     'rows' => $rows,
-    'empty' => '',
+    'empty' => t('No vocabularies have been detected.'),
     'collapsed' => $collapsed,
     'todo_status' => $todo_status,
   );

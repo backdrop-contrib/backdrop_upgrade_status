@@ -21,7 +21,11 @@ function views_backdrop_upgrade_status_todo() {
 function views_backdrop_upgrade_status_report($todo_status = FALSE) {
   // Get all the taxonomy terms in the system.
   $rows = array();
-  $collapsed = TRUE;
+
+  // Get current state.
+  $todo_status = backdrop_upgrade_status_get_state('views');
+  $collapsed = $todo_status;
+
   $views = views_get_all_views();
   foreach ($views as $view) {
 
@@ -84,7 +88,6 @@ function views_backdrop_upgrade_status_report($todo_status = FALSE) {
   }
 
   // Mark all views as reviewed when all are in the database.
-  $todo_status = FALSE;
   if ($collapsed && !isset($renderable['intro']['backdrop_upgrade_status_todo']['#default_value']['views'])) {
     $todo_status = TRUE;
   }
@@ -95,7 +98,7 @@ function views_backdrop_upgrade_status_report($todo_status = FALSE) {
     'info' => t('All views should show STORAGE STATE as <strong>In database</strong> in order to be properly upgraded into Backdrop CMS. Note: You will first need to make the <em>Save</em> button appear on the Edit View form. Click on any setting to open a modal, then click <em>Cancel</em> to close the modal. The <em>Save</em> button will be at the top right.'),
     'header' => array(t('View name'), t('Machine name'), t('Storage state'), t('Description'), t('Recommendation')),
     'rows' => $rows,
-    'empty' => '',
+    'empty' => t('No enabled custom views have been detected.'),
     'collapsed' => $collapsed,
     'todo_status' => $todo_status,
   );

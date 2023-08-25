@@ -38,11 +38,9 @@ function paragraphs_backdrop_upgrade_status_report($todo_status = FALSE) {
     $rows[] = $row;
   }
 
-  // @todo add $collapsed
-  $collapsed = FALSE;
-
-  // @todo add $todo_status
-  $todo_status = FALSE;
+  // Get current state.
+  $todo_status = backdrop_upgrade_status_get_state('paragraphs');
+  $collapsed = $todo_status;
 
   $return = array(
     'machine' => 'paragraphs',
@@ -50,7 +48,7 @@ function paragraphs_backdrop_upgrade_status_report($todo_status = FALSE) {
     'info' => t('Any paragraph types with zero items could be deleted.'),
     'header' => array(t('Paragraph type'), t('Machine name'), t('Number of paragraphs')),
     'rows' => $rows,
-    'empty' => '',
+    'empty' => t('No paragraph types have been detected.'),
     'collapsed' => $collapsed,
     'todo_status' => $todo_status,
   );

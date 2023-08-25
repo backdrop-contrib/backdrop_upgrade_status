@@ -227,6 +227,53 @@ function backdrop_upgrade_status_fetch_data() {
 }
 
 /**
+ * Saves the state of a checkboxes on the todo list.
+ *
+ * @param $new_state array
+ *   Array of key/value pairs to save.
+ *   - key is name of checkbox.
+ *   - value is boolean TRUE/FALSE.
+ *
+ * @see backdrop_upgrade_status_get_state()
+ */
+function backdrop_upgrade_status_save_state($new_state = '') {
+  if (!empty($new_state)) {
+    $todo_state = &drupal_static(__FUNCTION__);
+    if (empty($todo_state)) {
+      $todo_state = variable_get('backdrop_upgrade_status_todo', array());
+    }
+
+    $todo_state += $new_state;
+    variable_set('backdrop_upgrade_status_todo', $todo_state);
+  }
+}
+
+/**
+ * Saves the state of a single checkbox on the todo list.
+ *
+ * @param $checkbox string
+ *   Machine name of checkbox.
+ *
+ * @return boolean
+ *   Value of stored state, or FLASE if not set.
+ *
+ * @see backdrop_upgrade_status_save_state()
+ */
+function backdrop_upgrade_status_get_state($checkbox = '') {
+  if (!empty($checkbox)) {
+    $todo_state = &drupal_static(__FUNCTION__);
+    if (empty($todo_state)) {
+      $todo_state = variable_get('backdrop_upgrade_status_todo', array());
+    }
+
+    if (in_array($checkbox, $todo_state)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/**
  * Returns all currently cached data about available releases for all projects.
  *
  * @return
