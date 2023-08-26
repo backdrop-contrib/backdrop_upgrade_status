@@ -17,7 +17,7 @@ function features_backdrop_upgrade_status_todo() {
 }
 
 /**
- * Implements hook_backdrop_upgrade_status_report_alter().
+ * Implements hook_backdrop_upgrade_status_report().
  */
 function features_backdrop_upgrade_status_report($todo_status = FALSE) {
   // Add a checkbox to the todo list.

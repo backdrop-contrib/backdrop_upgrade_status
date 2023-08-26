@@ -12,16 +12,20 @@
  * @return array
  *   An array containing all the data needed to build a table on the report,
  *   containing the following keys:
- *   - machine:
- *   - title:
- *   - info:
- *   - header:
- *   - rows:
- *   - empty:
- *   - collapsed:
- *   - todo_status:
+ *   - machine: The machine name of the checkbox.
+ *   - title: The content for fieldset label, as passed through t().
+ *   - info: The content for the introductary paragraph, passed through t().
+ *   - header: Array of columnn headers for data, each passed through t().
+ *   - rows: Table of data (must match column headers), sanitized.
+ *   - empty: Text to display when there are no rows.
+ *   - collapsed: Whether or not the fieldset should be collapsed.
+ *   - todo_status: deprecated. do not use.
  */
 function hook_backdrop_upgrade_status_report() {
+
+  // Get current state.
+  $profile_collapsed = backdrop_upgrade_status_get_state('profile');
+
   $return = array(
     'machine' => 'profile',
     'title' => t('Profile / Distribution'),
@@ -29,7 +33,7 @@ function hook_backdrop_upgrade_status_report() {
     'header' => array(t('Profile name'), t('Enabled'), t('Distribution'), t('Backdrop status'), t('Recommendation')),
     'rows' => $profile_rows,
     'empty' => '',
-    'collapsed' => $collapsed,
+    'collapsed' => $profile_collapsed,
   );
 
   return $return;

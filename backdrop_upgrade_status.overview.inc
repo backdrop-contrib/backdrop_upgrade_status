@@ -26,7 +26,8 @@ function backdrop_upgrade_status_report() {
   // Add the profile data.
   $profile = drupal_get_profile();
   $info = system_get_info('module', $profile);
-  $collapsed = TRUE;
+  // Get current state. Defaults to FALSE / open.
+  $profile_collapsed = backdrop_upgrade_status_get_state('profile');
   $recommendation = '';
   $backdrop_status = t('Supported');
   $drupal_status = db_query("SELECT status FROM {system} WHERE name = :profile", array(':profile' => $profile))->fetchField();
@@ -39,10 +40,10 @@ function backdrop_upgrade_status_report() {
   }
 
   if ($info['distribution_name'] == 'Drupal') {
-    $todo_default['profile'] = 'profile';
+    // @todo, don't collapse when set not reviewed?
+    $profile_collapsed = TRUE;
   }
   else {
-    $collapsed = FALSE;
     $recommendation = t('Check if the distribution is available for Backdrop, or use the <a href="!url">profile switcher</a> module to change to the Standard profile.', array('!url' => 'https://www.drupal.org/project/profile_switcher'));
     $backdrop_status = t('Unknown');
     $class = 'warning';
@@ -59,12 +60,14 @@ function backdrop_upgrade_status_report() {
       'class' => isset($class) ? array($class) : array(),
     ),
   );
+
   $profile_data = array(
-    'title' => t('Profile / Distribution'),
+    'machine' => 'profile',
+    'title' => t('Install Profile / Distribution'),
     'info' => t('This is the Install Profile or Distribution that was used when the site was first installed.'),
     'header' => array(t('Profile name'), t('Enabled'), t('Distribution'), t('Backdrop status'), t('Recommendation')),
     'rows' => $profile_rows,
-    'collapsed' => $collapsed,
+    'collapsed' => $profile_collapsed,
   );
   $renderable['profile'] = backdrop_upgrade_status_report_data($profile_data);
 
@@ -80,11 +83,14 @@ function backdrop_upgrade_status_report() {
     $backdrop_data = backdrop_upgrade_status_calculate_project_data($available);
   }
 
-  $collapsed = TRUE;
   $core_modules = array();
   $core_module_rows = array();
+  $core_collapsed = backdrop_upgrade_status_get_state('core_modules');
+
   $contrib_modules = array();
   $contrib_module_rows = array();
+  $contrib_collapsed = backdrop_upgrade_status_get_state('contrib_modules');
+
   $last_project = '';
   foreach ($projects as $project) {
     $to_skip = array('views_ui', 'backdrop_upgrade_status');
@@ -103,7 +109,8 @@ function backdrop_upgrade_status_report() {
           $recommendation = $removed_modules[$project->name]['rec'];
           if (!empty($removed_modules[$project->name]['class'])) {
             $class = $removed_modules[$project->name]['class'];
-            $collapsed = FALSE;
+            // @todo, don't collapse when set not reviewed?
+            $core_collapsed = FALSE;
           }
         }
         else {
@@ -219,33 +226,25 @@ function backdrop_upgrade_status_report() {
     }
   }
 
-  if ($collapsed) {
-    $todo_default['core'] = 'core';
-  }
   $core_module_data = array(
     'title' => t('Enabled Core Modules'),
     'info' => t('This is a summary of enabled core modules.'),
     'header' => array(t('Module name'), t('Drupal status'), t('Backdrop status'), t('Recommendation')),
     'rows' => $core_module_rows,
-    'collapsed' => $collapsed,
+    'collapsed' => $core_collapsed,
   );
   $renderable['core_modules'] = backdrop_upgrade_status_report_data($core_module_data);
 
-  // Get current state.
-  $collapsed = backdrop_upgrade_status_get_state('contrib_modules');
-
   $contrib_module_data = array(
-    'machine' => 'contrib_modules',
     'title' => t('Enabled Contrib Modules'),
     'info' => t('This is a summary of enabled contributed modules.'),
     'header' => array(t('Module name'), t('Drupal version'), t('Backdrop status'), t('Recommendation')),
     'empty' => t('No enabled contributed modules have been detected.'),
-    'collapsed' => $collapsed,
+    'collapsed' => $contrib_collapsed,
   );
 
   if ($available) {
     $contrib_module_data['rows'] = $contrib_module_rows;
-    $contrib_module_data['collapsed'] = $collapsed;
   }
   else {
     $help = _backdrop_upgrade_status_help();
@@ -253,17 +252,16 @@ function backdrop_upgrade_status_report() {
   }
   $renderable['contrib_modules'] = backdrop_upgrade_status_report_data($contrib_module_data);
 
-  // Get current state.
-  $collapsed = backdrop_upgrade_status_get_state('custom_modules');
+  // Get current state, don't try to guess.
+  $custom_collapsed = backdrop_upgrade_status_get_state('custom_modules');
 
   $custom_module_data = array(
-    'machine' => 'custom_modules',
     'title' => t('Enabled Custom Modules'),
     'info' => t('This is a summary of enabled custom modules.'),
     'header' => array(t('Module name'), t('Drupal status'), t('Backdrop status'), t('Recommendation')),
     'rows' => $custom_module_rows,
     'empty' => t('No enabled custom modules have been detected.'),
-    'collapsed' => $collapsed,
+    'collapsed' => $custom_collapsed,
   );
   $renderable['custom_modules'] = backdrop_upgrade_status_report_data($custom_module_data);
 
@@ -271,6 +269,7 @@ function backdrop_upgrade_status_report() {
   foreach (module_implements('backdrop_upgrade_status_report') as $module) {
     $module_data = module_invoke($module, 'backdrop_upgrade_status_report');
 
+    // Use machine for the fieldset name only.
     $machine = $module_data['machine'];
     unset($module_data['machine']);
 
@@ -306,6 +305,9 @@ include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.features.inc')
  *   - header: Array of columnn headers for data, each passed through t().
  *   - rows: Table of data (must match column headers), sanitized.
  *   - collapsed: Whether or not the fieldset should be collapsed.
+ *   - empty: Text to display when there are no rows.
+ *
+ * Note: the key 'machine' should not be included in $variables.
  *
  * @return array
  *   Renderable fieldset.
@@ -315,28 +317,28 @@ function backdrop_upgrade_status_report_data($variables) {
   $info = $variables['info'];
   $header = $variables['header'];
   $rows = $variables['rows'];
-  $collapsed = isset($variables['collapsed'])? $variables['collapsed']: TRUE;
+  $collapsed = $variables['collapsed'];
+  $empty = $variables['empty'];
 
-  if (!empty($rows)) {
-    $fieldset = array(
-      '#type' => 'fieldset',
-      '#title' => $title,
-      '#collapsible' => TRUE,
-      '#collapsed' => $collapsed,
-    );
-    $fieldset['info'] = array(
-      '#type' => 'markup',
-      '#markup' => $info,
-    );
-    $fieldset['table'] = array(
-      '#type' => 'markup',
-      '#markup' => theme('table', array(
-        'header' => $header,
-        'rows' => $rows,
-        'attributes' => array('class' => array('backdrop-upgrade-table')),
-      )),
-    );
-  }
+  $fieldset = array(
+    '#type' => 'fieldset',
+    '#title' => $title,
+    '#collapsible' => TRUE,
+    '#collapsed' => $collapsed,
+  );
+  $fieldset['info'] = array(
+    '#type' => 'markup',
+    '#markup' => $info,
+  );
+  $fieldset['table'] = array(
+    '#type' => 'markup',
+    '#markup' => theme('table', array(
+      'header' => $header,
+      'rows' => $rows,
+      'attributes' => array('class' => array('backdrop-upgrade-table')),
+      'empty' => $empty,
+    )),
+  );
 
   return $fieldset;
 }
