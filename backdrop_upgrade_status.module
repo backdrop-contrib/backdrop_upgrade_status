@@ -75,13 +75,13 @@ function backdrop_upgrade_status_menu() {
     'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
-    'file' => 'backdrop_upgrade_status.report.inc'
+    'file' => 'backdrop_upgrade_status.report.inc',
   );
   $items['admin/reports/updates/backdrop-upgrade/check'] = array(
     'page callback' => 'backdrop_upgrade_status_manual_status',
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
-    'file' => 'backdrop_upgrade_status.fetch.inc'
+    'file' => 'backdrop_upgrade_status.fetch.inc',
   );
 
   // Add overview report.
@@ -92,7 +92,7 @@ function backdrop_upgrade_status_menu() {
     'page arguments' => array('backdrop_upgrade_status_report'),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'backdrop_upgrade_status.overview.inc'
+    'file' => 'backdrop_upgrade_status.overview.inc',
   );
 
   return $items;
@@ -349,7 +349,7 @@ function theme_backdrop_upgrade_status_last_check($variables) {
  * @return
  *   TRUE if project has been moved into core.
  *
- * @see _backdrop_upgrade_status_backdrop_core().
+ * @see _backdrop_upgrade_status_backdrop_core()
  */
 function backdrop_upgrade_status_moved_into_core(&$projects, $project) {
 
@@ -383,6 +383,7 @@ function backdrop_upgrade_status_moved_into_core(&$projects, $project) {
  * Helper function to provide links for generating upgrade status data.
  */
 function _backdrop_upgrade_status_help() {
+  $destination = drupal_get_destination();
   $help = t('No Backdrop upgrade information available. <a href="@run_cron">Run cron</a> or <a href="@check_manually">check manually</a>.', array(
     '@run_cron' => url('admin/reports/status/run-cron', array('query' => $destination)),
     '@check_manually' => url('admin/reports/updates/backdrop-upgrade/check', array('query' => $destination)),
