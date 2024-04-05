@@ -374,7 +374,7 @@ function backdrop_upgrade_status_moved_into_core(&$projects, $project) {
       $include_me = 'includes/backdrop_upgrade_status.';
       module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'd7core');
       $d7_core = _backdrop_upgrade_status_d7_core($projects, $project);
-      module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'core');
+      module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'core.included');
       $backdrop_core = _backdrop_upgrade_status_backdrop_core($projects, $project);
 
       $core = $d7_core || $backdrop_core;
