@@ -314,6 +314,15 @@ include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.features.inc')
  *   Renderable fieldset.
  */
 function backdrop_upgrade_status_report_data($variables) {
+  $defaults = array(
+    'title' => '',
+    'info' => '',
+    'header' => '',
+    'rows' => '',
+    'collapsed' => '',
+    'empty' => '',
+  );
+  $variables = array_merge($defaults , $variables);
   $title = $variables['title'];
   $info = $variables['info'];
   $header = $variables['header'];
@@ -396,8 +405,13 @@ function backdrop_upgrade_status_report_checklist_form($form = array()) {
     $module_todos = module_invoke($module, 'backdrop_upgrade_status_todo');
     foreach ($module_todos as $machine => $item) {
       // Move optional items to the bottom of the list.
-      if ($item['optional'] === TRUE) {
-        $item['weight'] = $item['weight'] + 10;
+      if (isset($item['optional']) && $item['optional'] === TRUE) {
+        if (isset($item['weight'])) {
+          $item['weight'] = $item['weight'] + 100;
+        }
+        else {
+          $item['weight'] = 100;
+        }
       }
       $todo_items[$machine] = $item;
     }

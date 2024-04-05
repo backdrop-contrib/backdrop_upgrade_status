@@ -58,8 +58,16 @@ function field_backdrop_upgrade_status_report($todo_status = FALSE) {
         }
 
         // Add the current instance.
-        $admin_path = _field_ui_bundle_admin_path($entity_type, $bundle);
-        $rows[$field_name]['data']['bundles'][] = $admin_path ? l($bundles[$entity_type][$bundle]['label'], $admin_path . '/fields') : $bundles[$entity_type][$bundle]['label'];
+        if (isset($bundles[$entity_type][$bundle]['label'])) {
+          $label = $bundles[$entity_type][$bundle]['label'];
+          $admin_path = _field_ui_bundle_admin_path($entity_type, $bundle);
+          if ($admin_path) {
+            $rows[$field_name]['data']['bundles'][] = l($label, $admin_path . '/fields');
+          }
+          else {
+            $rows[$field_name]['data']['bundles'][] = $label;
+          }
+        }
 
         // Add the item count.
         $table = 'field_data_' . $field_name;
