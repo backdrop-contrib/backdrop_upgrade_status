@@ -361,7 +361,7 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
 
     case 'linkit':
       $data[$project]['in_core_since'] = '1.x';
-      $data[$project]['in_core_note'] = t('Partially in core.');
+      $data[$project]['in_core_note'] = t('Partially integrated into core.');
       $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
       break;
 
