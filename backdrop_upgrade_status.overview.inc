@@ -75,11 +75,13 @@ function backdrop_upgrade_status_report() {
   // Get all module data.
   $projects = system_rebuild_module_data();
   // Get list of core modules removed from Backdrop.
+  $include_me = 'includes/backdrop_upgrade_status.';
+  module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'core.removed');
   $removed_modules = _backdrop_upgrade_status_removed_core_modules();
 
   // Get backdrop project data.
   if ($available = backdrop_upgrade_status_get_available()) {
-    module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.compare');
+    module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'compare');
     $backdrop_data = backdrop_upgrade_status_calculate_project_data($available);
   }
 
@@ -513,84 +515,4 @@ function backdrop_upgrade_status_report_checklist_form_clear($form, &$form_state
   variable_set('backdrop_upgrade_status_todo', array());
 
   drupal_set_message(t('The checklist has been cleared.'));
-}
-
-/**
- * Get list of core modules removed from Backdrop, and what to do about each.
- *
- * @return array
- *   List of modules removed from core as an array with the follwing keys:
- *   - class: Class to color-code the row of the modules table.
- *   - rec: Recommendation for how to proceed.
- */
-function _backdrop_upgrade_status_removed_core_modules() {
-  $drupal_url = 'https://drupal.org/project/';
-  // @todo - remove t() here and add instead at render point.
-  return array(
-    'aggregator' => array(
-      'name' => '',
-      'class' => 'warning',
-      'rec' => t('Add the contrib version of Aggregator to Backdrop.'),
-    ),
-    'blog' => array(
-      'class' => 'error',
-      'rec' => t('Convert to custom content type, delete content, or port the Blog module to Backdrop.'),
-    ),
-    'dashboard' => array(
-      'class' => 'warning',
-      'rec' => t('Alternative core module provided. Disable and uninstall the Drupal 7 version, then install the provided version on Backdrop after the upgrade.'),
-    ),
-    'forum' => array(
-      'class' => 'warning',
-      'rec' => t('Add the contrib version of Forum to Backdrop.'),
-    ),
-    'help' => array(
-      'class' => 'warning', // Warning, because help is rarely necessary.
-      'rec' => t('Disable and Uninstall :module, or port to Backdrop.)'),
-    ),
-    'openid' => array(
-      'class' => 'error',
-      'rec' => t('Port :module to Backdrop, or Disable and Uninstall.'),
-    ),
-    'overlay' => array(
-      'class' => 'warning', // Warning, because overlay is rarely necessary.
-      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
-    ),
-    'php' => array(
-      'class' => 'error',
-      'rec' => t('Review all PHP code: delete or change format. Disable and Uninstall PHP Filter module.'),
-    ),
-    'poll' => array(
-      'class' => 'error',
-      'rec' => t('Port Poll modile to Backdrop, or Disable and Uninstall.'),
-    ),
-    'profile' => array(
-      'class' => 'warning',
-      'rec' => t('Add the contrib version of :module to Backdrop.'),
-    ),
-    'rdf' => array(
-      'class' => 'warning', // Warning, because rdf is rarely necessary.
-      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
-    ),
-    'shortcut' => array(
-      'class' => 'warning', // Warning, because shortcut is rarely necessary.
-      'rec' => t('Add the contrib version of :module to Backdrop.'),
-    ),
-    'statistics' => array(
-      'class' => 'warning', // Warning, because statistics is rarely necessary.
-      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
-    ),
-    'toolbar' => array(
-      'class' => '',
-      'rec' => t('Alternative core module provided. No action required.'),
-    ),
-    'tracker' => array(
-      'class' => 'warning', // Warning, because tracker is rarely necessary.
-      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
-    ),
-    'trigger' => array(
-      'class' => 'warning',
-      'rec' => t('Add the contrib version of :module to Backdrop.'),
-    )
-  );
 }

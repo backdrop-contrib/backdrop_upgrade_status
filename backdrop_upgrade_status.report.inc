@@ -14,7 +14,8 @@ module_load_include('inc', 'update', 'update.report');
 function backdrop_upgrade_status_status() {
   // US: Don't pass TRUE to check cache only.
   if ($available = backdrop_upgrade_status_get_available()) {
-    module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.compare');
+    $include_me = 'includes/backdrop_upgrade_status.';
+    module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'compare');
     $data = backdrop_upgrade_status_calculate_project_data($available);
     return theme('backdrop_upgrade_status_report', array('data' => $data));
   }

@@ -58,7 +58,8 @@ function backdrop_upgrade_status_cron() {
     return;
   }
 
-  module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.fetch');
+  $include_me = 'includes/backdrop_upgrade_status.';
+  module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'fetch');
   backdrop_upgrade_status_manual_status();
 
   variable_set('backdrop_upgrade_status_last_check', REQUEST_TIME);
@@ -142,7 +143,8 @@ function backdrop_upgrade_status_theme() {
  * @see update_get_projects()
  */
 function backdrop_upgrade_status_get_available($refresh = FALSE) {
-  module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.compare');
+  $include_me = 'includes/backdrop_upgrade_status.';
+  module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'compare');
   $needs_refresh = FALSE;
 
   // Grab whatever data we currently have cached in the DB.
@@ -202,7 +204,8 @@ function backdrop_upgrade_status_get_available($refresh = FALSE) {
  * @see _backdrop_upgrade_status_create_fetch_task()
  */
 function backdrop_upgrade_status_create_fetch_task($project) {
-  module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.fetch');
+  $include_me = 'includes/backdrop_upgrade_status.';
+  module_load_include('inc', 'backdrop_upgrade_status', $include_me .'fetch');
   return _backdrop_upgrade_status_create_fetch_task($project);
 }
 
@@ -212,7 +215,8 @@ function backdrop_upgrade_status_create_fetch_task($project) {
  * @see _backdrop_upgrade_status_refresh()
  */
 function backdrop_upgrade_status_refresh() {
-  module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.fetch');
+  $include_me = 'includes/backdrop_upgrade_status.';
+  module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'fetch');
   return _backdrop_upgrade_status_refresh();
 }
 
@@ -222,7 +226,8 @@ function backdrop_upgrade_status_refresh() {
  * @see _backdrop_upgrade_status_fetch_data()
  */
 function backdrop_upgrade_status_fetch_data() {
-  module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.fetch');
+  $include_me = 'includes/backdrop_upgrade_status.';
+  module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'fetch');
   return _backdrop_upgrade_status_fetch_data();
 }
 
@@ -366,10 +371,10 @@ function backdrop_upgrade_status_moved_into_core(&$projects, $project) {
 
     case '8.x':
 
-      module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.d7core');
+      $include_me = 'includes/backdrop_upgrade_status.';
+      module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'd7core');
       $d7_core = _backdrop_upgrade_status_d7_core($projects, $project);
-
-      module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.core');
+      module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'core');
       $backdrop_core = _backdrop_upgrade_status_backdrop_core($projects, $project);
 
       $core = $d7_core || $backdrop_core;

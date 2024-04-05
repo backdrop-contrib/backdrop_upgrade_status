@@ -221,7 +221,8 @@ function _backdrop_upgrade_status_process_fetch_task($project) {
  * Clears out all the cached available update data and initiates re-fetching.
  */
 function _backdrop_upgrade_status_refresh() {
-  module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.compare');
+  $include_me = 'includes/backdrop_upgrade_status.';
+  module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'compare');
 
   // Since we're fetching new available update data, we want to clear
   // our cache of both the projects we care about, and the current update
