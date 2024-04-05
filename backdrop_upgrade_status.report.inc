@@ -40,6 +40,7 @@ function backdrop_upgrade_status_status() {
 function theme_backdrop_upgrade_status_report($variables) {
   $data = $variables['data'];
 
+  // @todo - switch this to the state system?
   $last = variable_get('backdrop_upgrade_status_last_check', 0);
   $output = theme('backdrop_upgrade_status_last_check', array('last' => $last));
 
@@ -126,6 +127,7 @@ function theme_backdrop_upgrade_status_report($variables) {
         $icon = theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('warning'), 'title' => t('warning')));
         break;
     }
+
     // US: Special handling for project moved into core.
     if ($project['status'] == BACKDROP_UPGRADE_STATUS_CORE && empty($project['in_core_complete'])) {
       $icon = theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('warning'), 'title' => t('warning')));

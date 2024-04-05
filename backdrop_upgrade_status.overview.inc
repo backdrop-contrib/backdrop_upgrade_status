@@ -159,12 +159,22 @@ function backdrop_upgrade_status_report() {
                 }
                 break;
               case BACKDROP_UPGRADE_STATUS_STABLE;
-                $backdrop_version = t('Stable :bversion', array(':bversion' => $backdrop_data[$project->name]['latest_version']));
+                $project_name = $backdrop_data[$project->name]['title'];
+                if (isset($backdrop_data[$project->name]['link'])) {
+                  $project_name = l($project_name, $backdrop_data[$project->name]['link']);
+                }
+                $backdrop_version  = $project_name . ' -- ' . t('Stable') . ': ';
+                $backdrop_version .= $backdrop_data[$project->name]['latest_version'];
                 $status = t('Leave enabled.');
                 $recommendation = 'Before upgrade: Add the stable contrib version of :module to Backdrop.';
                 break;
               case BACKDROP_UPGRADE_STATUS_DEVELOPMENT:
-                $backdrop_version = t('In Development :bversion', array(':bversion' => $backdrop_data[$project->name]['latest_version']));
+                $project_name = $backdrop_data[$project->name]['title'];
+                if (isset($backdrop_data[$project->name]['link'])) {
+                  $project_name = l($project_name, $backdrop_data[$project->name]['link']);
+                }
+                $backdrop_version  = $project_name . ' -- ' . t('In Development') . ': ';
+                $backdrop_version .= $backdrop_data[$project->name]['latest_version'];
                 $recommendation = 'Before upgrade: Add the development contrib version of :module to Backdrop.';
                 $class = 'warning';
                 break;
