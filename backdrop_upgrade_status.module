@@ -58,8 +58,7 @@ function backdrop_upgrade_status_cron() {
     return;
   }
 
-  $include_me = 'includes/backdrop_upgrade_status.';
-  module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'fetch');
+  module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.fetch');
   backdrop_upgrade_status_manual_status();
 
   variable_set('backdrop_upgrade_status_last_check', REQUEST_TIME);
@@ -204,8 +203,7 @@ function backdrop_upgrade_status_get_available($refresh = FALSE) {
  * @see _backdrop_upgrade_status_create_fetch_task()
  */
 function backdrop_upgrade_status_create_fetch_task($project) {
-  $include_me = 'includes/backdrop_upgrade_status.';
-  module_load_include('inc', 'backdrop_upgrade_status', $include_me .'fetch');
+  module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.fetch');
   return _backdrop_upgrade_status_create_fetch_task($project);
 }
 
@@ -215,8 +213,7 @@ function backdrop_upgrade_status_create_fetch_task($project) {
  * @see _backdrop_upgrade_status_refresh()
  */
 function backdrop_upgrade_status_refresh() {
-  $include_me = 'includes/backdrop_upgrade_status.';
-  module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'fetch');
+  module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.fetch');
   return _backdrop_upgrade_status_refresh();
 }
 
@@ -226,8 +223,7 @@ function backdrop_upgrade_status_refresh() {
  * @see _backdrop_upgrade_status_fetch_data()
  */
 function backdrop_upgrade_status_fetch_data() {
-  $include_me = 'includes/backdrop_upgrade_status.';
-  module_load_include('inc', 'backdrop_upgrade_status', $include_me . 'fetch');
+  module_load_include('inc', 'backdrop_upgrade_status', 'backdrop_upgrade_status.fetch');
   return _backdrop_upgrade_status_fetch_data();
 }
 
