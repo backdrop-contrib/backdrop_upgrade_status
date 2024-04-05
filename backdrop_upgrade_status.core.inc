@@ -246,6 +246,13 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
       $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
       break;
 
+    case 'entityreference':
+      $data[$project]['in_core_since'] = '1.x';
+      $data[$project]['in_core_note'] = t('Moved into core in v1.23.');
+      $data[$project]['in_core_complete'] = TRUE;
+      $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
+      break;
+
     case 'entity_view_mode':
       $data[$project]['in_core_since'] = '1.x';
       $data[$project]['in_core_note'] = t('Integrated into core Field UI module in v1.6.');
