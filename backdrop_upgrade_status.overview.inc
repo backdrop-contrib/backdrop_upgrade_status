@@ -235,11 +235,13 @@ function backdrop_upgrade_status_report() {
   );
   $renderable['core_modules'] = backdrop_upgrade_status_report_data($core_module_data);
 
+  $prefix = 'No contributed modules detected.';
+  $help = _backdrop_upgrade_status_help($prefix);
   $contrib_module_data = array(
     'title' => t('Enabled Contrib Modules'),
     'info' => t('This is a summary of enabled contributed modules.'),
     'header' => array(t('Module name'), t('Drupal version'), t('Backdrop status'), t('Recommendation')),
-    'empty' => t('No enabled contributed modules have been detected.'),
+    'empty' => $help,
     'collapsed' => $contrib_collapsed,
   );
 
@@ -247,7 +249,6 @@ function backdrop_upgrade_status_report() {
     $contrib_module_data['rows'] = $contrib_module_rows;
   }
   else {
-    $help = _backdrop_upgrade_status_help();
     $contrib_module_data['rows'] = array(array(array('data' => $help, 'colspan' => 4)));
   }
   $renderable['contrib_modules'] = backdrop_upgrade_status_report_data($contrib_module_data);

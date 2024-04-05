@@ -381,12 +381,19 @@ function backdrop_upgrade_status_moved_into_core(&$projects, $project) {
 
 /**
  * Helper function to provide links for generating upgrade status data.
+ *
+ * @param string $prefix
+ *   A message to be added as a prefix for the links.
  */
-function _backdrop_upgrade_status_help() {
-  $destination = drupal_get_destination();
-  $help = t('No Backdrop upgrade information available. <a href="@run_cron">Run cron</a> or <a href="@check_manually">check manually</a>.', array(
-    '@run_cron' => url('admin/reports/status/run-cron', array('query' => $destination)),
-    '@check_manually' => url('admin/reports/updates/backdrop-upgrade/check', array('query' => $destination)),
+function _backdrop_upgrade_status_help($prefix = '') {
+  if ($prefix == '') {
+    $prefix = 'No Backdrop upgrade information available.';
+  }
+  $options = array('query' => drupal_get_destination());
+  $help = t('!prefix <a href="@run_cron">Run cron</a> or <a href="@check_manually">check manually</a>.', array(
+    '!prefix' => $prefix,
+    '@run_cron' => url('admin/reports/status/run-cron', $options),
+    '@check_manually' => url('admin/reports/updates/backdrop-upgrade/check', $options),
   ));
   return $help;
 }
