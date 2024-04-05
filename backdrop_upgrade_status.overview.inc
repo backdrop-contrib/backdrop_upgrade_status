@@ -523,7 +523,7 @@ function _backdrop_upgrade_status_removed_core_modules() {
     ),
     'dashboard' => array(
       'class' => 'warning',
-      'rec' => t('Alternaive core module provided. No action required.'),
+      'rec' => t('Alternative core module provided. Disable and uninstall the Drupal 7 version, then install the provided version on Backdrop after the upgrade.'),
     ),
     'forum' => array(
       'class' => 'warning',
@@ -567,7 +567,7 @@ function _backdrop_upgrade_status_removed_core_modules() {
     ),
     'toolbar' => array(
       'class' => '',
-      'rec' => t('Alternaive core module provided. No action required.'),
+      'rec' => t('Alternative core module provided. No action required.'),
     ),
     'tracker' => array(
       'class' => 'warning', // Warning, because tracker is rarely necessary.
