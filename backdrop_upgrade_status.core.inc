@@ -162,7 +162,7 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
 
     case 'date':
       $data[$project]['in_core_since'] = '1.x';
-      $data[$project]['in_core_note'] = t('Partially moved into core in v1.2.');
+      $data[$project]['in_core_note'] = t('Partially moved into core in v1.2.');
       $data[$project]['in_core_warning'] = t('<a href="@repeat">Date Repeat</a> remains in contrib.', array(
         '@repeat' => 'https://github.com/backdrop-contrib/date_repeat',
       ));
@@ -216,7 +216,8 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
 
     case 'email':
       $data[$project]['in_core_since'] = '1.x';
-      $data[$project]['in_core_note'] = t('Moved into core in v1.2. E-mail address contact forms are not supported by core.');
+      $data[$project]['in_core_note'] = t('Moved into core in v1.2.');
+      $data[$project]['in_core_warning'] = t('E-mail address contact forms are not supported by core.');
       $data[$project]['in_core_complete'] = TRUE;
       $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
       break;
@@ -230,10 +231,11 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
 
     case 'entity':
       $data[$project]['in_core_since'] = '1.x';
-      $data[$project]['in_core_note'] = t('Integrated into core Entity module in v1.0.');
-      $data[$project]['in_core_warning'] = t('The Entity Metadata Wrapper is not included but <a href="@entity_plus">is available in contrib</a>.', array(
-        '@diff' => url('https://github.com/backdrop-contrib/entity_plus'),
+      $data[$project]['in_core_note'] = t('Partially moved into core in v1.0.');
+      $data[$project]['in_core_warning'] = t('See the <a href="@entity_docs">documentation on supplemental contrib modules</a>.', array(
+        '@entity_docs' => url('https://docs.backdropcms.org/documentation/upgrading-drupal-7-modules-with-backdrop-replacements'),
       ));
+      $data[$project]['in_core_complete'] = FALSE;
       $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
       break;
 
