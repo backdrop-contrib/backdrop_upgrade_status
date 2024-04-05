@@ -574,7 +574,7 @@ function _backdrop_upgrade_status_removed_core_modules() {
     ),
     'shortcut' => array(
       'class' => 'warning', // Warning, because shortcut is rarely necessary.
-      'rec' => t('Disable and Uninstall :module, or port to Backdrop.'),
+      'rec' => t('Add the contrib version of :module to Backdrop.'),
     ),
     'statistics' => array(
       'class' => 'warning', // Warning, because statistics is rarely necessary.
