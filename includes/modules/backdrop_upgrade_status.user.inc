@@ -44,7 +44,7 @@ function user_backdrop_upgrade_status_report($todo_status = FALSE) {
 
   $return = array(
     'machine' => 'user',
-    'title' => t('User account data'),
+    'title' => t('User account summary'),
     'info' => t('This is a summary of the user accounts on the site.'),
     'header' => array(t('User accounts'), t('Status'), t('Number of users')),
     'rows' => $rows,

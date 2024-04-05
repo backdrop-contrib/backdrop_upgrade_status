@@ -49,7 +49,7 @@ function taxonomy_backdrop_upgrade_status_report($todo_status = FALSE) {
 
   $return = array(
     'machine' => 'taxonomy',
-    'title' => t('Vocabulary & Term data'),
+    'title' => t('Taxonomy Vocabularies & Terms'),
     'info' => t('Any vocabularies with zero terms could be deleted.'),
     'header' => array(t('Vocabulary'), t('Vocabulary ID'), t('Machine name'), t('Number of terms')),
     'rows' => $rows,

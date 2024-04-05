@@ -94,7 +94,7 @@ function views_backdrop_upgrade_status_report($todo_status = FALSE) {
 
   $return = array(
     'machine' => 'views',
-    'title' => t('Views data'),
+    'title' => t('Views configuration'),
     'info' => t('All views should show STORAGE STATE as <strong>In database</strong> in order to be properly upgraded into Backdrop CMS. Note: In order to return a view to the database you will first need to make the <em>Save</em> button appear on the Edit View form. On the form, click on any setting to open a modal, then click <em>Cancel</em> to close the modal. The <em>Save</em> should appear at the top right.'),
     'header' => array(t('View name'), t('Machine name'), t('Storage state'), t('Description'), t('Recommendation')),
     'rows' => $rows,
