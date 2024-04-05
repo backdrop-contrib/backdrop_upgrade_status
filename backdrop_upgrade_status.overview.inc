@@ -285,7 +285,7 @@ function backdrop_upgrade_status_report() {
 }
 
 // Include all the
-$path = drupal_get_path('module', 'backdrop_upgrade_status') . '/includes/';
+$path = drupal_get_path('module', 'backdrop_upgrade_status') . '/includes/modules/';
 include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.node.inc');
 include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.field.inc');
 include_once(DRUPAL_ROOT . '/' . $path . 'backdrop_upgrade_status.image.inc');
