@@ -72,7 +72,7 @@ function theme_backdrop_upgrade_status_report($variables) {
   foreach ($data as $project) {
     // Skip future version replacements and this module, which would cause
     // confusion if it showed up.
-    if (isset($project['api_version']) || $project['name'] == 'backdrop_upgrade_status' || $project['name'] == 'drupal') {
+    if (!isset($project['name']) || isset($project['api_version']) || $project['name'] == 'backdrop_upgrade_status' || $project['name'] == 'drupal') {
       continue;
     }
 
@@ -257,7 +257,12 @@ function theme_backdrop_upgrade_status_report($variables) {
       $row .= '<div class="includes">';
       $replacements = array();
       foreach ($project['replaced_by'] as $replacement) {
-        $replacements[] = t('!name @version', array('!name' => l($data[$replacement['name']]['title'], $data[$replacement['name']]['link']), '@version' => $data[$replacement['name']]['recommended']));
+        $replacement_name = $replacement['name'];
+        if (isset($data[$replacement_name]['title'])) {
+          $replacements[] = t('!name @version', array(
+            '!name' => l($data[$replacement_name]['title'], $data[$name]['link']),
+            '@version' => $data[$replacement_name]['recommended']));
+        }
       }
       $replaced = implode(', ', $replacements);
       $row .= t('Replaced by: !replaced', array('!replaced' => $replaced));
@@ -309,14 +314,17 @@ function theme_backdrop_upgrade_status_report($variables) {
 
     $row .= "</div>\n"; // Info div.
 
-    if (!isset($rows[$project['project_type']])) {
-      $rows[$project['project_type']] = array();
+    if (isset($project['project_type'])) {
+      $project_type = $project['project_type'];
+      if (!isset($rows[$project_type])) {
+        $rows[$project_type] = array();
+      }
+      $row_key = isset($project['title']) ? drupal_strtolower($project['title']) : drupal_strtolower($project['name']);
+      $rows[$project['project_type']][$row_key] = array(
+        'class' => array($class),
+        'data' => array($row),
+      );
     }
-    $row_key = isset($project['title']) ? drupal_strtolower($project['title']) : drupal_strtolower($project['name']);
-    $rows[$project['project_type']][$row_key] = array(
-      'class' => array($class),
-      'data' => array($row),
-    );
   }
 
   $project_types = array(
