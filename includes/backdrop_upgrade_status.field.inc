@@ -63,12 +63,14 @@ function field_backdrop_upgrade_status_report($todo_status = FALSE) {
 
         // Add the item count.
         $table = 'field_data_' . $field_name;
-        $count = db_query("SELECT count(entity_id) FROM {" . $table . "}")->fetchField();
-        $rows[$field_name]['data']['count'] = $count;
-        $rows[$field_name]['data']['recommendation'] = '';
-        if ($count == 0) {
-          $rows[$field_name]['class'] = array('warning');
-          $rows[$field_name]['data']['recommendation'] = t('Delete this field?');
+          if (db_table_exists($table)) {
+          $count = db_query("SELECT count(entity_id) FROM {" . $table . "}")->fetchField();
+          $rows[$field_name]['data']['count'] = $count;
+          $rows[$field_name]['data']['recommendation'] = '';
+          if ($count == 0) {
+            $rows[$field_name]['class'] = array('warning');
+            $rows[$field_name]['data']['recommendation'] = t('Delete this field?');
+          }
         }
       }
     }
