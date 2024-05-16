@@ -324,20 +324,6 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
       $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
       break;
 
-    case 'insert':
-      $data[$project]['in_core_since'] = '1.x';
-      $data[$project]['in_core_note'] = t('Integrated into the core CKEditor module in v1.2.');
-      $data[$project]['in_core_complete'] = TRUE;
-      $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
-      break;
-
-    case 'instantfilter':
-      $data[$project]['in_core_since'] = '1.x';
-      $data[$project]['in_core_note'] = t('Replaced by search box on the modules page in v1.0.');
-      $data[$project]['in_core_complete'] = TRUE;
-      $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
-      break;
-
     case 'image_mobile_camera':
       $data[$project]['in_core_since'] = '1.x';
       $data[$project]['in_core_note'] = t('Integrated into the core File module in v1.4.');
@@ -352,6 +338,27 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
       $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
       break;
 
+    case 'insert':
+      $data[$project]['in_core_since'] = '1.x';
+      $data[$project]['in_core_note'] = t('Integrated into the core CKEditor module in v1.2.');
+      $data[$project]['in_core_complete'] = TRUE;
+      $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
+      break;
+
+    case 'instantfilter':
+      $data[$project]['in_core_since'] = '1.x';
+      $data[$project]['in_core_note'] = t('Replaced by search box on the modules page in v1.0.');
+      $data[$project]['in_core_complete'] = TRUE;
+      $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
+      break;
+
+    case 'jquery_update':
+      $data[$project]['in_core_since'] = '1.x';
+      $data[$project]['in_core_note'] = t('integrated into System module in v1.0, User Interface added in v1.26');
+      $data[$project]['in_core_complete'] = TRUE;
+      $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
+      break;
+
     case 'link':
       $data[$project]['in_core_since'] = '1.x';
       $data[$project]['in_core_note'] = t('Moved into core in v1.2.');
@@ -361,7 +368,7 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
 
     case 'linkit':
       $data[$project]['in_core_since'] = '1.x';
-      $data[$project]['in_core_note'] = t('Partially integrated into core.');
+      $data[$project]['in_core_note'] = t('Integrated into Filter modile in v1.16.');
       $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
       break;
 
@@ -483,6 +490,13 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
       $data[$project]['in_core_note'] = t('Integrated into User module in v1.6.');
       $data[$project]['in_core_complete'] = TRUE;
       $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
+      break;
+
+    case 'role_help':
+      $data[$project]['in_core_since'] = '1.x';
+      $data[$project]['in_core_note'] = t('Integrated into User module in v1.24.');
+      $data[$project]['in_core_complete'] = TRUE;
+      $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
       break;
 
     case 'scheduler':
