@@ -18,19 +18,22 @@ function _backdrop_upgrade_status_removed_core_modules() {
   return array(
     'aggregator' => array(
       'class' => 'warning',
-      'rec' => t('Add the contrib version of Aggregator module to Backdrop.'),
+      'rec' => t('Add the contrib version of !module module to Backdrop.',
+        array('!module' => l('Aggregator'), 'https://backdropcms.org/project/aggregator')),
     ),
     'blog' => array(
       'class' => 'error',
-      'rec' => t('Add the contrib version of Blog module to Backdrop.'),
+      'rec' => t('Add the contrib version of !module module to Backdrop.',
+        array('!module' => l('Blog'), 'https://backdropcms.org/project/blog')),
     ),
     'dashboard' => array(
       'class' => 'warning',
       'rec' => t('Alternative core module provided. Disable and uninstall the Drupal 7 version, then install on Backdrop after the upgrade.'),
     ),
     'forum' => array(
-      'class' => 'warning',
-      'rec' => t('Add the contrib version of Forum module to Backdrop.'),
+      'class' => 'error',
+      'rec' => t('Add the contrib version of !module module to Backdrop.',
+        array('!module' => l('Forum'), 'https://backdropcms.org/project/forum')),
     ),
     'help' => array(
       'class' => 'warning', // Warning, because help is rarely necessary.
@@ -50,11 +53,13 @@ function _backdrop_upgrade_status_removed_core_modules() {
     ),
     'poll' => array(
       'class' => 'error',
-      'rec' => t('Add the contrib version of Poll module to Backdrop.'),
+      'rec' => t('Add the contrib version of !module module to Backdrop.',
+        array('!module' => l('Poll'), 'https://backdropcms.org/project/poll')),
     ),
     'profile' => array(
-      'class' => 'warning',
-      'rec' => t('Add the contrib version of Profile module to Backdrop.'),
+      'class' => 'error',
+      'rec' => t('Add the contrib version of !module module to Backdrop.',
+        array('!module' => l('Profile'), 'https://backdropcms.org/project/profile')),
     ),
     'rdf' => array(
       'class' => 'warning', // Warning, because rdf is rarely necessary.
@@ -62,11 +67,13 @@ function _backdrop_upgrade_status_removed_core_modules() {
     ),
     'shortcut' => array(
       'class' => 'warning', // Warning, because shortcut is rarely necessary.
-      'rec' => t('Add the contrib version of Shortcut module to Backdrop.'),
+      'rec' => t('Disable and Uninstall, or add the contrib version of !module module to Backdrop.',
+        array('!module' => l('Shortcut'), 'https://backdropcms.org/project/shortcut')),
     ),
     'statistics' => array(
       'class' => 'warning', // Warning, because statistics is rarely necessary.
-      'rec' => t('Disable and Uninstall Statistics module, or port to Backdrop.'),
+      'rec' => t('Disable and Uninstall, or add the contrib version of !module module to Backdrop.',
+        array('!module' => l('Statistics'), 'https://backdropcms.org/project/statistics')),
     ),
     'toolbar' => array(
       'class' => '',
@@ -77,8 +84,8 @@ function _backdrop_upgrade_status_removed_core_modules() {
       'rec' => t('Disable and Uninstall Tracker module, or port to Backdrop.'),
     ),
     'trigger' => array(
-      'class' => 'warning',
-      'rec' => t('Add the contrib version of Trigger module to Backdrop.'),
-    )
+      'class' => 'warning', // Warning, because trigger is rarely necessary.
+      'rec' => t('Disable and Uninstall Trigger module, or port to Backdrop.'),
+    ),
   );
 }
