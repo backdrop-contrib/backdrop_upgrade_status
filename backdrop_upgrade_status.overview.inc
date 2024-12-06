@@ -268,6 +268,11 @@ function backdrop_upgrade_status_report() {
   // Get current state, don't try to guess.
   $custom_collapsed = backdrop_upgrade_status_get_state('custom_modules');
 
+  // Check if there are any Custom Modules installed.  If not, add this as an empty array.
+  if (!isset($custom_module_rows)) {
+    $custom_module_rows = array();
+  } 
+
   $custom_module_data = array(
     'title' => t('Enabled Custom Modules'),
     'info' => t('This is a summary of enabled custom modules.'),
