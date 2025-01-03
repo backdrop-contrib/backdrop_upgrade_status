@@ -157,7 +157,7 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
         '@url' => 'https://www.drupal.org/project/page_manager',
       ));
       $data[$project]['in_core_warning'] = t('Plugins (replaced by info hooks) and Form Wizard are not supported.');
-      $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
+      $data[$project]['in_core_upgrade_status'] = t('Okay to leave enabled');
       break;
 
     case 'date':
@@ -171,7 +171,7 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
 
     case 'date_popup_authored':
       $data[$project]['in_core_since'] = '1.x';
-      $data[$project]['in_core_note'] = t('Integrated into Date module in v1.2.');
+      $data[$project]['in_core_note'] = t('Integrated into Date module in v1.2.');
       $data[$project]['in_core_complete'] = TRUE;
       $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
       break;
@@ -245,7 +245,7 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
       $data[$project]['in_core_warning'] = t('See <a href="@entitycache">the documentation</a> for more information.', array(
         '@entitycache' => 'https://docs.backdropcms.org/change-records/entity-caching-added-to-core',
       ));
-      $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
+      $data[$project]['in_core_upgrade_status'] = t('Okay to leave enabled');
       break;
 
     case 'entityreference':
@@ -269,6 +269,13 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
         '@views' => 'https://github.com/backdrop/backdrop-issues/issues/151',
       ));
       $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
+      break;
+
+    case 'fast_token_browser':
+      $data[$project]['in_core_since'] = '1.x';
+      $data[$project]['in_core_note'] = t('Integrated into System module in v1.30.');
+      $data[$project]['in_core_complete'] = TRUE;
+      $data[$project]['in_core_upgrade_status'] = t('Okay to leave enabled');
       break;
 
     case 'features':
@@ -312,7 +319,7 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
 
     case 'float_filter':
       $data[$project]['in_core_since'] = '1.x';
-      $data[$project]['in_core_note'] = t('Integrated into the core CKEditor module in v1.2.');
+      $data[$project]['in_core_note'] = t('Integrated into the core CKEditor module in v1.2.');
       $data[$project]['in_core_complete'] = TRUE;
       $data[$project]['in_core_upgrade_status'] = t('Disable and uninstall.');
       break;
@@ -454,7 +461,7 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
       $data[$project]['in_core_since'] = '1.x';
       $data[$project]['in_core_note'] = t('Integrated into core Path module in v1.11.');
       $data[$project]['in_core_complete'] = TRUE;
-      $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
+      $data[$project]['in_core_upgrade_status'] = t('Okay to Leave enabled.');
       break;
 
     case 'placeholder':
@@ -489,7 +496,7 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
       $data[$project]['in_core_since'] = '1.x';
       $data[$project]['in_core_note'] = t('Integrated into User module in v1.6.');
       $data[$project]['in_core_complete'] = TRUE;
-      $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
+      $data[$project]['in_core_upgrade_status'] = t('Okay to leave enabled');
       break;
 
     case 'role_help':
@@ -561,7 +568,7 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
       $data[$project]['in_core_since'] = '1.x';
       $data[$project]['in_core_note'] = t('Replaced by the core Configuration Management system in v1.0.');
       $data[$project]['in_core_complete'] = TRUE;
-      $data[$project]['in_core_upgrade_status'] = t('Leave enabled.');
+      $data[$project]['in_core_upgrade_status'] = t('Okay to leave enabled');
       break;
 
     case 'vertical_tabs_responsive':
