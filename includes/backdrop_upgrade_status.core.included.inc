@@ -84,6 +84,12 @@ function _backdrop_upgrade_status_backdrop_core(&$data, $project) {
       $data[$project]['in_core_complete'] = TRUE;
       break;
 
+    case 'book_cache':
+      $data[$project]['in_core_since'] = '1.x';
+      $data[$project]['in_core_note'] = t('Integrated into core Book module in v1.32.');
+      $data[$project]['in_core_complete'] = TRUE;
+      break;
+
     case 'boolean_formatter':
       $data[$project]['in_core_since'] = '1.x';
       $data[$project]['in_core_note'] = t('Integrated into core List module in v1.15.');
